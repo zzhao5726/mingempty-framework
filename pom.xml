@@ -7,7 +7,7 @@
 
     <groupId>top.mingempty</groupId>
     <artifactId>mingempty-framework</artifactId>
-    <version>${framework-vision}</version>
+    <version>${framework.version}</version>
 
     <packaging>pom</packaging>
 
@@ -16,8 +16,8 @@
     </modules>
 
     <properties>
-        <!--framework-vision -->
-        <framework-vision>1.0.0${changelist}</framework-vision>
+        <!--framework.version -->
+        <framework.version>1.0.0${changelist}</framework.version>
 
         <!--使用的JDK版本-->
         <java.version>21</java.version>

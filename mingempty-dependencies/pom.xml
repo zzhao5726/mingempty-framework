@@ -7,11 +7,11 @@
     <parent>
         <groupId>top.mingempty</groupId>
         <artifactId>mingempty-framework</artifactId>
-        <version>${framework-vision}</version>
+        <version>${framework.version}</version>
     </parent>
 
     <artifactId>mingempty-dependencies</artifactId>
-    <version>${dependencies-vision}</version>
+    <version>${dependencies.version}</version>
 
     <packaging>pom</packaging>
     <modules>
@@ -19,8 +19,8 @@
     </modules>
 
     <properties>
-        <!--dependencies-vision -->
-        <dependencies-vision>${spring-boot.version}_${framework-vision}</dependencies-vision>
+        <!--dependencies.version -->
+        <dependencies.version>${spring-boot.version}_${framework.version}</dependencies.version>
 
 
         <java.version>21</java.version>
@@ -207,6 +207,13 @@
 
 
             <!--👇👇👇👇👇👇👇👇👇👇👇👇👇👇自身项目的依赖start   👇👇👇👇👇👇👇👇👇👇👇👇👇👇-->
+            <!--项目的基础领域模块-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-domain</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
 
         </dependencies>
     </dependencyManagement>
