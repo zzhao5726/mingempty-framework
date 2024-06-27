@@ -14,6 +14,9 @@
     <version>${dependencies-vision}</version>
 
     <packaging>pom</packaging>
+    <modules>
+        <module>../mingempty-domain</module>
+    </modules>
 
     <properties>
         <!--dependencies-vision -->
@@ -51,6 +54,7 @@
 
         <lombok.version>1.18.32</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <swagger-annotations-jakarta.version>2.2.22</swagger-annotations-jakarta.version>
 
     </properties>
 
@@ -190,6 +194,13 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
+            </dependency>
+
+            <!--swagger-annotations-jakarta-->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger-annotations-jakarta.version}</version>
             </dependency>
 
             <!--👆👆👆👆👆👆👆👆👆👆👆👆👆👆第三方项目的依赖start 👆👆👆👆👆👆👆👆👆👆👆👆👆👆-->
