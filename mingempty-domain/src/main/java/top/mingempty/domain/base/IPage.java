@@ -24,10 +24,10 @@ public class IPage {
 
 
     public static IPage build(long pageNo, long pageSize) {
-        IPage IPage = new IPage();
-        IPage.setPageNo(pageNo);
-        IPage.setPageSize(pageSize);
-        return IPage;
+        IPage iPage = new IPage();
+        iPage.setPageNo(pageNo);
+        iPage.setPageSize(pageSize);
+        return iPage;
     }
 
     /**
@@ -51,12 +51,12 @@ public class IPage {
      * 查询起始索引
      */
     @Schema(title = "查询起始索引", description = "查询起始索引")
-    private long startSize = 0;
+    private long startIndex = 0;
     /**
      * 查询起始索引
      */
     @Schema(title = "查询终止索引", description = "查询终止索引")
-    private long endSize = -1;
+    private long endIndex = -1;
 
     /**
      * 是否查询总数量
@@ -88,10 +88,10 @@ public class IPage {
      * 设置查询起始索引
      * 私有化以禁止赋值
      *
-     * @param startSize 起始索引
+     * @param startIndex 起始索引
      */
-    private void setStartSize(long startSize) {
-        this.startSize = startSize;
+    private void setStartIndex(long startIndex) {
+        this.startIndex = startIndex;
     }
 
     /**
@@ -123,24 +123,24 @@ public class IPage {
     /**
      * 获取查询起始索引
      */
-    public long getStartSize() {
-        if (this.startSize < 0) {
-            this.startSize = (this.getPageNo() - 1) * this.getPageSize();
+    public long getStartIndex() {
+        if (this.startIndex < 0) {
+            this.startIndex = (this.getPageNo() - 1) * this.getPageSize();
         }
-        if (this.startSize < 0) {
-            this.startSize = 0;
+        if (this.startIndex < 0) {
+            this.startIndex = 0;
         }
-        return this.startSize;
+        return this.startIndex;
     }
 
-    public long getEndSize() {
-        if (this.endSize == 0) {
-            this.endSize = this.getStartSize() + this.getPageSize() - 1;
+    public long getEndIndex() {
+        if (this.endIndex == 0) {
+            this.endIndex = this.getStartIndex() + this.getPageSize() - 1;
         }
-        if (this.endSize < -1) {
-            this.endSize = -1L;
+        if (this.endIndex < -1) {
+            this.endIndex = -1L;
         }
-        return this.endSize;
+        return this.endIndex;
     }
 
     public long getTotal() {
