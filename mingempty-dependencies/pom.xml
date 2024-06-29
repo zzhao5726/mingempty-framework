@@ -16,6 +16,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>../mingempty-domain</module>
+        <module>../mingempty-commons</module>
+        <module>../mingempty-cloud-spring-boot3-starter</module>
     </modules>
 
     <properties>
@@ -55,6 +57,8 @@
         <lombok.version>1.18.32</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <swagger-annotations-jakarta.version>2.2.22</swagger-annotations-jakarta.version>
+        <hutool.version>5.8.28</hutool.version>
+        <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
 
     </properties>
 
@@ -203,14 +207,43 @@
                 <version>${swagger-annotations-jakarta.version}</version>
             </dependency>
 
+            <!--hutool-all-->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <!--ttl-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId>
+                <version>${transmittable-thread-local.version}</version>
+            </dependency>
+
+
             <!--👆👆👆👆👆👆👆👆👆👆👆👆👆👆第三方项目的依赖start 👆👆👆👆👆👆👆👆👆👆👆👆👆👆-->
 
 
             <!--👇👇👇👇👇👇👇👇👇👇👇👇👇👇自身项目的依赖start   👇👇👇👇👇👇👇👇👇👇👇👇👇👇-->
-            <!--项目的基础领域模块-->
+            <!--基础领域模块-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-domain</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!--基础工具类-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-commons</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!--对spring的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-cloud-spring-boot3-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
