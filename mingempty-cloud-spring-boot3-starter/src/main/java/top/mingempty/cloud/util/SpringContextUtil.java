@@ -1,5 +1,6 @@
 package top.mingempty.cloud.util;
 
+import cn.hutool.core.map.MapUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
@@ -12,12 +13,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.lang.Nullable;
-import org.springframework.util.ClassUtils;
 import top.mingempty.commons.util.StringUtil;
 
 import java.beans.Introspector;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Spring ApplicationContext 工具类
@@ -127,9 +130,37 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
         return getApplicationContext().getBean(name, clazz);
     }
 
-    public static <T> Map<String, T> getBeansOfType(Class<T> baseType) {
+
+    /**
+     * 获取指定类型的所有bean
+     *
+     * @param baseType
+     * @param <T>
+     * @return
+     */
+    public static <T> Map<String, T> getBeanMapOfType(Class<T> baseType) {
         return APPLICATION_CONTEXT.getBeansOfType(baseType);
     }
+
+    /**
+     * 获取指定类型的所有bean
+     *
+     * @param baseType
+     * @param <T>
+     * @return
+     */
+    public static <T> List<T> getBeanListOfType(Class<T> baseType) {
+        Map<String, T> beanMapOfType = getBeanMapOfType(baseType);
+        if (MapUtil.isEmpty(beanMapOfType)) {
+            return Collections.emptyList();
+        }
+        return beanMapOfType
+                .entrySet()
+                .parallelStream()
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
+    }
+
 
     /**
      * 注册bean
