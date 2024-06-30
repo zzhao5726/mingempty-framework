@@ -32,7 +32,10 @@
         <!--plugin version-->
         <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
+        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
 
+        <!--指定保存的maven编译时间戳格式-->
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss.SSS</maven.build.timestamp.format>
     </properties>
 
     <build>
@@ -47,6 +50,7 @@
                 </configuration>
             </plugin>
 
+            <!--maven版本占位符替换-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
@@ -73,7 +77,33 @@
                 </executions>
             </plugin>
 
+            <!--构建增强-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <name>current.time</name>
+                    <pattern>yyyy-MM-dd HH:mm:ss.SSS</pattern>
+                    <timeZone>GMT+8</timeZone>
+                </configuration>
+            </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
 
