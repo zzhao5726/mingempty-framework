@@ -230,21 +230,21 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-domain</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--基础工具类-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-commons</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--对spring的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-cloud-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
 
@@ -295,7 +295,6 @@
                         <arg>-parameters</arg>
                     </compilerArgs>
                 </configuration>
-
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
