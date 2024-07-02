@@ -1,0 +1,4 @@
+# Environment Post Processors
+org.springframework.boot.env.EnvironmentPostProcessor=\
+top.mingempty.cloud.postprocessor.EnAndDeCryptionEnvironmentPostProcessor,\
+top.mingempty.cloud.postprocessor.ApplicationEnvironmentPostProcessor

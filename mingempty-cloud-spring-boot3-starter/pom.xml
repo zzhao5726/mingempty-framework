@@ -54,6 +54,12 @@
             <artifactId>aspectjweaver</artifactId>
         </dependency>
 
+        <!--jakarta.servlet-api-->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+        </dependency>
+
         <!--第三方依赖👆  项目自身依赖👇-->
 
         <!--基础工具类-->
