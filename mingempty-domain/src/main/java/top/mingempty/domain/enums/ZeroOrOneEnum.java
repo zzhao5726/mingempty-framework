@@ -6,7 +6,8 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 是否-01枚举
@@ -45,14 +46,9 @@ public enum ZeroOrOneEnum {
     private final String itemName;
 
     private final static Map<String, ZeroOrOneEnum> ZERO_OR_ONE_ENUM_OPTIONAL_MAP =
-            new ConcurrentHashMap<>(ZeroOrOneEnum.values().length) {
-                {
-                    Arrays.stream(ZeroOrOneEnum.values())
-                            .parallel()
-                            .forEach(zeroOrOneEnum
-                                    -> ZERO_OR_ONE_ENUM_OPTIONAL_MAP.put(zeroOrOneEnum.getItemCode(), zeroOrOneEnum));
-                }
-            };
+            Arrays.stream(ZeroOrOneEnum.values())
+                    .parallel()
+                    .collect(Collectors.toMap(ZeroOrOneEnum::getItemCode, Function.identity()));
 
     /**
      * 通过编码查找

@@ -18,6 +18,7 @@
         <module>../mingempty-domain</module>
         <module>../mingempty-commons</module>
         <module>../mingempty-cloud-spring-boot3-starter</module>
+        <module>../mingempty-trace</module>
     </modules>
 
     <properties>
@@ -240,10 +241,31 @@
                 <version>${dependencies.version}</version>
             </dependency>
 
-            <!--对spring的封装-->
+            <!--对spring的封装starter-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-cloud-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--trace链路封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-trace</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--trace链路信息发送封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-trace-api-record</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--trace链路封装starter-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-trace-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
@@ -326,7 +348,7 @@
                         <version>${maven-source-plugin.version}</version>
                         <executions>
                             <execution>
-                                <phase>package</phase>
+                                <phase>deploy</phase>
                                 <goals>
                                     <goal>jar-no-fork</goal>
                                 </goals>

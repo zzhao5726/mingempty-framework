@@ -6,7 +6,8 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 是否启用枚举
@@ -44,15 +45,12 @@ public enum EnabledOrNotEnum {
     @Schema(title = "字典项名称")
     private final String itemName;
 
+
+
     private final static Map<String, EnabledOrNotEnum> ENABLED_OR_NOT_ENUM_OPTIONAL_MAP =
-            new ConcurrentHashMap<>(EnabledOrNotEnum.values().length) {
-                {
-                    Arrays.stream(EnabledOrNotEnum.values())
-                            .parallel()
-                            .forEach(enabledOrNotEnum
-                                    -> ENABLED_OR_NOT_ENUM_OPTIONAL_MAP.put(enabledOrNotEnum.getItemCode(), enabledOrNotEnum));
-                }
-            };
+            Arrays.stream(EnabledOrNotEnum.values())
+                    .parallel()
+                    .collect(Collectors.toMap(EnabledOrNotEnum::getItemCode, Function.identity()));
 
 
     /**
