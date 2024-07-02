@@ -6,7 +6,8 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 是否-YN枚举
@@ -45,14 +46,9 @@ public enum YesOrNoEnum {
     private final String itemName;
 
     private final static Map<String, YesOrNoEnum> YES_OR_NO_ENUM_OPTIONAL_MAP =
-            new ConcurrentHashMap<>(YesOrNoEnum.values().length) {
-                {
-                    Arrays.stream(YesOrNoEnum.values())
-                            .parallel()
-                            .forEach(yesOrNoEnum
-                                    -> YES_OR_NO_ENUM_OPTIONAL_MAP.put(yesOrNoEnum.getItemCode(), yesOrNoEnum));
-                }
-            };
+            Arrays.stream(YesOrNoEnum.values())
+                    .parallel()
+                    .collect(Collectors.toMap(YesOrNoEnum::getItemCode, Function.identity()));
 
     /**
      * 通过编码查找

@@ -5,7 +5,8 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 内置字典条目枚举
@@ -55,15 +56,9 @@ public enum BuiltInDictEntryEnum {
     }
 
     private final static Map<String, BuiltInDictEntryEnum> BUILT_IN_DICT_ENTRY_ENUM_OPTIONAL_MAP =
-            new ConcurrentHashMap<>(BuiltInDictEntryEnum.values().length) {
-                {
-                    Arrays.stream(BuiltInDictEntryEnum.values())
-                            .parallel()
-                            .forEach(builtInDictEntryEnum
-                                    -> BUILT_IN_DICT_ENTRY_ENUM_OPTIONAL_MAP.put(builtInDictEntryEnum.getEntryCode(),
-                                    builtInDictEntryEnum));
-                }
-            };
+            Arrays.stream(BuiltInDictEntryEnum.values())
+                    .parallel()
+                    .collect(Collectors.toMap(BuiltInDictEntryEnum::getEntryCode, Function.identity()));
 
     /**
      * 判断是否是内置条目编码
