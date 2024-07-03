@@ -10,14 +10,14 @@
         <version>${framework.version}</version>
     </parent>
 
-    <artifactId>mingempty-dependencies</artifactId>
+    <artifactId>spring-cloud-mingempty-dependencies</artifactId>
     <version>${dependencies.version}</version>
 
     <packaging>pom</packaging>
     <modules>
         <module>../mingempty-domain</module>
         <module>../mingempty-commons</module>
-        <module>../mingempty-cloud-spring-boot3-starter</module>
+        <module>../mingempty-commons-spring-boot3-starter</module>
         <module>../mingempty-trace</module>
     </modules>
 
@@ -244,7 +244,7 @@
             <!--对spring的封装starter-->
             <dependency>
                 <groupId>top.mingempty</groupId>
-                <artifactId>mingempty-cloud-spring-boot3-starter</artifactId>
+                <artifactId>mingempty-commons-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
