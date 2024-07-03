@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>mingempty-dependencies</module>
+        <module>spring-cloud-mingempty-dependencies</module>
     </modules>
 
     <properties>
