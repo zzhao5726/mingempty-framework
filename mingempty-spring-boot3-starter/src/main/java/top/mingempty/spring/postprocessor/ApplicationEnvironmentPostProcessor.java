@@ -25,7 +25,7 @@ public class ApplicationEnvironmentPostProcessor implements EnvironmentPostProce
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         String appName = StringUtil.null2Str(StringUtil
                 .null2Str(environment.getProperty("me.name"),
-                        environment.getProperty("spring.application.name")), "mingempty");
+                        environment.getProperty("spring.application.namespring.application.name")), "mingempty");
         String appGroup = StringUtil.null2Str(StringUtil
                 .null2Str(environment.getProperty("me.group"),
                         environment.getProperty("spring.application.group")), "g");
