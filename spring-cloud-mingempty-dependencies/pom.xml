@@ -17,7 +17,7 @@
     <modules>
         <module>../mingempty-domain</module>
         <module>../mingempty-commons</module>
-        <module>../mingempty-commons-spring-boot3-starter</module>
+        <module>../mingempty-spring-boot3-starter</module>
         <module>../mingempty-trace</module>
     </modules>
 
@@ -244,7 +244,7 @@
             <!--对spring的封装starter-->
             <dependency>
                 <groupId>top.mingempty</groupId>
-                <artifactId>mingempty-commons-spring-boot3-starter</artifactId>
+                <artifactId>mingempty-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
@@ -348,7 +348,7 @@
                         <version>${maven-source-plugin.version}</version>
                         <executions>
                             <execution>
-                                <phase>deploy</phase>
+                                <phase>install</phase>
                                 <goals>
                                     <goal>jar-no-fork</goal>
                                 </goals>

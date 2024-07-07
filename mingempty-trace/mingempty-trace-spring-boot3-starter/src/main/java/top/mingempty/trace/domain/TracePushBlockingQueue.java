@@ -4,14 +4,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import top.mingempty.cloud.util.SpringContextUtil;
+import top.mingempty.spring.util.SpringContextUtil;
 import top.mingempty.domain.enums.ParameteTypeEnum;
+import top.mingempty.commons.trace.TraceContext;
+import top.mingempty.commons.trace.enums.ProtocolEnum;
+import top.mingempty.commons.trace.enums.SpanTypeEnum;
 import top.mingempty.trace.adapter.TraceRecordPushAdapter;
-import top.mingempty.trace.constants.ProtocolEnum;
-import top.mingempty.trace.constants.SpanTypeEnum;
 
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 日志队列
@@ -20,7 +25,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 @Slf4j
 @AllArgsConstructor
-public class TracePushBlockingQueue implements InitializingBean {
+public class TracePushBlockingQueue implements InitializingBean, DisposableBean {
 
     /**
      * 消息队列
@@ -57,16 +62,35 @@ public class TracePushBlockingQueue implements InitializingBean {
      */
     private static TracePushBlockingQueue TRACE_PUSH_BLOCKING_QUEUE;
 
+    /**
+     * 设置一个默认的ForkJoinPool，用于获取消息并推送至适配器
+     */
+    private static ForkJoinPool FORK_JOIN_POOL;
+
 
     /**
-     * 接受链路数据，并做转换
+     * 链路数据转换，并将信息发送出去
      *
      * @param traceContext
      * @param parameteTypeEnum
      * @param parameter
      */
     public static void offer(TraceContext traceContext, ParameteTypeEnum parameteTypeEnum, Object parameter) {
-        if (traceContext == null) {
+        offer(traceContext, parameteTypeEnum, parameter, null);
+    }
+
+    /**
+     * 链路数据转换，并将信息发送出去
+     *
+     * @param traceContext
+     * @param parameteTypeEnum
+     * @param parameter
+     * @param timeConsuming
+     */
+    public static void offer(TraceContext traceContext, ParameteTypeEnum parameteTypeEnum, Object parameter,
+                             Long timeConsuming) {
+        if (TRACE_PUSH_BLOCKING_QUEUE == null
+                || traceContext == null) {
             return;
         }
         String traceId = traceContext.getTraceId();
@@ -76,7 +100,6 @@ public class TracePushBlockingQueue implements InitializingBean {
         String functionName = traceContext.getFunctionName();
         ProtocolEnum protocolEnum = traceContext.getProtocolEnum();
         SpanTypeEnum spanTypeEnum = traceContext.getSpanTypeEnum();
-        long timeConsuming = traceContext.timeConsuming();
         Message.MessageBuilder messageBuilder = Message.builder()
                 .currentThreadId(currentThreadId)
                 .currentThreadName(currentThreadName)
@@ -147,15 +170,43 @@ public class TracePushBlockingQueue implements InitializingBean {
      */
     @Override
     public void afterPropertiesSet() throws Exception {
-        //初始化后开始消费
-        for (int i = 0; i < Runtime.getRuntime().availableProcessors() / 2; i++) {
-            new Thread(() -> {
-                while (true) {
-                    traceRecordPushAdapter.push(takeFirst());
-                }
-            }, String.format("TracePush-%d", i))
-                    .start();
-        }
         TRACE_PUSH_BLOCKING_QUEUE = this;
+        FORK_JOIN_POOL = new ForkJoinPool(
+                Runtime.getRuntime().availableProcessors() / 2,
+                new ForkJoinPool.ForkJoinWorkerThreadFactory() {
+                    final AtomicInteger counter = new AtomicInteger();
+
+                    @Override
+                    public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
+                        ForkJoinWorkerThread thread = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+                        thread.setName("Trace-Push-" + counter.incrementAndGet());
+                        return thread;
+                    }
+                },
+                null,
+                true
+        );
+        FORK_JOIN_POOL.execute(() -> {
+            while (true) {
+                try {
+                    traceRecordPushAdapter.push(takeFirst());
+                } catch (Exception e) {
+                    log.error("链路数据出队异常", e);
+                }
+            }
+        });
+    }
+
+    /**
+     * Invoked by the containing {@code BeanFactory} on destruction of a bean.
+     *
+     * @throws Exception in case of shutdown errors. Exceptions will get logged
+     *                   but not rethrown to allow other beans to release their resources as well.
+     */
+    @Override
+    public void destroy() throws Exception {
+        if (FORK_JOIN_POOL != null) {
+            FORK_JOIN_POOL.shutdown();
+        }
     }
 }

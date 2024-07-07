@@ -8,9 +8,9 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-import top.mingempty.trace.constants.ProtocolEnum;
-import top.mingempty.trace.constants.SpanTypeEnum;
-import top.mingempty.trace.constants.TraceConstant;
+import top.mingempty.commons.trace.constants.TraceConstant;
+import top.mingempty.commons.trace.enums.ProtocolEnum;
+import top.mingempty.commons.trace.enums.SpanTypeEnum;
 import top.mingempty.trace.util.TraceAdapterUtil;
 
 /**
@@ -40,14 +40,15 @@ public class TraceFluxFilter implements WebFilter {
                 String spanId = headers.getFirst(TraceConstant.SPAN_ID);
                 String requestUrl = requestPath.value();
                 // TODO 请求参数待定
-                TraceAdapterUtil.initTraceContext(requestUrl, traceId, spanId, ProtocolEnum.HTTP, SpanTypeEnum.NORMAL, "");
+                TraceAdapterUtil.initTraceContext(requestUrl, traceId, spanId, ProtocolEnum.HTTP, SpanTypeEnum.NORMAL,
+                        "");
             } catch (Exception e) {
                 log.debug("链路初始化异常", e);
             }
             return chain.filter(exchange);
         } finally {
             // TODO 响应参数待定
-            TraceAdapterUtil.clearTraceContext();
+            TraceAdapterUtil.endTraceContext(null);
         }
     }
 }
