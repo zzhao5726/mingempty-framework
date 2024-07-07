@@ -8,7 +8,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import top.mingempty.commons.util.StringUtil;
 
 /**
- * 系统基础信息增强
+ * 系统基础信息配置增强
  *
  * @author zzhao
  */
@@ -32,13 +32,19 @@ public class ApplicationEnvironmentPostProcessor implements EnvironmentPostProce
         String appVersion = StringUtil.null2Str(StringUtil
                 .null2Str(environment.getProperty("me.version"),
                         environment.getProperty("spring.application.version")), "v");
+        String basePath = StringUtil.null2Str(StringUtil
+                .null2Str(environment.getProperty("server.servlet.context-path"),
+                        environment.getProperty("spring.webflux.base-path")), "/mingempty");
         environment.getSystemProperties().put("me.name", appName);
         environment.getSystemProperties().put("spring.application.name", appName);
         environment.getSystemProperties().put("me.group", appGroup);
         environment.getSystemProperties().put("spring.application.group", appGroup);
         environment.getSystemProperties().put("me.version", appVersion);
         environment.getSystemProperties().put("spring.application.version", appVersion);
-        log.debug("系统基础信息增强。appName:[{}],appGroup:[{}],appVersion:[{}]", appName, appGroup, appVersion);
+        environment.getSystemProperties().put("server.servlet.context-path", basePath);
+        environment.getSystemProperties().put("spring.webflux.base-path", basePath);
+        log.debug("系统基础信息增强。appName:[{}],appGroup:[{}],appVersion:[{}],basePath:[{}]",
+                appName, appGroup, appVersion, basePath);
     }
 
     /**
