@@ -9,7 +9,9 @@ import top.mingempty.domain.other.DatePattern;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 请求响应公共参数
@@ -51,5 +53,32 @@ public class BaseHeaderModel implements Serializable {
      * 分页参数数据模型
      */
     @Schema(title = "分页参数数据模型", description = "分页参数数据模型")
-    private IPage IPage;
+    private IPage iPage;
+
+    /**
+     * 其他参数
+     */
+    @Schema(title = "其他参数", description = "其他参数")
+    private Map<String, Object> parameters = new ConcurrentHashMap<>(2);
+
+
+    /**
+     * 设置参数
+     *
+     * @param key   key
+     * @param value value
+     */
+    public void putParameter(String key, Object value) {
+        parameters.put(key, value);
+    }
+
+    /**
+     * 获取参数
+     *
+     * @param key key
+     * @return value
+     */
+    public Object getParameter(String key) {
+        return parameters.get(key);
+    }
 }

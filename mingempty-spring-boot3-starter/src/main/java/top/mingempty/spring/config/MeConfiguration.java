@@ -1,9 +1,13 @@
 package top.mingempty.spring.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import top.mingempty.spring.domain.MeProperties;
 import top.mingempty.spring.util.BeanFactoryUtil;
 import top.mingempty.spring.util.EnvironmentUtil;
 import top.mingempty.spring.util.MessageSourceUtil;
@@ -14,7 +18,10 @@ import top.mingempty.spring.util.SpringContextUtil;
  *
  * @author zzhao
  */
-public class CloudConfiguration implements Ordered {
+@EnableConfigurationProperties(MeProperties.class)
+@ComponentScan(basePackages = "top.mingempty.spring.advice")
+@ConditionalOnProperty(prefix = "me",name = "enabled", havingValue = "true", matchIfMissing = true)
+public class MeConfiguration implements Ordered {
 
     @Bean
     @ConditionalOnMissingBean(name = "springContextUtil")

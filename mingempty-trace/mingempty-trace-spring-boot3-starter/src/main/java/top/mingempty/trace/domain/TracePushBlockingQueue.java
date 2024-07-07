@@ -6,11 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import top.mingempty.spring.util.SpringContextUtil;
-import top.mingempty.domain.enums.ParameteTypeEnum;
 import top.mingempty.commons.trace.TraceContext;
 import top.mingempty.commons.trace.enums.ProtocolEnum;
 import top.mingempty.commons.trace.enums.SpanTypeEnum;
+import top.mingempty.domain.enums.ParameteTypeEnum;
+import top.mingempty.spring.util.SpringContextUtil;
 import top.mingempty.trace.adapter.TraceRecordPushAdapter;
 
 import java.util.concurrent.ForkJoinPool;
@@ -125,7 +125,7 @@ public class TracePushBlockingQueue implements InitializingBean, DisposableBean 
         try {
             return MESSAGE_BLOCKING_QUEUE.takeFirst();
         } catch (InterruptedException e) {
-            log.error("链路队列等待出队中断", e);
+            log.warn("链路队列等待出队中断",e);
             return null;
         }
     }

@@ -1,8 +1,8 @@
 package top.mingempty.trace.util;
 
+import top.mingempty.commons.trace.TraceContext;
 import top.mingempty.commons.util.IpUtils;
 import top.mingempty.commons.util.ProcessUtil;
-import top.mingempty.commons.trace.TraceContext;
 
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
