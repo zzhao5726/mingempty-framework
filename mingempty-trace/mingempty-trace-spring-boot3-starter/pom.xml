@@ -48,7 +48,7 @@
         <!--对spring的封装starter-->
         <dependency>
             <groupId>top.mingempty</groupId>
-            <artifactId>mingempty-commons-spring-boot3-starter</artifactId>
+            <artifactId>mingempty-spring-boot3-starter</artifactId>
         </dependency>
     </dependencies>
 

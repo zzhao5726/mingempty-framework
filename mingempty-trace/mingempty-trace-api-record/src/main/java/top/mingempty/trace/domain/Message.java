@@ -108,7 +108,7 @@ public class Message implements Serializable {
      * 接口耗时
      */
     @Schema(title = "接口耗时")
-    private final long timeConsuming;
+    private final Long timeConsuming;
 
 
 }

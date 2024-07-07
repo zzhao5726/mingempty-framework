@@ -9,9 +9,9 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
-import top.mingempty.trace.constants.ProtocolEnum;
-import top.mingempty.trace.constants.SpanTypeEnum;
-import top.mingempty.trace.constants.TraceConstant;
+import top.mingempty.commons.trace.constants.TraceConstant;
+import top.mingempty.commons.trace.enums.ProtocolEnum;
+import top.mingempty.commons.trace.enums.SpanTypeEnum;
 import top.mingempty.trace.util.TraceAdapterUtil;
 
 import java.io.IOException;
@@ -31,11 +31,12 @@ public class TraceMvcFilter implements Filter, Ordered {
             try {
                 //初始化TraceContext
                 HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-                String requestUrl =httpServletRequest.getRequestURI();
+                String requestUrl = httpServletRequest.getRequestURI();
                 String traceId = httpServletRequest.getHeader(TraceConstant.TRACE_ID);
                 String spanId = httpServletRequest.getHeader(TraceConstant.SPAN_ID);
                 // TODO 请求参数待定
-                TraceAdapterUtil.initTraceContext(requestUrl, traceId, spanId, ProtocolEnum.HTTP, SpanTypeEnum.NORMAL, "");
+                TraceAdapterUtil.initTraceContext(requestUrl, traceId, spanId, ProtocolEnum.HTTP, SpanTypeEnum.NORMAL,
+                        null);
             } catch (Exception e) {
                 log.debug("链路初始化异常", e);
             }
@@ -43,7 +44,7 @@ public class TraceMvcFilter implements Filter, Ordered {
             filterChain.doFilter(servletRequest, servletResponse);
         } finally {
             // TODO 响应参数待定
-            TraceAdapterUtil.clearTraceContext();
+            TraceAdapterUtil.endTraceContext(null);
         }
     }
 

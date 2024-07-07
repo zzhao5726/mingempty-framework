@@ -36,22 +36,21 @@ public class DefaultTraceRecordPushAdapter implements TraceRecordPushAdapter {
         LocalDateTime traceTime = message.getNow();
         int protocolCode = message.getProtocolCode();
         int spanType = message.getSpanType();
-        long timeConsuming = message.getTimeConsuming();
         String parameter = JacksonUtil.toStr(message.getParameter());
         switch (message.getParameteTypeEnum()) {
             case ParameteTypeEnum.REQUEST -> {
-                log.debug("消息链路记录发送默认实现---appName:[{}],appGroup:[{}],appVersion:[{}],traceId:[{}],spanId:[{}]," +
+                log.debug("消息链路记录发送默认实现---链路开始---appName:[{}],appGroup:[{}],appVersion:[{}],traceId:[{}],spanId:[{}]," +
                                 "traceThreadId:[{}],traceThreadName:[{}],traceFunctionName:[{}],traceStartTime:[{}]," +
                                 "protocolCode:[{}],spanType:[{}],requestParameter:[{}]",
                         appName, appGroup, appVersion, traceId, spanId, currentThreadId, currentThreadName,
                         functionName, traceTime, protocolCode, spanType, parameter);
             }
             case ParameteTypeEnum.RESPONSE -> {
-                log.debug("消息链路记录发送默认实现---appName:[{}],appGroup:[{}],appVersion:[{}],traceId:[{}],spanId:[{}]," +
+                log.debug("消息链路记录发送默认实现---链路结束---appName:[{}],appGroup:[{}],appVersion:[{}],traceId:[{}],spanId:[{}]," +
                                 "traceThreadId:[{}],traceThreadName:[{}],traceFunctionName:[{}],traceEndTime:[{}]," +
                                 "protocolCode:[{}],spanType:[{}],timeConsuming:[{}],responseParameter:[{}]",
                         appName, appGroup, appVersion, traceId, spanId, currentThreadId, currentThreadName,
-                        functionName, traceTime, protocolCode, spanType, timeConsuming, parameter);
+                        functionName, traceTime, protocolCode, spanType, message.getTimeConsuming(), parameter);
             }
         }
     }
