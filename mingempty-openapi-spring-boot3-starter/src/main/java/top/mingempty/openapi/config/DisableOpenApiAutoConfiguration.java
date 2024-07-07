@@ -1,7 +1,5 @@
 package top.mingempty.openapi.config;
 
-import org.springdoc.core.configuration.SpringDocConfiguration;
-import org.springdoc.webmvc.ui.SwaggerConfig;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +10,8 @@ import org.springframework.context.annotation.Configuration;
  * @author zzhao
  */
 @Configuration
-@EnableAutoConfiguration(exclude = {SwaggerConfig.class, SpringDocConfiguration.class})
+@EnableAutoConfiguration(excludeName = {"org.springdoc.webflux.ui.SwaggerConfig",
+        "org.springdoc.webflux.ui.SwaggerConfig", "org.springdoc.core.configuration.SpringDocConfiguration"})
 @ConditionalOnProperty(prefix = "me.openapi", name = "enabled", havingValue = "false", matchIfMissing = true)
 public class DisableOpenApiAutoConfiguration {
 
