@@ -1,6 +1,7 @@
 package top.mingempty.trace.filter;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.RequestPath;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -19,7 +20,7 @@ import top.mingempty.trace.util.TraceAdapterUtil;
  * @author zzhao
  */
 @Slf4j
-public class TraceFluxFilter implements WebFilter {
+public class TraceFluxFilter implements WebFilter, Ordered {
     /**
      * Process the Web request and (optionally) delegate to the next
      * {@code WebFilter} through the given {@link WebFilterChain}.
@@ -50,5 +51,22 @@ public class TraceFluxFilter implements WebFilter {
             // TODO 响应参数待定
             TraceAdapterUtil.endTraceContext(null);
         }
+    }
+
+    /**
+     * Get the order value of this object.
+     * <p>Higher values are interpreted as lower priority. As a consequence,
+     * the object with the lowest value has the highest priority (somewhat
+     * analogous to Servlet {@code load-on-startup} values).
+     * <p>Same order values will result in arbitrary sort positions for the
+     * affected objects.
+     *
+     * @return the order value
+     * @see #HIGHEST_PRECEDENCE
+     * @see #LOWEST_PRECEDENCE
+     */
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 }

@@ -2,12 +2,14 @@ package top.mingempty.commons.trace;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.MDC;
 import top.mingempty.commons.data.StopWatch;
 import top.mingempty.commons.trace.constants.TraceConstant;
 import top.mingempty.commons.trace.enums.ProtocolEnum;
 import top.mingempty.commons.trace.enums.SpanTypeEnum;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,6 +25,14 @@ public class TraceContext {
      */
     @Schema(title = "当前线程链路数据")
     private final static ThreadLocal<TraceContext> TRACE_CONTEXT_THREAD_LOCAL = new ThreadLocal<>();
+
+    /**
+     * 当前链路地理、政治或文化区域
+     */
+    @Setter
+    @Getter
+    @Schema(title = "当前链路地理、政治或文化区域")
+    private volatile Locale locale = Locale.getDefault();
 
     /**
      * 线程ID
@@ -259,6 +269,7 @@ public class TraceContext {
         TraceContext traceContext = new TraceContext(this.functionName, this.traceId, this.spanId, this.spanCount,
                 new AtomicInteger(1), this.protocolEnum, spanTypeEnum);
         traceContext.oldSpan = true;
+        traceContext.locale = this.locale;
         return traceContext;
     }
 }
