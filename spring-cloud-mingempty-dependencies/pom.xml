@@ -19,6 +19,7 @@
         <module>../mingempty-commons</module>
         <module>../mingempty-spring-boot3-starter</module>
         <module>../mingempty-trace</module>
+        <module>../mingempty-event-spring-boot3-starter</module>
     </modules>
 
     <properties>
@@ -266,6 +267,13 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-trace-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对event事件的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-event-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
