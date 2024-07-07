@@ -20,6 +20,7 @@
         <module>../mingempty-spring-boot3-starter</module>
         <module>../mingempty-trace</module>
         <module>../mingempty-event-spring-boot3-starter</module>
+        <module>../mingempty-openapi-spring-boot3-starter</module>
     </modules>
 
     <properties>
@@ -61,6 +62,7 @@
         <swagger-annotations-jakarta.version>2.2.22</swagger-annotations-jakarta.version>
         <hutool.version>5.8.28</hutool.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
+        <springdoc-openapi-starte.version>2.6.0</springdoc-openapi-starte.version>
 
     </properties>
 
@@ -209,6 +211,20 @@
                 <version>${swagger-annotations-jakarta.version}</version>
             </dependency>
 
+            <!--openapi-webmvc-->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc-openapi-starte.version}</version>
+            </dependency>
+
+            <!--openapi-webflux-->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+                <version>${springdoc-openapi-starte.version}</version>
+            </dependency>
+
             <!--hutool-all-->
             <dependency>
                 <groupId>cn.hutool</groupId>
@@ -274,6 +290,13 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-event-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对openapi的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-openapi-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
