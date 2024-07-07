@@ -5,8 +5,10 @@ import jakarta.servlet.ServletException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,6 +17,7 @@ import top.mingempty.commons.trace.TraceContext;
 import top.mingempty.commons.trace.constants.TraceConstant;
 import top.mingempty.domain.base.IRsp;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -61,6 +64,13 @@ public class GloableExceptionAdvice implements Ordered {
                 message = exception.getMessage();
             }
             case ExpressionException expressionException -> log.error("表达式解析异常，异常原因:", expressionException);
+            case ErrorResponse errorResponse -> {
+                log.error("ErrorResponse异常，异常原因:", exception);
+                if (Objects.equals(HttpStatus.NOT_FOUND.value(), errorResponse.getStatusCode().value())) {
+                    return IRsp.notFound();
+                }
+                return IRsp.failed();
+            }
             case ServletException servletException -> {
                 Throwable rootCause = servletException.getRootCause();
                 if (rootCause != null) {
