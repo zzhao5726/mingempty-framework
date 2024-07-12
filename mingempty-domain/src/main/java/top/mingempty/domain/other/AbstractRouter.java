@@ -5,9 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 路由抽象类
@@ -15,13 +17,13 @@ import java.util.Objects;
  * @author zzhao
  */
 @Slf4j
+@Getter
 public abstract class AbstractRouter<T> {
 
     /**
      * 指定在找不到当前查找键的特定路由时，是否对默认路由应用宽松回退。
      */
     @Setter
-    @Getter
     @Schema(title = "指定在找不到当前查找键的特定路由时，是否对默认路由应用宽松回退。")
     private boolean lenientFallback = true;
 
@@ -34,14 +36,12 @@ public abstract class AbstractRouter<T> {
     /**
      * 最终默认路由
      */
-    @Getter
     @Schema(title = "最终默认路由")
     private final T resolvedDefaultRouter;
 
     /**
      * 最终默认路由名称
      */
-    @Getter
     @Schema(title = "最终默认路由名称")
     private final String resolvedDefaultName;
 
@@ -62,12 +62,9 @@ public abstract class AbstractRouter<T> {
 
         this.lenientFallback = lenientFallback;
         this.resolvedDefaultName = defaultTargetName;
-        this.resolvedRouter = new HashMap<>(targetRouter.size());
-        targetRouter.forEach((key, value) -> {
-            String lookupKey = resolveSpecifiedLookupKey(key);
-            this.resolvedRouter.put(lookupKey, value);
-        });
-
+        Map<String, T> newTargetRouterMap = new ConcurrentHashMap<>(targetRouter.size());
+        targetRouter.forEach((key, value) -> newTargetRouterMap.put(resolveSpecifiedLookupKey(key), value));
+        this.resolvedRouter = newTargetRouterMap;
         if (Objects.isNull(getResolvedRouter(defaultTargetName))) {
             log.error("属性[默认路由名称]对应的路由是必须的");
             throw new IllegalArgumentException("属性[默认路由名称]对应的路由是必须的");
@@ -133,11 +130,49 @@ public abstract class AbstractRouter<T> {
     }
 
 
+    /**
+     * 通过路由名称获取路由
+     *
+     * @param routerName 路由名称
+     * @return 路由
+     */
     public T getResolvedRouter(String routerName) {
         if (Objects.isNull(this.resolvedRouter)) {
             throw new IllegalStateException("路由未被初始化");
         }
         return this.resolvedRouter.get(routerName);
+    }
+
+
+    /**
+     * 通过路由名称获取路由
+     *
+     * @return 路由集合
+     */
+    public List<T> getResolvedRouters() {
+        if (Objects.isNull(this.resolvedRouter)) {
+            throw new IllegalStateException("路由未被初始化");
+        }
+        return new CopyOnWriteArrayList<>(this.resolvedRouter.values());
+    }
+
+
+    /**
+     * 移除一个路由
+     *
+     * @param key 路由key
+     */
+    public void remove(String key) {
+        this.resolvedRouter.remove(resolveSpecifiedLookupKey(key));
+    }
+
+    /**
+     * 添加一个路由
+     *
+     * @param key 路由key
+     */
+    public void add(String key, T t) {
+        this.resolvedRouter.put(resolveSpecifiedLookupKey(key), t);
     }
 
 

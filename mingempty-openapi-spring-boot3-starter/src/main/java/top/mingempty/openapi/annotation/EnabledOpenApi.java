@@ -2,8 +2,8 @@ package top.mingempty.openapi.annotation;
 
 
 import org.springframework.context.annotation.Import;
-import top.mingempty.openapi.config.OpenApiAutoConfiguration;
 import top.mingempty.openapi.config.DisableOpenApiAutoConfiguration;
+import top.mingempty.openapi.config.OpenApiAutoConfiguration;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
