@@ -21,6 +21,7 @@
         <module>../mingempty-trace</module>
         <module>../mingempty-event-spring-boot3-starter</module>
         <module>../mingempty-openapi-spring-boot3-starter</module>
+        <module>../mingempty-concurrent-spring-boot3-starter</module>
     </modules>
 
     <properties>
@@ -297,6 +298,13 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-openapi-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对concurrent的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-concurrent-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 

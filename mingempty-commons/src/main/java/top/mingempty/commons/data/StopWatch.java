@@ -4,7 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
-import top.mingempty.domain.other.DomainConstant;
+import top.mingempty.domain.other.GlobalConstant;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -101,7 +101,7 @@ public class StopWatch {
      * 构造，不启动任何任务
      */
     public StopWatch() {
-        this(DomainConstant.EMPTY);
+        this(GlobalConstant.EMPTY);
     }
 
     /**
@@ -148,7 +148,7 @@ public class StopWatch {
      * @throws IllegalStateException 前一个任务没有结束
      */
     public void start() throws IllegalStateException {
-        start(DomainConstant.EMPTY);
+        start(GlobalConstant.EMPTY);
     }
 
     /**
