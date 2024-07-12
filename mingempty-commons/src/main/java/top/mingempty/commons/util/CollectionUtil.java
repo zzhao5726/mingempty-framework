@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 /**
  * 集合工具类
  *
- * @auth:zzhao
- * @date: 2023/2/17 11:36
+ * @author zzhao
+ * @date 2023/2/17 11:36
  */
 public class CollectionUtil {
 

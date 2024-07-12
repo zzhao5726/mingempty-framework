@@ -8,7 +8,7 @@ import top.mingempty.domain.base.IPage;
  * 分页工具类
  *
  * @author zzhao
- * @date: 2023/5/25 17:02
+ * @date 2023/5/25 17:02
  */
 public class PageUtil {
 
