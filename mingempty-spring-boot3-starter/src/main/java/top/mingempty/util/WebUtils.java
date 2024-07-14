@@ -1,4 +1,4 @@
-package top.mingempty.spring.util;
+package top.mingempty.util;
 
 import cn.hutool.core.codec.Base64;
 import jakarta.servlet.http.Cookie;

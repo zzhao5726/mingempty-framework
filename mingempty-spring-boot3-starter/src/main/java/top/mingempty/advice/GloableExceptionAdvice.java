@@ -1,4 +1,4 @@
-package top.mingempty.spring.advice;
+package top.mingempty.advice;
 
 import cn.hutool.extra.expression.ExpressionException;
 import jakarta.servlet.ServletException;
@@ -69,7 +69,6 @@ public class GloableExceptionAdvice implements Ordered {
                 if (Objects.equals(HttpStatus.NOT_FOUND.value(), errorResponse.getStatusCode().value())) {
                     return IRsp.notFound();
                 }
-                return IRsp.failed();
             }
             case ServletException servletException -> {
                 Throwable rootCause = servletException.getRootCause();

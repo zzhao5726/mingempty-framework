@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import top.mingempty.spring.util.SpringContextUtil;
+import top.mingempty.util.SpringContextUtil;
 
 import java.util.Optional;
 
@@ -23,7 +23,7 @@ public class MeEventPublisher {
                                         Class<? extends MeEventListenerHandler<D>> meEventListenerHandlerClass) {
         ApplicationEventPublisher applicationEventPublisher
                 = Optional.ofNullable(Optional
-                        .ofNullable(SpringContextUtil.getBean(MeEventPublisher.class))
+                        .ofNullable(SpringContextUtil.gainBean(MeEventPublisher.class))
                         .orElseThrow(()
                                 -> new IllegalArgumentException("事件发送者未初始化。。。。。。"))
                         .getApplicationEventPublisher())

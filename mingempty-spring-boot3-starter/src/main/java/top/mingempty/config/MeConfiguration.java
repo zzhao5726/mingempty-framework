@@ -1,4 +1,4 @@
-package top.mingempty.spring.config;
+package top.mingempty.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -7,11 +7,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import top.mingempty.spring.domain.MeProperties;
-import top.mingempty.spring.util.BeanFactoryUtil;
-import top.mingempty.spring.util.EnvironmentUtil;
-import top.mingempty.spring.util.MessageSourceUtil;
-import top.mingempty.spring.util.SpringContextUtil;
+import top.mingempty.domain.MeProperties;
+import top.mingempty.util.BeanFactoryUtil;
+import top.mingempty.util.EnvironmentUtil;
+import top.mingempty.util.MessageSourceUtil;
+import top.mingempty.util.SpringContextUtil;
 
 /**
  * mingempty cloud 基础工具配置类
@@ -19,7 +19,7 @@ import top.mingempty.spring.util.SpringContextUtil;
  * @author zzhao
  */
 @EnableConfigurationProperties(MeProperties.class)
-@ComponentScan(basePackages = "top.mingempty.spring.advice")
+@ComponentScan(basePackages = "top.mingempty.advice")
 @ConditionalOnProperty(prefix = "me",name = "enabled", havingValue = "true", matchIfMissing = true)
 public class MeConfiguration implements Ordered {
 

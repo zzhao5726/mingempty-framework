@@ -1,10 +1,9 @@
-package top.mingempty.spring.util;
+package top.mingempty.util;
 
 import cn.hutool.core.map.MapUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanDefinitionCustomizer;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -59,19 +58,34 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
         }
     }
 
-
-    public static <T> void registerSingleton(Class<T> type) {
-        T obj = DEFAULT_LISTABLE_BEAN_FACTORY.createBean(type);
-        String beanName = StringUtil.beanName(type.getName());
-        DEFAULT_LISTABLE_BEAN_FACTORY.registerSingleton(beanName, obj);
+    /**
+     * 通过一个名称销毁一个bean
+     *
+     * @param beanClass 类
+     */
+    public static void destroy(Class<?> beanClass) {
+        destroy(beanClass.getName());
     }
 
+
+    /**
+     * 通过一个类名称销毁一个bean
+     *
+     * @param className 类名称
+     */
     public static void destroy(String className) {
-        String beanName = StringUtil.beanName(className);
-        DEFAULT_LISTABLE_BEAN_FACTORY.destroySingleton(beanName);
+        DEFAULT_LISTABLE_BEAN_FACTORY.destroySingleton(Introspector.decapitalize(ClassUtils.getShortName(className)));
     }
 
-    public static <T> T getBean(String beanName) {
+
+    /**
+     * 通过bean名称获取一个bean
+     *
+     * @param beanName bean名称
+     * @param <T>      bean类型
+     * @return 获取的bean
+     */
+    public static <T> T gainBean(String beanName) {
         if (APPLICATION_CONTEXT.containsBean(beanName)) {
             return (T) APPLICATION_CONTEXT.getBean(beanName);
         } else {
@@ -82,75 +96,51 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
     /**
      * 通过class获取Bean
      *
-     * @param clazz
-     * @param <T>
-     * @return
+     * @param beanClass bean的类
+     * @param <T>       bean类型
+     * @return 获取的bean
      */
-    public static <T> T getBean(Class<T> clazz) {
+    public static <T> T gainBean(Class<T> beanClass) {
         try {
-            return APPLICATION_CONTEXT.getBean(clazz);
+            return APPLICATION_CONTEXT.getBean(beanClass);
         } catch (Exception e) {
             return null;
         }
     }
 
     /**
-     * 获取默认的bean名称
-     *
-     * @param clazz
-     * @param <T>
-     * @return
-     */
-    public static <T> String getDefaultBeanName(Class<T> clazz) {
-        String shortClassName = ClassUtils.getShortName(clazz);
-        return Introspector.decapitalize(shortClassName);
-    }
-
-    /**
-     * 获取默认的bean名称
-     *
-     * @param prefix
-     * @param clazz
-     * @param <T>
-     * @return
-     */
-    public static <T> String getDefaultBeanName(String prefix, Class<T> clazz) {
-        return prefix.concat(getDefaultBeanName(clazz));
-    }
-
-    /**
      * 通过name,以及Clazz返回指定的Bean
      *
      * @param name
-     * @param clazz
+     * @param beanClass
      * @param <T>
      * @return
      */
-    public static <T> T getBean(String name, Class<T> clazz) {
-        return getApplicationContext().getBean(name, clazz);
+    public static <T> T gainBean(String name, Class<T> beanClass) {
+        return getApplicationContext().getBean(name, beanClass);
     }
 
 
     /**
      * 获取指定类型的所有bean
      *
-     * @param baseType
+     * @param beanClass
      * @param <T>
      * @return
      */
-    public static <T> Map<String, T> getBeanMapOfType(Class<T> baseType) {
-        return APPLICATION_CONTEXT.getBeansOfType(baseType);
+    public static <T> Map<String, T> gainBeanMapOfType(Class<T> beanClass) {
+        return APPLICATION_CONTEXT.getBeansOfType(beanClass);
     }
 
     /**
      * 获取指定类型的所有bean
      *
-     * @param baseType
+     * @param beanClass
      * @param <T>
      * @return
      */
-    public static <T> List<T> getBeanListOfType(Class<T> baseType) {
-        Map<String, T> beanMapOfType = getBeanMapOfType(baseType);
+    public static <T> List<T> getBeanListOfType(Class<T> beanClass) {
+        Map<String, T> beanMapOfType = gainBeanMapOfType(beanClass);
         if (MapUtil.isEmpty(beanMapOfType)) {
             return Collections.emptyList();
         }
@@ -161,25 +151,55 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 获取默认的bean名称
+     *
+     * @param beanClass bean的类
+     * @param <T>       bean类型
+     * @return 获取的bean
+     */
+    public static <T> String gainDefaultBeanName(Class<T> beanClass) {
+        return Introspector.decapitalize(ClassUtils.getShortName(beanClass));
+    }
+
+    /**
+     * 获取默认的bean名称并加上前缀
+     *
+     * @param prefix    前缀
+     * @param beanClass bean的类
+     * @param <T>       bean类型
+     * @return 加上前缀的bean名称
+     */
+    public static <T> String gainDefaultBeanName(String prefix, Class<T> beanClass) {
+        return prefix.concat(gainDefaultBeanName(beanClass));
+    }
+
+
+    /**
+     * 通过类注册一个单例bean
+     *
+     * @param beanClass 类
+     * @param <T>       泛型
+     */
+    public static <T> void registerSingleton(Class<T> beanClass) {
+        DEFAULT_LISTABLE_BEAN_FACTORY.registerSingleton(StringUtil.beanName(beanClass.getName()),
+                DEFAULT_LISTABLE_BEAN_FACTORY.createBean(beanClass));
+    }
+
 
     /**
      * 注册bean
      *
-     * @param beanName
-     * @param beanClass
-     * @param supplier
-     * @param customizers
-     * @param <T>
+     * @param beanName    bean的名称
+     * @param beanClass   bean的类型
+     * @param supplier    获取bean的方式
+     * @param customizers 自定义
+     * @param <T>         bean的泛型
      */
     @SneakyThrows
     public static <T> void registerBean(@Nullable String beanName, Class<T> beanClass,
                                         @Nullable Supplier<T> supplier, BeanDefinitionCustomizer... customizers) {
         GENERIC_APPLICATION_CONTEXT.registerBean(beanName, beanClass, supplier, customizers);
-        // 统一执行
-        if (supplier.get() instanceof InitializingBean) {
-            ((InitializingBean) supplier.get()).afterPropertiesSet();
-        }
-
     }
 
     /**
@@ -199,7 +219,7 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
         return APPLICATION_CONTEXT.isSingleton(name);
     }
 
-    public static Class<? extends Object> getType(String name) {
+    public static Class<?> getType(String name) {
         return APPLICATION_CONTEXT.getType(name);
     }
 }

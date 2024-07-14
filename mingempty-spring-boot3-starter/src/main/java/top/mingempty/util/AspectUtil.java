@@ -1,4 +1,4 @@
-package top.mingempty.spring.util;
+package top.mingempty.util;
 
 
 import lombok.extern.slf4j.Slf4j;
