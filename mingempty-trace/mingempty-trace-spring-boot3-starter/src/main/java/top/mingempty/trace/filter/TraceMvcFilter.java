@@ -44,7 +44,7 @@ public class TraceMvcFilter implements Filter, Ordered {
             filterChain.doFilter(servletRequest, servletResponse);
         } finally {
             // TODO 响应参数待定
-            TraceAdapterUtil.endTraceContext(null);
+            TraceAdapterUtil.endTraceContext();
         }
     }
 
