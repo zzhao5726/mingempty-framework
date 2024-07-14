@@ -1,0 +1,30 @@
+me:
+  name: mingempty-gateway
+  group: mingempty
+  version: 1.0.0
+  timestamp: ${current.time}
+  using-base-path: false
+
+spring:
+  cloud:
+    nacos:
+      server-addr: al31221.pve.mingempty.top:21013
+      username: mingempty
+      password: mingempty
+      config:
+        namespace: 9d0a606f-63ca-4aef-8a97-2832b140f114
+        group: DEFAULT_GROUP
+      discovery:
+        namespace: 9d0a606f-63ca-4aef-8a97-2832b140f114
+        group: DEFAULT_GROUP
+
+
+
+  config:
+    import:
+      - optional:nacos:gateway.yaml
+
+
+
+logging:
+  config: classpath:logback-me.xml

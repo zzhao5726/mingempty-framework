@@ -23,6 +23,7 @@
         <module>../mingempty-openapi-spring-boot3-starter</module>
         <module>../mingempty-concurrent-spring-boot3-starter</module>
         <module>../spring-cloud-starter-mingempty-openfeign</module>
+        <module>../mingempty-gateway</module>
     </modules>
 
     <properties>

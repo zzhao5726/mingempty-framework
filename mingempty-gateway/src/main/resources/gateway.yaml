@@ -1,0 +1,50 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          #表明gateway开启服务注册和发现的功能，并且spring cloud gateway自动根据服务发现为每一个服务创建了一个router，这个router将以服务名开头的请求路径转发到对应的服务。
+          # 不添加“spring.cloud.gateway.discovery.locator.predicates[0]”时：
+          #   请求路径：http://网关IP:网关端口/被调用微服务注册中心名称/被调用微服务context-path（没有则该层级省略）/接口路径
+          #   StripPrefix需要配置参数为1，在转发时会将"被调用微服务注册中心名称"移除，然后转发到具体路径
+          # 添加“spring.cloud.gateway.discovery.locator.predicates[0]”时：
+          #   请求路径：http://网关IP:网关端口/api/被调用微服务注册中心名称/被调用微服务context-path（没有则该层级省略）/接口路径
+          #   StripPrefix需要配置参数为2，在转发时会将"api/被调用微服务注册中心名称"移除，然后转发到具体路径
+          enabled: true
+          #是将请求路径上的服务名配置为小写（因为服务注册的时候，向注册中心注册时将服务名转成大写的了），比如以/service-hi/*的请求路径被路由转发到服务名为service-hi的服务上。
+          lowerCaseServiceId: true
+          filters:
+            - StripPrefix=2
+          predicates:
+            - Path='/api/'+serviceId+'/**'
+      routes:
+        #路由的ID，没有固定的规则，但是要求唯一，建议配合服务名
+        - id: meta-data-service1
+          #匹配提供服务的路由地址，即被调用微服务注册中心名称
+          uri: lb://meta-data-service
+          predicates:
+            # 直接匹配被调用微服务context-path
+            - Path=/meta-data/**
+        #路由的ID，没有固定的规则，但是要求唯一，建议配合服务名
+        - id: meta-data-service2
+          #匹配提供服务的路由地址，即被调用微服务注册中心名称
+          uri: lb://meta-data-service
+          predicates:
+            # 匹配/api(自定义前缀)/被调用微服务context-path
+            # 匹配后配置routes.filters为StripPrefix=1，移除/api前缀
+            # 如果前缀层级过多，请配置routes.filters为StripPrefix=n，移除前缀
+            - Path=/api/meta-data/**
+          filters:
+            - StripPrefix=1
+        #路由的ID，没有固定的规则，但是要求唯一，建议配合服务名
+        - id: demo
+          #匹配提供服务的路由地址，即被调用微服务注册中心名称
+          uri: lb://demo
+          predicates:
+            # 用于后端未配置context-path
+            # 匹配/api2(自定义前缀)
+            # 匹配后配置routes.filters为StripPrefix=1，移除api2前缀
+            # 如果前缀层级过多，请配置routes.filters为StripPrefix=n，移除前缀
+            - Path=/api2/**
+          filters:
+            - StripPrefix=1
