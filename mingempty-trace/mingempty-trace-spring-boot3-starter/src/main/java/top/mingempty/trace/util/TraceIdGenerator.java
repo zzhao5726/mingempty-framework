@@ -23,6 +23,19 @@ public class TraceIdGenerator {
      * @return traceId
      */
     public static String generateTraceId() {
+        return generateTraceId(TraceAdapterUtil.gainTraceContext());
+    }
+
+    /**
+     * 生成traceId
+     *
+     * @return traceId
+     */
+    public static String generateTraceId(TraceContext traceContext) {
+        if (traceContext != null) {
+            return traceContext.getTraceId();
+        }
+
         return String.format("%013d", Instant.now().toEpochMilli())
                 .concat(PROCESS_ID_STR + IP_HEX)
                 .concat(String.format("%04d", getNextSequence()));

@@ -47,4 +47,12 @@ public interface GlobalConstant {
      */
     @Schema(title = "字符串常量", description = "空格符")
     String SPACE = " ";
+
+    /**
+     * 字符串常量：{@code "request-from-inner"}
+     * </p>
+     * 标识当前请求来源于内部
+     */
+    @Schema(title = "字符串常量", description = "标识当前请求来源于内部")
+    String REQUEST_FROM_INNER = "request-from-inner";
 }
