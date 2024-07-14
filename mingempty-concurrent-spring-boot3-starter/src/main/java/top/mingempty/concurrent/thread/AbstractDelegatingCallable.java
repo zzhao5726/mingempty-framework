@@ -2,6 +2,7 @@ package top.mingempty.concurrent.thread;
 
 
 import com.alibaba.ttl.TtlCallable;
+import top.mingempty.commons.exception.BaseCommonException;
 import top.mingempty.commons.trace.TraceContext;
 import top.mingempty.concurrent.model.enums.PriorityEnum;
 
@@ -118,22 +119,17 @@ public abstract class AbstractDelegatingCallable<V>
             return callable;
         }
 
-        if (callable instanceof TtlCallable) {
-            if (((TtlCallable<V>) callable).getCallable() instanceof AbstractDelegatingCallable) {
-                return callable;
-            }
+        if (callable instanceof TtlCallable ttlRunnable
+                && ttlRunnable.getCallable() instanceof AbstractDelegatingCallable) {
+            return callable;
         }
 
-        return new AbstractDelegatingCallable<V>(priorityEnum) {
-            /**
-             * 线程真正执行的业务方法
-             *
-             * @return 线程执行结果
-             */
-            @Override
-            public V realRun() throws Exception {
+        return new SimpleDelegatingCallable<>(() -> {
+            try {
                 return callable.call();
+            } catch (Exception e) {
+                throw new BaseCommonException("0000000001", e);
             }
-        };
+        }, priorityEnum);
     }
 }

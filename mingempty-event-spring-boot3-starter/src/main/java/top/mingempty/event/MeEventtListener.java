@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import top.mingempty.commons.trace.enums.SpanTypeEnum;
-import top.mingempty.util.SpringContextUtil;
 import top.mingempty.trace.util.TraceAdapterUtil;
+import top.mingempty.util.SpringContextUtil;
 
 import java.util.Comparator;
 import java.util.List;

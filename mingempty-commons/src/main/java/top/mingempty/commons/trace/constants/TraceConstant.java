@@ -12,6 +12,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public interface TraceConstant {
 
     /**
+     * 链路信息
+     */
+    @Schema(title = "链路信息", description = "链路信息")
+    String TRACE = "mingempty-trace";
+
+    /**
      * 整个调用链路树的唯一ID
      */
     @Schema(title = "整个调用链路树的唯一ID", description = "整个调用链路树的唯一ID")

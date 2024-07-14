@@ -1,7 +1,9 @@
 package top.mingempty.concurrent.pool;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
+import top.mingempty.concurrent.thread.AbstractDelegatingCallable;
 import top.mingempty.concurrent.thread.AbstractDelegatingRunnable;
 
 import java.security.PrivilegedAction;
@@ -15,6 +17,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 /**
  * 虚拟线程执行器封装
@@ -158,7 +161,7 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
      */
     @Override
     public <T> Future<T> submit(Callable<T> task) {
-        return VIRTUAL_EXECUTOR_SERVICE.submit(task);
+        return VIRTUAL_EXECUTOR_SERVICE.submit(AbstractDelegatingCallable.delegatingCallable(task));
     }
 
     /**
@@ -175,7 +178,7 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
      */
     @Override
     public <T> Future<T> submit(Runnable task, T result) {
-        return VIRTUAL_EXECUTOR_SERVICE.submit(task, result);
+        return VIRTUAL_EXECUTOR_SERVICE.submit(AbstractDelegatingRunnable.delegatingRunnable(task), result);
     }
 
     /**
@@ -191,7 +194,7 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
      */
     @Override
     public Future<?> submit(Runnable task) {
-        return VIRTUAL_EXECUTOR_SERVICE.submit(task);
+        return VIRTUAL_EXECUTOR_SERVICE.submit(AbstractDelegatingRunnable.delegatingRunnable(task));
     }
 
     /**
@@ -216,6 +219,12 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
      */
     @Override
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
+        if (CollUtil.isNotEmpty(tasks)) {
+            VIRTUAL_EXECUTOR_SERVICE.invokeAll(
+                    tasks.parallelStream()
+                            .map(AbstractDelegatingCallable::delegatingCallable)
+                            .collect(Collectors.toList()));
+        }
         return VIRTUAL_EXECUTOR_SERVICE.invokeAll(tasks);
     }
 
@@ -248,6 +257,12 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
      */
     @Override
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
+        if (CollUtil.isNotEmpty(tasks)) {
+            VIRTUAL_EXECUTOR_SERVICE.invokeAll(
+                    tasks.parallelStream()
+                            .map(AbstractDelegatingCallable::delegatingCallable)
+                            .collect(Collectors.toList()), timeout, unit);
+        }
         return VIRTUAL_EXECUTOR_SERVICE.invokeAll(tasks, timeout, unit);
     }
 
@@ -271,6 +286,12 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
      */
     @Override
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
+        if (CollUtil.isNotEmpty(tasks)) {
+            VIRTUAL_EXECUTOR_SERVICE.invokeAny(
+                    tasks.parallelStream()
+                            .map(AbstractDelegatingCallable::delegatingCallable)
+                            .collect(Collectors.toList()));
+        }
         return VIRTUAL_EXECUTOR_SERVICE.invokeAny(tasks);
     }
 
@@ -298,6 +319,12 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
      */
     @Override
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        if (CollUtil.isNotEmpty(tasks)) {
+            VIRTUAL_EXECUTOR_SERVICE.invokeAny(
+                    tasks.parallelStream()
+                            .map(AbstractDelegatingCallable::delegatingCallable)
+                            .collect(Collectors.toList()), timeout, unit);
+        }
         return VIRTUAL_EXECUTOR_SERVICE.invokeAny(tasks, timeout, unit);
     }
 
