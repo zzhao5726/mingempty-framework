@@ -129,23 +129,15 @@ public abstract class AbstractDelegatingRunnable
      * @return 返回委托的Runnable
      */
     public static Runnable delegatingRunnable(Runnable runnable, PriorityEnum priorityEnum) {
-        if (runnable instanceof TtlRunnable) {
-            Runnable runnable1 = ((TtlRunnable) runnable).getRunnable();
-            if (runnable1 instanceof AbstractDelegatingRunnable) {
-                return runnable;
-            }
-        } else if (runnable instanceof AbstractDelegatingRunnable) {
+        if (runnable instanceof AbstractDelegatingRunnable) {
             return runnable;
         }
-        //转换为MeDelegatingRunnable
-        return new AbstractDelegatingRunnable(priorityEnum) {
-            /**
-             * 线程真正执行的业务方法，无返回值
-             */
-            @Override
-            public void runReal() {
-                runnable.run();
-            }
-        };
+
+        if (runnable instanceof TtlRunnable ttlRunnable
+                && ttlRunnable.getRunnable() instanceof AbstractDelegatingRunnable) {
+            return runnable;
+        }
+        //转换为DelegatingRunnable
+        return new SimpleDelegatingRunnable(runnable::run, priorityEnum);
     }
 }

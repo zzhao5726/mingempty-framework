@@ -1,10 +1,9 @@
 package top.mingempty.trace.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -42,14 +41,14 @@ public class TraceConfiguration {
 
 
     @Bean
-    @ConditionalOnMissingClass(value = {"reactor.core.publisher.Mono"})
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     public TraceMvcFilter meTraceFilter() {
         return new TraceMvcFilter();
     }
 
 
     @Bean
-    @ConditionalOnClass(name = {"reactor.core.publisher.Mono"})
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
     public TraceFluxFilter meTraceFluxFilter() {
         return new TraceFluxFilter();
     }
