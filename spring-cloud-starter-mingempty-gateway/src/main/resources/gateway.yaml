@@ -1,0 +1,19 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          #表明gateway开启服务注册和发现的功能，并且spring cloud gateway自动根据服务发现为每一个服务创建了一个router，这个router将以服务名开头的请求路径转发到对应的服务。
+          enabled: true
+          #是将请求路径上的服务名配置为小写（因为服务注册的时候，向注册中心注册时将服务名转成大写的了），比如以/service-hi/*的请求路径被路由转发到服务名为service-hi的服务上。
+          lowerCaseServiceId: true
+          filters:
+            # 如果客户端设置了context-path，则需要设置这个参数，否则会将断言匹配的路径去除
+            - StripPrefix=0
+      routes:
+        #路由的ID，没有固定的规则，但是要求唯一，建议配合服务名
+        - id: demo
+          #匹配提供服务的路由地址
+          uri: lb://demo
+          predicates:
+            - Path=/demo/**
