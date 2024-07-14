@@ -56,7 +56,7 @@ public class TraceAdapterUtil {
                 || gainTraceContext() == null) {
             return null;
         }
-        return gainTraceContext().getStopWatch();
+        return Objects.requireNonNull(gainTraceContext()).getStopWatch();
     }
 
 
@@ -69,11 +69,10 @@ public class TraceAdapterUtil {
      * @param protocolEnum     链路入口来源
      * @param spanTypeEnum     链路树类型
      * @param requestParameter 请求参数
-     * @return
      */
-    public static TraceContext initTraceContext(String functionName, ProtocolEnum protocolEnum,
-                                                SpanTypeEnum spanTypeEnum, Object requestParameter) {
-        return initTraceContext(functionName, TraceIdGenerator.generateTraceId(), TraceIdGenerator.generateSpanId(),
+    public static void initTraceContext(String functionName, ProtocolEnum protocolEnum,
+                                        SpanTypeEnum spanTypeEnum, Object requestParameter) {
+        initTraceContext(functionName, TraceIdGenerator.generateTraceId(), TraceIdGenerator.generateSpanId(),
                 protocolEnum, spanTypeEnum, requestParameter);
     }
 
@@ -89,20 +88,19 @@ public class TraceAdapterUtil {
      * @param protocolEnum     链路入口来源
      * @param spanTypeEnum     链路树类型
      * @param requestParameter 请求参数
-     * @return
      */
-    public static TraceContext initTraceContext(String functionName, String traceId,
-                                                String spanId, ProtocolEnum protocolEnum,
-                                                SpanTypeEnum spanTypeEnum, Object requestParameter) {
+    public static void initTraceContext(String functionName, String traceId,
+                                        String spanId, ProtocolEnum protocolEnum,
+                                        SpanTypeEnum spanTypeEnum, Object requestParameter) {
         if (initialized()
                 && gainTraceContext() != null) {
-            if (Objects.equals(Thread.currentThread().threadId(), gainTraceContext().getCurrentThreadId())) {
+            if (Objects.equals(Thread.currentThread().threadId(), Objects.requireNonNull(gainTraceContext()).getCurrentThreadId())) {
                 //说明是同一个线程，此时其余参数失效
                 // 线程重入次数+1
-                gainTraceContext().threadReentryCountIncrementAndGet();
-                return gainTraceContext();
+                Objects.requireNonNull(gainTraceContext()).threadReentryCountIncrementAndGet();
+                return;
             }
-            return gainTraceContext();
+            return;
         }
         TraceContext traceContext = new TraceContext(functionName,
                 traceId == null ? TraceIdGenerator.generateTraceId() : traceId,
@@ -110,7 +108,6 @@ public class TraceAdapterUtil {
                 1, new AtomicInteger(1), protocolEnum, spanTypeEnum);
         //初始化方法
         initialized(traceContext, requestParameter);
-        return gainTraceContext();
     }
 
     /**
@@ -119,38 +116,40 @@ public class TraceAdapterUtil {
      * 适用于事件和异步线程
      *
      * @param traceContext     发起方线程链路数据
-     * @param enableSpan       是否开启新的链路树
+     * @param newSpan          是否开启新的链路树
      * @param spanTypeEnum     链路树类型
      * @param functionName     方法名称
-     * @param requestParameter 请求参数
-     * @return
+     * @param requestParameter 链路入参
      */
-    public static TraceContext initTraceContextAsync(TraceContext traceContext, boolean enableSpan,
-                                                     SpanTypeEnum spanTypeEnum, String functionName,
-                                                     Object requestParameter) {
+    public static void initTraceContextAsync(TraceContext traceContext, boolean newSpan,
+                                             SpanTypeEnum spanTypeEnum, String functionName,
+                                             Object requestParameter) {
         if (traceContext == null) {
             //说明没有链路数据，直接开启新的
-            return initTraceContext(functionName, ProtocolEnum.OTHER, spanTypeEnum, requestParameter);
+            initTraceContext(functionName, ProtocolEnum.OTHER, spanTypeEnum, requestParameter);
+            return;
         }
 
         if (Objects.equals(Thread.currentThread().threadId(), traceContext.getCurrentThreadId())) {
             //说明是同一个线程，此时其余参数失效
             // 线程重入次数+1
             traceContext.threadReentryCountIncrementAndGet();
-            return gainTraceContext();
+            gainTraceContext();
+            return;
         }
         //说明已经不是同一个线程了
-        if (enableSpan) {
+        if (newSpan) {
             //说明需要开启一个新的链路树
             initTraceContext(functionName, traceContext.getTraceId(), TraceIdGenerator.generateSpanId(traceContext),
                     traceContext.getProtocolEnum(),
                     spanTypeEnum, requestParameter);
-            return gainTraceContext();
+            gainTraceContext();
+            return;
         }
 
         //说明不需要开启一个新的链路树,需设置当前线程的链路树类型
         initialized(traceContext.cloneRow(spanTypeEnum));
-        return gainTraceContext();
+        gainTraceContext();
     }
 
 
@@ -172,8 +171,15 @@ public class TraceAdapterUtil {
 
     /**
      * 结束链路
+     */
+    public static void endTraceContext() {
+        endTraceContext(null);
+    }
+
+    /**
+     * 结束链路
      *
-     * @param responseParameter 链路Id
+     * @param responseParameter 链路出参
      */
     public static void endTraceContext(Object responseParameter) {
         //当前线程链路信息不为空并且线程重入次数等于0时，直接结束

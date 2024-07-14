@@ -49,7 +49,7 @@ public class TraceFluxFilter implements WebFilter, Ordered {
             return chain.filter(exchange);
         } finally {
             // TODO 响应参数待定
-            TraceAdapterUtil.endTraceContext(null);
+            TraceAdapterUtil.endTraceContext();
         }
     }
 
