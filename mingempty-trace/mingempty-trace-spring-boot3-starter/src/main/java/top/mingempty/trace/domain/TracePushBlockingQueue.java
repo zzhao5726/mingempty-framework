@@ -10,8 +10,8 @@ import top.mingempty.commons.trace.TraceContext;
 import top.mingempty.commons.trace.enums.ProtocolEnum;
 import top.mingempty.commons.trace.enums.SpanTypeEnum;
 import top.mingempty.domain.enums.ParameteTypeEnum;
-import top.mingempty.util.SpringContextUtil;
 import top.mingempty.trace.adapter.TraceRecordPushAdapter;
+import top.mingempty.util.SpringContextUtil;
 
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;

@@ -235,7 +235,7 @@ public class TraceContext {
     public void start() {
         TRACE_CONTEXT_THREAD_LOCAL.set(this);
         // 给日志变量设置值
-        MDC.put(TraceConstant.TRACE_ID, this.getSpanId());
+        MDC.put(TraceConstant.TRACE_ID, this.getTraceId());
         MDC.put(TraceConstant.SPAN_ID, this.getSpanId());
         MDC.put(TraceConstant.PROTOCOL, String.valueOf(this.getProtocolEnum().getCode()));
         MDC.put(TraceConstant.SPAN_TYPE, String.valueOf(this.getSpanTypeEnum().getType()));

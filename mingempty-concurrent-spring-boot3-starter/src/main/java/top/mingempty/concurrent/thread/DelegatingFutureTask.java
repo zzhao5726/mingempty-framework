@@ -26,13 +26,14 @@ public class DelegatingFutureTask<T>
     public DelegatingFutureTask(Callable<T> callable) {
         super(AbstractDelegatingCallable.delegatingCallable(callable));
         Integer priority = PriorityEnum.D.getPriority();
-        if (callable instanceof TtlCallable) {
-            Callable<T> callable1 = ((TtlCallable<T>) callable).getCallable();
-            if (callable1 instanceof AbstractDelegatingCallable) {
-                priority = ((AbstractDelegatingCallable<T>) callable1).getPriority();
-            }
-        } else if (callable instanceof AbstractDelegatingCallable) {
-            priority = ((AbstractDelegatingCallable<T>) callable).getPriority();
+        if (callable instanceof AbstractDelegatingCallable<?> abstractDelegatingCallable) {
+            priority = abstractDelegatingCallable.getPriority();
+        }
+
+        if (callable instanceof TtlCallable ttlCallable
+                && ttlCallable.getCallable() instanceof AbstractDelegatingCallable<?> abstractDelegatingCallable) {
+            priority = abstractDelegatingCallable.getPriority();
+
         }
         this.priority = priority;
     }
@@ -40,13 +41,15 @@ public class DelegatingFutureTask<T>
     public DelegatingFutureTask(Runnable runnable, T result) {
         super(AbstractDelegatingRunnable.delegatingRunnable(runnable), result);
         Integer priority = PriorityEnum.D.getPriority();
-        if (runnable instanceof TtlRunnable) {
-            Runnable runnable1 = ((TtlRunnable) runnable).getRunnable();
-            if (runnable1 instanceof AbstractDelegatingRunnable) {
-                priority = ((AbstractDelegatingRunnable) runnable1).getPriority();
-            }
-        } else if (runnable instanceof AbstractDelegatingRunnable) {
-            priority = ((AbstractDelegatingRunnable) runnable).getPriority();
+
+        if (runnable instanceof AbstractDelegatingRunnable abstractDelegatingRunnable) {
+            priority = abstractDelegatingRunnable.getPriority();
+        }
+
+        if (runnable instanceof TtlRunnable ttlRunnable
+                && ttlRunnable.getRunnable() instanceof AbstractDelegatingCallable<?> abstractDelegatingRunnable) {
+            priority = abstractDelegatingRunnable.getPriority();
+
         }
         this.priority = priority;
     }

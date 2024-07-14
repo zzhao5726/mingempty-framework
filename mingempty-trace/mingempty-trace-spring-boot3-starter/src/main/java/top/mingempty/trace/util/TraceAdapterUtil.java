@@ -70,9 +70,9 @@ public class TraceAdapterUtil {
      * @param spanTypeEnum     链路树类型
      * @param requestParameter 请求参数
      */
-    public static void initTraceContext(String functionName, ProtocolEnum protocolEnum,
-                                        SpanTypeEnum spanTypeEnum, Object requestParameter) {
-        initTraceContext(functionName, TraceIdGenerator.generateTraceId(), TraceIdGenerator.generateSpanId(),
+    public static TraceContext initTraceContext(String functionName, ProtocolEnum protocolEnum,
+                                                SpanTypeEnum spanTypeEnum, Object requestParameter) {
+        return initTraceContext(functionName, TraceIdGenerator.generateTraceId(), TraceIdGenerator.generateSpanId(),
                 protocolEnum, spanTypeEnum, requestParameter);
     }
 
@@ -89,18 +89,18 @@ public class TraceAdapterUtil {
      * @param spanTypeEnum     链路树类型
      * @param requestParameter 请求参数
      */
-    public static void initTraceContext(String functionName, String traceId,
-                                        String spanId, ProtocolEnum protocolEnum,
-                                        SpanTypeEnum spanTypeEnum, Object requestParameter) {
+    public static TraceContext initTraceContext(String functionName, String traceId,
+                                                String spanId, ProtocolEnum protocolEnum,
+                                                SpanTypeEnum spanTypeEnum, Object requestParameter) {
         if (initialized()
                 && gainTraceContext() != null) {
             if (Objects.equals(Thread.currentThread().threadId(), Objects.requireNonNull(gainTraceContext()).getCurrentThreadId())) {
                 //说明是同一个线程，此时其余参数失效
                 // 线程重入次数+1
                 Objects.requireNonNull(gainTraceContext()).threadReentryCountIncrementAndGet();
-                return;
+                return gainTraceContext();
             }
-            return;
+            return gainTraceContext();
         }
         TraceContext traceContext = new TraceContext(functionName,
                 traceId == null ? TraceIdGenerator.generateTraceId() : traceId,
@@ -108,6 +108,7 @@ public class TraceAdapterUtil {
                 1, new AtomicInteger(1), protocolEnum, spanTypeEnum);
         //初始化方法
         initialized(traceContext, requestParameter);
+        return gainTraceContext();
     }
 
     /**
@@ -121,21 +122,20 @@ public class TraceAdapterUtil {
      * @param functionName     方法名称
      * @param requestParameter 链路入参
      */
-    public static void initTraceContextAsync(TraceContext traceContext, boolean newSpan,
-                                             SpanTypeEnum spanTypeEnum, String functionName,
-                                             Object requestParameter) {
+    public static TraceContext initTraceContextAsync(TraceContext traceContext, boolean newSpan,
+                                                     SpanTypeEnum spanTypeEnum, String functionName,
+                                                     Object requestParameter) {
         if (traceContext == null) {
             //说明没有链路数据，直接开启新的
             initTraceContext(functionName, ProtocolEnum.OTHER, spanTypeEnum, requestParameter);
-            return;
+            return gainTraceContext();
         }
 
         if (Objects.equals(Thread.currentThread().threadId(), traceContext.getCurrentThreadId())) {
             //说明是同一个线程，此时其余参数失效
             // 线程重入次数+1
             traceContext.threadReentryCountIncrementAndGet();
-            gainTraceContext();
-            return;
+            return gainTraceContext();
         }
         //说明已经不是同一个线程了
         if (newSpan) {
@@ -143,13 +143,12 @@ public class TraceAdapterUtil {
             initTraceContext(functionName, traceContext.getTraceId(), TraceIdGenerator.generateSpanId(traceContext),
                     traceContext.getProtocolEnum(),
                     spanTypeEnum, requestParameter);
-            gainTraceContext();
-            return;
+            return gainTraceContext();
         }
 
         //说明不需要开启一个新的链路树,需设置当前线程的链路树类型
         initialized(traceContext.cloneRow(spanTypeEnum));
-        gainTraceContext();
+        return gainTraceContext();
     }
 
 

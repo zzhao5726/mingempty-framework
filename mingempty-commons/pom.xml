@@ -23,6 +23,12 @@
     </properties>
 
     <dependencies>
+        <!--logback-->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!--hutool-all-->
         <dependency>

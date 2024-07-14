@@ -3,9 +3,6 @@ package top.mingempty.domain;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDateTime;
 
 /**
  * 链路日志配置文件
@@ -60,6 +57,12 @@ public class MeProperties {
     private String version = "v";
 
     /**
+     * 是否使用设置的请求路径前缀
+     */
+    @Schema(title = "是否使用设置的请求路径前缀")
+    private boolean usingBasePath = true;
+
+    /**
      * 请求路径前缀</br>
      * <p>
      * 如果{@code  me.base-path}不存在时则取{@code server.servlet.context-path}</br>
@@ -80,8 +83,7 @@ public class MeProperties {
      * {@code me.timestamp=${current.time}}, 然后通过maven插件配置时间</br>
      */
     @Schema(title = "项目编译时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private LocalDateTime timestamp;
+    private String timestamp;
 
 
 }

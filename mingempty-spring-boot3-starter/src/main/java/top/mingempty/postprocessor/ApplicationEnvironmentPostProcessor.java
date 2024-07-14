@@ -35,11 +35,6 @@ public class ApplicationEnvironmentPostProcessor implements EnvironmentPostProce
                 StringUtil.null2Str(environment.getProperty("spring.application.version"),
                         "v"));
 
-        String basePath = StringUtil.null2Str(environment.getProperty("me.base-path"),
-                StringUtil.null2Str(environment.getProperty("server.servlet.context-path"),
-                        StringUtil.null2Str(environment.getProperty("spring.webflux.base-path"),
-                                "/mingempty")));
-
 
         environment.getSystemProperties().put("me.name", appName);
         environment.getSystemProperties().put("spring.application.name", appName);
@@ -47,10 +42,25 @@ public class ApplicationEnvironmentPostProcessor implements EnvironmentPostProce
         environment.getSystemProperties().put("spring.application.group", appGroup);
         environment.getSystemProperties().put("me.version", appVersion);
         environment.getSystemProperties().put("spring.application.version", appVersion);
-        environment.getSystemProperties().put("server.servlet.context-path", basePath);
-        environment.getSystemProperties().put("spring.webflux.base-path", basePath);
-        log.debug("系统基础信息增强。appName:[{}],appGroup:[{}],appVersion:[{}],basePath:[{}]",
-                appName, appGroup, appVersion, basePath);
+        if (Boolean.parseBoolean(StringUtil.null2Str(environment.getProperty("me.using-base-path"), "true"))) {
+            String basePath = StringUtil.null2Str(environment.getProperty("me.base-path"),
+                    StringUtil.null2Str(environment.getProperty("server.servlet.context-path"),
+                            StringUtil.null2Str(environment.getProperty("spring.webflux.base-path"),
+                                    "/mingempty")));
+            environment.getSystemProperties().put("me.base-path", basePath);
+            environment.getSystemProperties().put("server.servlet.context-path", basePath);
+            environment.getSystemProperties().put("spring.webflux.base-path", basePath);
+            environment.getSystemProperties().put("me.using-base-path", true);
+            log.debug("系统基础信息增强。appName:[{}],appGroup:[{}],appVersion:[{}],basePath:[{}]",
+                    appName, appGroup, appVersion, basePath);
+        } else {
+            environment.getSystemProperties().remove("server.servlet.context-path");
+            environment.getSystemProperties().remove("spring.webflux.base-path");
+            log.debug("系统基础信息增强。appName:[{}],appGroup:[{}],appVersion:[{}]",
+                    appName, appGroup, appVersion);
+        }
+
+
     }
 
     /**

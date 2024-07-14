@@ -2,7 +2,6 @@ package top.mingempty.concurrent.thread;
 
 
 import cn.hutool.core.map.MapUtil;
-import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -125,7 +124,7 @@ public abstract class AbstractDelegatingContext<V> implements Comparable<Abstrac
 
     public AbstractDelegatingContext(Map<String, Object> params, PriorityEnum priorityEnum,
                                      CountDownLatch countDownLatch, TraceContext traceContext) {
-        this.traceContext = traceContext;
+        this.traceContext = traceContext == null ? TraceAdapterUtil.gainTraceContext() : traceContext;
         this.priority = priorityEnum == null ? PriorityEnum.D.getPriority() : priorityEnum.getPriority();
         this.countDownLatch = countDownLatch;
         if (MapUtil.isNotEmpty(params)) {
@@ -151,15 +150,12 @@ public abstract class AbstractDelegatingContext<V> implements Comparable<Abstrac
     protected final V abstractRun() {
         V v = null;
         try {
-            JsonNode jsonNode = JacksonUtil.toNode(this.params);
-            JsonNode newSpanJsonNode = jsonNode.get(TraceConstant.NEW_SPAN);
-            boolean newSpan = newSpanJsonNode != null && newSpanJsonNode.asBoolean();
-            JsonNode functionNameJsonNode = jsonNode.get(TraceConstant.FUNCTION_NAME);
-            String functionName = functionNameJsonNode != null ? functionNameJsonNode.asText() : this.getClass().getName();
+            Object newSpan = this.params.get(TraceConstant.NEW_SPAN);
+            Object functionName = this.params.get(TraceConstant.FUNCTION_NAME);
             TraceAdapterUtil.initTraceContextAsync(traceContext,
-                    newSpan,
+                    newSpan != null && Boolean.parseBoolean(newSpan.toString()),
                     SpanTypeEnum.THREAD_ASYNC,
-                    functionName,
+                    functionName != null ? functionName.toString() : this.getClass().getName(),
                     params);
             v = realRun();
             return v;
