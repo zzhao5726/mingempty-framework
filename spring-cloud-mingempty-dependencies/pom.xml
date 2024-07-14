@@ -22,6 +22,7 @@
         <module>../mingempty-event-spring-boot3-starter</module>
         <module>../mingempty-openapi-spring-boot3-starter</module>
         <module>../mingempty-concurrent-spring-boot3-starter</module>
+        <module>../spring-cloud-starter-mingempty-openfeign</module>
     </modules>
 
     <properties>
@@ -305,6 +306,13 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-concurrent-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对openfeign的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>spring-cloud-starter-mingempty-openfeign</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
