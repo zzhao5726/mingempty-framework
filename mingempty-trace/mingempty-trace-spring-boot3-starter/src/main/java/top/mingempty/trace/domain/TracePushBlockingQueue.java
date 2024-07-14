@@ -10,7 +10,7 @@ import top.mingempty.commons.trace.TraceContext;
 import top.mingempty.commons.trace.enums.ProtocolEnum;
 import top.mingempty.commons.trace.enums.SpanTypeEnum;
 import top.mingempty.domain.enums.ParameteTypeEnum;
-import top.mingempty.spring.util.SpringContextUtil;
+import top.mingempty.util.SpringContextUtil;
 import top.mingempty.trace.adapter.TraceRecordPushAdapter;
 
 import java.util.concurrent.ForkJoinPool;
@@ -154,7 +154,7 @@ public class TracePushBlockingQueue implements InitializingBean, DisposableBean 
             if (TRACE_PUSH_BLOCKING_QUEUE != null) {
                 return TRACE_PUSH_BLOCKING_QUEUE;
             }
-            TRACE_PUSH_BLOCKING_QUEUE = SpringContextUtil.getBean(TracePushBlockingQueue.class);
+            TRACE_PUSH_BLOCKING_QUEUE = SpringContextUtil.gainBean(TracePushBlockingQueue.class);
         }
         return TRACE_PUSH_BLOCKING_QUEUE;
     }

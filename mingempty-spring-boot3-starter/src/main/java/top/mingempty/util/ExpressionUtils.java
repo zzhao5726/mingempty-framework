@@ -1,4 +1,4 @@
-package top.mingempty.spring.util;
+package top.mingempty.util;
 
 
 import cn.hutool.core.util.ArrayUtil;

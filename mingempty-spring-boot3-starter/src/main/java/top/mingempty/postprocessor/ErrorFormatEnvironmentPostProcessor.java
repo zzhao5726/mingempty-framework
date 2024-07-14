@@ -1,4 +1,4 @@
-package top.mingempty.spring.postprocessor;
+package top.mingempty.postprocessor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanDefinitionStoreException;

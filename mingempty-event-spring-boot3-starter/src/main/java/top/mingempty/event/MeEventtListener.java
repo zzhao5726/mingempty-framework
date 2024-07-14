@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import top.mingempty.commons.trace.enums.SpanTypeEnum;
-import top.mingempty.spring.util.SpringContextUtil;
+import top.mingempty.util.SpringContextUtil;
 import top.mingempty.trace.util.TraceAdapterUtil;
 
 import java.util.Comparator;
@@ -38,7 +38,7 @@ public class MeEventtListener {
                     if (meEventListenerHandler.gainAsync()) {
                         Executor executor = null;
                         if (StrUtil.isNotEmpty(meEventListenerHandler.gainAsyncBeanName())) {
-                            executor = SpringContextUtil.getBean(meEventListenerHandler.gainAsyncBeanName(), Executor.class);
+                            executor = SpringContextUtil.gainBean(meEventListenerHandler.gainAsyncBeanName(), Executor.class);
                         }
                         if (executor == null) {
                             executor = ForkJoinPool.commonPool();
@@ -58,7 +58,7 @@ public class MeEventtListener {
                     meApplicationEvent.getData());
             meEventListenerHandler.handle(meApplicationEvent.getData());
         } finally {
-            TraceAdapterUtil.endTraceContext(null);
+            TraceAdapterUtil.endTraceContext();
         }
     }
 

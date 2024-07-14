@@ -1,4 +1,4 @@
-package top.mingempty.spring.util;
+package top.mingempty.util;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class MessageSourceUtil implements MessageSourceAware {
      */
     public static void addBasenames(String... basenames) {
         if (RESOURCE_BUNDLE_MESSAGE_SOURCE == null) {
-            ResourceBundleMessageSource resourceBundleMessageSource = SpringContextUtil.getBean(ResourceBundleMessageSource.class);
+            ResourceBundleMessageSource resourceBundleMessageSource = SpringContextUtil.gainBean(ResourceBundleMessageSource.class);
             RESOURCE_BUNDLE_MESSAGE_SOURCE = resourceBundleMessageSource;
             MESSAGE_SOURCE = resourceBundleMessageSource;
         }
