@@ -1,4 +1,4 @@
-package top.mingempty.spring.condition;
+package top.mingempty.condition;
 
 
 import org.springframework.context.annotation.Conditional;

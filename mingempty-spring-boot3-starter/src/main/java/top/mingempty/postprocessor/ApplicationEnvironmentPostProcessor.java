@@ -1,4 +1,4 @@
-package top.mingempty.spring.postprocessor;
+package top.mingempty.postprocessor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
@@ -23,18 +23,24 @@ public class ApplicationEnvironmentPostProcessor implements EnvironmentPostProce
      */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        String appName = StringUtil.null2Str(StringUtil
-                .null2Str(environment.getProperty("me.name"),
-                        environment.getProperty("spring.application.namespring.application.name")), "mingempty");
-        String appGroup = StringUtil.null2Str(StringUtil
-                .null2Str(environment.getProperty("me.group"),
-                        environment.getProperty("spring.application.group")), "g");
-        String appVersion = StringUtil.null2Str(StringUtil
-                .null2Str(environment.getProperty("me.version"),
-                        environment.getProperty("spring.application.version")), "v");
-        String basePath = StringUtil.null2Str(StringUtil
-                .null2Str(environment.getProperty("server.servlet.context-path"),
-                        environment.getProperty("spring.webflux.base-path")), "/mingempty");
+        String appName = StringUtil.null2Str(environment.getProperty("me.name"),
+                StringUtil.null2Str(environment.getProperty("spring.application.name"),
+                        "mingempty"));
+
+        String appGroup = StringUtil.null2Str(environment.getProperty("me.group"),
+                StringUtil.null2Str(environment.getProperty("spring.application.group"),
+                        "g"));
+
+        String appVersion = StringUtil.null2Str(environment.getProperty("me.version"),
+                StringUtil.null2Str(environment.getProperty("spring.application.version"),
+                        "v"));
+
+        String basePath = StringUtil.null2Str(environment.getProperty("me.base-path"),
+                StringUtil.null2Str(environment.getProperty("server.servlet.context-path"),
+                        StringUtil.null2Str(environment.getProperty("spring.webflux.base-path"),
+                                "/mingempty")));
+
+
         environment.getSystemProperties().put("me.name", appName);
         environment.getSystemProperties().put("spring.application.name", appName);
         environment.getSystemProperties().put("me.group", appGroup);

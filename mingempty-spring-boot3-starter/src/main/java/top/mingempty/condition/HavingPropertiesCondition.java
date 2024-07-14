@@ -1,4 +1,4 @@
-package top.mingempty.spring.condition;
+package top.mingempty.condition;
 
 
 import org.springframework.context.annotation.Condition;
@@ -9,7 +9,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
-import top.mingempty.spring.util.EnvironmentUtil;
+import top.mingempty.util.EnvironmentUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;

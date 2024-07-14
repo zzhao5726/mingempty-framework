@@ -1,4 +1,4 @@
-package top.mingempty.spring.util;
+package top.mingempty.util;
 
 import lombok.Getter;
 import org.springframework.context.EnvironmentAware;
