@@ -5,8 +5,6 @@ import top.mingempty.commons.util.JacksonUtil;
 import top.mingempty.domain.enums.ParameteTypeEnum;
 import top.mingempty.trace.domain.Message;
 
-import java.time.LocalDateTime;
-
 /**
  * 链路追踪适配器
  *
@@ -25,34 +23,16 @@ public class DefaultTraceRecordPushAdapter implements TraceRecordPushAdapter {
         if (message == null) {
             return;
         }
-        String appName = message.getAppName();
-        String appGroup = message.getAppGroup();
-        String appVersion = message.getAppVersion();
-        String traceId = message.getTraceId();
-        String spanId = message.getSpanId();
-        String currentThreadName = message.getCurrentThreadName();
-        Long currentThreadId = message.getCurrentThreadId();
-        String functionName = message.getFunctionName();
-        LocalDateTime traceTime = message.getNow();
-        int protocolCode = message.getProtocolCode();
-        int spanType = message.getSpanType();
-        String parameter = JacksonUtil.toStr(message.getParameter());
+
         switch (message.getParameteTypeEnum()) {
             case ParameteTypeEnum.REQUEST -> {
-                log.debug("消息链路记录发送默认实现---链路开始---appName:[{}],appGroup:[{}],appVersion:[{}],traceId:[{}],spanId:[{}]," +
-                                "traceThreadId:[{}],traceThreadName:[{}],traceFunctionName:[{}],traceStartTime:[{}]," +
-                                "protocolCode:[{}],spanType:[{}],requestParameter:[{}]",
-                        appName, appGroup, appVersion, traceId, spanId, currentThreadId, currentThreadName,
-                        functionName, traceTime, protocolCode, spanType, parameter);
+                log.debug("trace start：[{}]", JacksonUtil.toStr(message));
             }
             case ParameteTypeEnum.RESPONSE -> {
-                log.debug("消息链路记录发送默认实现---链路结束---appName:[{}],appGroup:[{}],appVersion:[{}],traceId:[{}],spanId:[{}]," +
-                                "traceThreadId:[{}],traceThreadName:[{}],traceFunctionName:[{}],traceEndTime:[{}]," +
-                                "protocolCode:[{}],spanType:[{}],timeConsuming:[{}],responseParameter:[{}]",
-                        appName, appGroup, appVersion, traceId, spanId, currentThreadId, currentThreadName,
-                        functionName, traceTime, protocolCode, spanType, message.getTimeConsuming(), parameter);
+                log.debug("trace end：[{}]", JacksonUtil.toStr(message));
             }
         }
+
     }
 
 }
