@@ -13,9 +13,7 @@ import top.mingempty.commons.trace.TraceContext;
 import top.mingempty.commons.trace.constants.TraceConstant;
 import top.mingempty.commons.trace.enums.ProtocolEnum;
 import top.mingempty.commons.trace.enums.SpanTypeEnum;
-import top.mingempty.commons.util.StringUtil;
 import top.mingempty.trace.util.TraceAdapterUtil;
-import top.mingempty.trace.util.TraceIdGenerator;
 
 /**
  * 链路日志过滤器
@@ -34,25 +32,26 @@ public class TraceFluxFilter implements WebFilter, Ordered {
      */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        String traceId = TraceIdGenerator.generateTraceId();
-        String spanId = TraceIdGenerator.generateSpanId();
+        TraceContext traceContext = null;
         try {
             try {
                 //初始化TraceContext
                 ServerHttpRequest serverHttpRequest = exchange.getRequest();
                 HttpHeaders headers = serverHttpRequest.getHeaders();
                 RequestPath requestPath = serverHttpRequest.getPath();
-                traceId = StringUtil.null2Str(headers.getFirst(TraceConstant.TRACE_ID),
-                        traceId);
-                spanId = StringUtil.null2Str(headers.getFirst(TraceConstant.SPAN_ID),
-                        spanId);
+                String traceId = headers.getFirst(TraceConstant.TRACE_ID);
+                String spanId = headers.getFirst(TraceConstant.SPAN_ID);
                 String requestUrl = requestPath.value();
                 // TODO 请求参数待定
-                TraceContext traceContext = TraceAdapterUtil.initTraceContext(requestUrl, traceId, spanId, ProtocolEnum.HTTP, SpanTypeEnum.NORMAL,
+                traceContext = TraceAdapterUtil.initTraceContext(requestUrl, traceId, spanId, ProtocolEnum.HTTP, SpanTypeEnum.NORMAL,
                         "");
                 exchange.getAttributes().put(TraceConstant.TRACE, traceContext);
             } catch (Exception e) {
                 log.debug("链路初始化异常", e);
+            }
+            if (traceContext != null) {
+                TraceContext finalTraceContext = traceContext;
+                return chain.filter(exchange).contextWrite(ctx -> ctx.put(TraceConstant.TRACE, finalTraceContext));
             }
             return chain.filter(exchange);
         } finally {
