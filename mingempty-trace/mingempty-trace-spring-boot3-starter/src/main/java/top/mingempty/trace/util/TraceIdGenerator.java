@@ -23,7 +23,7 @@ public class TraceIdGenerator {
      * @return traceId
      */
     public static String generateTraceId() {
-        return generateTraceId(TraceAdapterUtil.gainTraceContext());
+        return generateTraceId(TraceContext.gainTraceContext());
     }
 
     /**
@@ -62,7 +62,7 @@ public class TraceIdGenerator {
      * @return traceId
      */
     public static String generateSpanId() {
-        return generateSpanId(TraceAdapterUtil.gainTraceContext());
+        return generateSpanId(TraceContext.gainTraceContext());
     }
 
 
