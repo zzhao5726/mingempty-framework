@@ -4,6 +4,7 @@ package top.mingempty.concurrent.thread;
 import cn.hutool.core.map.MapUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import top.mingempty.commons.trace.TraceContext;
@@ -11,6 +12,7 @@ import top.mingempty.commons.trace.constants.TraceConstant;
 import top.mingempty.commons.trace.enums.SpanTypeEnum;
 import top.mingempty.commons.util.JacksonUtil;
 import top.mingempty.concurrent.model.enums.PriorityEnum;
+import top.mingempty.domain.function.ApplyFunction;
 import top.mingempty.trace.util.TraceAdapterUtil;
 
 import java.util.Collections;
@@ -41,6 +43,20 @@ public abstract class AbstractDelegatingContext<V> implements Comparable<Abstrac
      */
     @Schema(title = "异步所需要的参数(封装为不可变MAP)", description = "异步所需要的参数(封装为不可变MAP)")
     protected final Map<String, Object> params;
+
+    /**
+     * 启动异步时前所需执行的方法
+     */
+    @Setter
+    @Schema(title = "启动异步时前所需执行的方法", description = "异常时，则跳过程序执行，")
+    private ApplyFunction applyFunctionByStart;
+
+    /**
+     * 终止异步前所需执行的方法
+     */
+    @Setter
+    @Schema(title = "终止异步前所需执行的方法", description = "终止异步前所需执行的方法")
+    private ApplyFunction applyFunctionByEnd;
 
     /**
      * 闭锁
@@ -157,6 +173,9 @@ public abstract class AbstractDelegatingContext<V> implements Comparable<Abstrac
                     SpanTypeEnum.THREAD_ASYNC,
                     functionName != null ? functionName.toString() : this.getClass().getName(),
                     params);
+            if (applyFunctionByStart != null) {
+                applyFunctionByStart.apply();
+            }
             v = realRun();
             return v;
         } catch (Exception e) {
@@ -167,10 +186,16 @@ public abstract class AbstractDelegatingContext<V> implements Comparable<Abstrac
             }
             throw e;
         } finally {
-            if (countDownLatch != null) {
-                countDownLatch.countDown();
+            try {
+                if (applyFunctionByEnd != null) {
+                    applyFunctionByEnd.apply();
+                }
+            } finally {
+                if (countDownLatch != null) {
+                    countDownLatch.countDown();
+                }
+                TraceAdapterUtil.endTraceContext(v);
             }
-            TraceAdapterUtil.endTraceContext(v);
         }
     }
 
