@@ -25,6 +25,7 @@
         <module>../spring-cloud-starter-mingempty-openfeign</module>
         <module>../mingempty-gateway</module>
         <module>../mingempty-jdbc-spring-boot3-starter</module>
+        <module>../mingempty-cache</module>
     </modules>
 
     <properties>
@@ -70,6 +71,7 @@
         <hikari.version>5.1.0</hikari.version>
         <c3p0.version>0.10.1</c3p0.version>
         <druid.version>1.2.23</druid.version>
+        <redisson-spring-boot-starter.version>3.33.0</redisson-spring-boot-starter.version>
 
     </properties>
 
@@ -274,6 +276,13 @@
                 <version>${druid.version}</version>
             </dependency>
 
+            <!-- redisson-springboot -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson-spring-boot-starter.version}</version>
+            </dependency>
+
 
             <!--👆👆👆👆👆👆👆👆👆👆👆👆👆👆第三方项目的依赖start 👆👆👆👆👆👆👆👆👆👆👆👆👆👆-->
 
@@ -318,6 +327,34 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-trace-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--cache封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-cache</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--cache抽象-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-cache-commons</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--本地缓存封装starter-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-local-cache-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--redis封装starter-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-redis-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
