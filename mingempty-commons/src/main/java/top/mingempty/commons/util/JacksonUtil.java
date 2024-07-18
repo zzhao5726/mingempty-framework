@@ -1,5 +1,6 @@
 package top.mingempty.commons.util;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -46,8 +47,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class JacksonUtil {
@@ -79,28 +82,79 @@ public class JacksonUtil {
         DEFAULT_OBJECT_MAPPER = build();
     }
 
+    /**
+     * 根据配置参数构建一个定制化的ObjectMapper实例。
+     * ObjectMapper是Jackson库中用于序列化和反序列化JSON的主要类。
+     * 这些方法提供了多种方式来配置ObjectMapper的行为，例如是否启用缩进输出、如何处理null值、是否启用默认类型化等。
+     */
     public static ObjectMapper build() {
         return build(IS_ENABLE_INDENT_OUTPUT, DEFAULT_PROPERTY_INCLUSION);
     }
 
+    /**
+     * 根据是否启用缩进输出和JSON属性的包含策略构建ObjectMapper实例。
+     *
+     * @param isEnableIndentOutput 是否启用缩进输出，用于美化JSON格式
+     * @param include              JSON属性的包含策略，决定如何处理null值
+     * @return 配置后的ObjectMapper实例
+     */
     public static ObjectMapper build(boolean isEnableIndentOutput, JsonInclude.Include include) {
         return build(isEnableIndentOutput, include, ACTIVATE_DEFAULT_TYPING);
     }
 
-    private static ObjectMapper build(boolean isEnableIndentOutput, JsonInclude.Include include, boolean activateDefaultTyping) {
+    /**
+     * 根据是否启用缩进输出、JSON属性的包含策略和是否激活默认类型化构建ObjectMapper实例。
+     *
+     * @param isEnableIndentOutput  是否启用缩进输出，用于美化JSON格式
+     * @param include               JSON属性的包含策略，决定如何处理null值
+     * @param activateDefaultTyping 是否激活默认类型化，用于自动处理泛型和继承类型
+     * @return 配置后的ObjectMapper实例
+     */
+    public static ObjectMapper build(boolean isEnableIndentOutput, JsonInclude.Include include,
+                                     boolean activateDefaultTyping) {
+        return build(isEnableIndentOutput, include, activateDefaultTyping, Collections.emptyMap());
+    }
+
+    /**
+     * 根据是否启用缩进输出、JSON属性的包含策略、是否激活默认类型化以及日期格式映射表构建ObjectMapper实例。
+     * 此方法允许对日期时间的序列化和反序列化进行细粒度控制。
+     *
+     * @param isEnableIndentOutput  是否启用缩进输出，用于美化JSON格式
+     * @param include               JSON属性的包含策略，决定如何处理null值
+     * @param activateDefaultTyping 是否激活默认类型化，用于自动处理泛型和继承类型
+     * @param datePatternMap        日期格式映射表，关联日期类型和对应的格式字符串
+     * @return 配置后的ObjectMapper实例
+     */
+    public static ObjectMapper build(boolean isEnableIndentOutput, JsonInclude.Include include,
+                                     boolean activateDefaultTyping, Map<Class<?>, String> datePatternMap) {
+        // 处理日期格式映射表为空的情况
+        if (datePatternMap == null) {
+            datePatternMap = Collections.emptyMap();
+        }
+
+        // 从日期格式映射表中获取或默认指定日期时间的序列化格式
+        String localDateTimeSerializer = datePatternMap.getOrDefault(LocalDateTime.class, DatePattern.PURE_DATETIME_MS_PATTERN);
+        String localTimeSerializer = datePatternMap.getOrDefault(LocalDate.class, DatePattern.PURE_DATE_PATTERN);
+        String localDateSerializer = datePatternMap.getOrDefault(LocalTime.class, DatePattern.PURE_TIME_MS_PATTERN);
+        String dateSerializer = datePatternMap.getOrDefault(Date.class, DatePattern.PURE_DATETIME_MS_PATTERN);
+
+        // 配置Java 8日期时间模块
         JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DatePattern.NORM_DATETIME_PATTERN)));
+        javaTimeModule.addSerializer(LocalDateTime.class,
+                new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(localDateTimeSerializer)));
         javaTimeModule.addSerializer(LocalDate.class,
-                new LocalDateSerializer(DateTimeFormatter.ofPattern(DatePattern.NORM_DATE_PATTERN)));
-        javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(DatePattern.NORM_TIME_PATTERN)));
+                new LocalDateSerializer(DateTimeFormatter.ofPattern(localTimeSerializer)));
+        javaTimeModule.addSerializer(LocalTime.class,
+                new LocalTimeSerializer(DateTimeFormatter.ofPattern(localDateSerializer)));
 
-
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DatePattern.NORM_DATETIME_PATTERN)));
-        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DatePattern.NORM_DATE_PATTERN)));
+        javaTimeModule.addDeserializer(LocalDateTime.class,
+                new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(localDateTimeSerializer)));
+        javaTimeModule.addDeserializer(LocalDate.class,
+                new LocalDateDeserializer(DateTimeFormatter.ofPattern(localTimeSerializer)));
         javaTimeModule.addDeserializer(LocalTime.class,
-                new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DatePattern.NORM_TIME_PATTERN)));
+                new LocalTimeDeserializer(DateTimeFormatter.ofPattern(localDateSerializer)));
 
-
+        // 使用Builder模式构建ObjectMapper实例，配置各种序列化和反序列化选项
         JsonMapper.Builder builder = JsonMapper.builder()
                 .configure(SerializationFeature.INDENT_OUTPUT, isEnableIndentOutput)
                 .configure(MapperFeature.USE_ANNOTATIONS, false)
@@ -110,6 +164,9 @@ public class JacksonUtil {
                 .addModule(new Jdk8Module())
                 .addModule(javaTimeModule)
                 .serializationInclusion(include)
+                //设置日期格式
+
+                .defaultDateFormat(new SimpleDateFormat(dateSerializer))
                 //序列化BigDecimal时之间输出原始数字还是科学计数, 默认false, 即是否以toPlainString()科学计数方式来输出
                 .disable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
                 //允许将JSON空字符串强制转换为null对象值
@@ -136,21 +193,24 @@ public class JacksonUtil {
                 .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
                 //识别单引号
                 .enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
-                //时间格式
+                //禁用某些特性，如：不输出null值
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .defaultDateFormat(new SimpleDateFormat(DatePattern.NORM_DATETIME_PATTERN))
                 //识别Guava包的类
                 .addModule(new GuavaModule())
                 //允许更改基础{@link VisibilityChecker}配置的便捷方法，以更改自动检测的属性类型的详细信息。
                 .visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+
+        // 根据配置决定是否激活默认类型化
         if (activateDefaultTyping) {
-            // 解决反序列化时变成LinkedHashMap问题
+            // 可以解决反序列化时变成LinkedHashMap问题
             builder.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
                     ObjectMapper.DefaultTyping.NON_FINAL,
                     JsonTypeInfo.As.PROPERTY);
         }
+
         return builder.build();
     }
+
 
     /**
      * 设置序列化级别
@@ -202,6 +262,11 @@ public class JacksonUtil {
         if (null == object) {
             return null;
         }
+
+        if (object.getClass().equals(vClass)) {
+            return (V) object;
+        }
+
         try {
             switch (object) {
                 case JsonParser jsonParser -> {
@@ -226,13 +291,27 @@ public class JacksonUtil {
                     return objectMapper.readValue(bytes, vClass);
                 }
                 default -> {
-                    return objectMapper.readValue(toStr(object), vClass);
+                    return objectMapper.readValue(toStr(objectMapper, object), vClass);
                 }
             }
         } catch (IOException ioException) {
-            log.error("jsonStr to node error, object: {}", object, ioException);
+            log.error("json to obj error, object: {}", object, ioException);
             return null;
         }
+    }
+
+    /**
+     * JSON反序列化
+     */
+    public static <V> List<V> toList(Object object, TypeReference<List<V>> vTypeReference) {
+        return toList(DEFAULT_OBJECT_MAPPER, object, vTypeReference);
+    }
+
+    /**
+     * JSON反序列化
+     */
+    public static <V> List<V> toList(ObjectMapper objectMapper, Object object, TypeReference<List<V>> vTypeReference) {
+        return toObj(objectMapper, object, vTypeReference);
     }
 
 
@@ -254,6 +333,7 @@ public class JacksonUtil {
         if (null == object) {
             return null;
         }
+
         try {
             switch (object) {
                 case JsonParser jsonParser -> {
@@ -278,11 +358,11 @@ public class JacksonUtil {
                     return objectMapper.readValue(bytes, vTypeReference);
                 }
                 default -> {
-                    return objectMapper.readValue(toStr(object), vTypeReference);
+                    return objectMapper.readValue(toStr(objectMapper, object), vTypeReference);
                 }
             }
         } catch (IOException ioException) {
-            log.error("jsonStr to node error, object: {}", object, ioException);
+            log.error("json to obj error, object: {}", object, ioException);
             return null;
         }
     }
@@ -300,6 +380,12 @@ public class JacksonUtil {
      */
     public static <V> String toStr(ObjectMapper objectMapper, V v) {
         try {
+            if (ObjUtil.isEmpty(v)) {
+                return null;
+            }
+            if (String.class.equals(v.getClass())) {
+                return (String) v;
+            }
             return objectMapper.writeValueAsString(v);
         } catch (JsonProcessingException e) {
             log.error("jackson to error, obj: {}", v, e);
@@ -387,11 +473,11 @@ public class JacksonUtil {
                     return objectMapper.readTree(bytes);
                 }
                 default -> {
-                    return objectMapper.readTree(toStr(object));
+                    return objectMapper.readTree(toStr(objectMapper, object));
                 }
             }
         } catch (IOException ioException) {
-            log.error("jsonStr to node error, object: {}", object, ioException);
+            log.error("json to node error, object: {}", object, ioException);
             return new ObjectNode(objectMapper.getNodeFactory());
         }
     }
@@ -664,7 +750,7 @@ public class JacksonUtil {
             return null;
         }
         String string = getString(objectMapper, jsonStr, key);
-        return toObj(string, new TypeReference<ArrayList<T>>() {
+        return toList(string, new TypeReference<>() {
         });
     }
 
@@ -685,7 +771,7 @@ public class JacksonUtil {
     public static <T> String add(ObjectMapper objectMapper, String jsonStr, String key, T value) {
         try {
             JsonNode node = objectMapper.readTree(jsonStr);
-            add(node, key, value);
+            add(objectMapper, node, key, value);
             return node.toString();
         } catch (IOException e) {
             log.error("jackson add error, json: {}, key: {}, value: {}", jsonStr, key, value, e);
@@ -696,7 +782,7 @@ public class JacksonUtil {
     /**
      * 向json中添加属性
      */
-    private static <T> void add(JsonNode jsonNode, String key, T value) {
+    private static <T> void add(ObjectMapper objectMapper, JsonNode jsonNode, String key, T value) {
         switch (value) {
             case String s -> ((ObjectNode) jsonNode).put(key, s);
             case Short i -> ((ObjectNode) jsonNode).put(key, i);
@@ -708,7 +794,7 @@ public class JacksonUtil {
             case BigInteger bigInteger -> ((ObjectNode) jsonNode).put(key, bigInteger);
             case Boolean b -> ((ObjectNode) jsonNode).put(key, b);
             case byte[] bytes -> ((ObjectNode) jsonNode).put(key, bytes);
-            case null, default -> ((ObjectNode) jsonNode).put(key, toStr(value));
+            case null, default -> ((ObjectNode) jsonNode).put(key, toStr(objectMapper, value));
         }
     }
 
@@ -751,7 +837,7 @@ public class JacksonUtil {
         try {
             JsonNode node = objectMapper.readTree(jsonStr);
             ((ObjectNode) node).remove(key);
-            add(node, key, value);
+            add(objectMapper, node, key, value);
             return node.toPrettyString();
         } catch (IOException e) {
             log.error("jackson update error, json: {}, pullWaybillKey: {}, value: {}", jsonStr, key, value, e);
@@ -835,6 +921,5 @@ public class JacksonUtil {
             }
         }
     }
-
 }
 

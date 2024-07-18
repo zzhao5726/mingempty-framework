@@ -75,6 +75,11 @@ public interface DatePattern {
     String PURE_TIME_PATTERN = "HHmmss";
 
     /**
+     * 标准日期格式：HHmmssSSS
+     */
+    String PURE_TIME_MS_PATTERN = "HHmmssSSS";
+
+    /**
      * 标准日期格式：yyyyMMddHHmmss
      */
     String PURE_DATETIME_PATTERN = "yyyyMMddHHmmss";
