@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.web.cors.CorsConfiguration;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,7 +26,7 @@ public class GatewayProperties {
      * {@code request-from-inner}
      */
     @Schema(title = "配置需要清洗的请求头")
-    private List<String> clearHeaders = Collections.emptyList();
+    private List<String> clearHeaders = List.of();
 
     /**
      * 跨域配置
