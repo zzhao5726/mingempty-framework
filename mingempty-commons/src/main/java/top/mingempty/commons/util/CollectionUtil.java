@@ -3,9 +3,10 @@ package top.mingempty.commons.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import jakarta.validation.constraints.NotNull;
+import top.mingempty.domain.base.IPage;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,16 +31,16 @@ public class CollectionUtil {
      * @param <T>
      * @return
      */
-    public static <T> List<List<T>> batchSubList(List<T> sourceList, Integer batchCount) {
+    public static <T> List<List<T>> batchSubList(Collection<T> sourceList, Integer batchCount) {
         if (CollUtil.isEmpty(sourceList)) {
-            return new ArrayList<>();
+            return List.of();
         }
-
+        ArrayList<T> ts = new ArrayList<>(sourceList);
         List<List<T>> returnList = new ArrayList<>();
 
         if (ObjUtil.isEmpty(batchCount)
                 || batchCount < 1) {
-            returnList.add(sourceList);
+            returnList.add(ts);
             return returnList;
         }
         // 从第0个下标开始
@@ -51,7 +52,7 @@ public class CollectionUtil {
             } else {
                 endIndex = startIndex + batchCount;
             }
-            returnList.add(sourceList.subList(startIndex, endIndex));
+            returnList.add(ts.subList(startIndex, endIndex));
             startIndex = startIndex + batchCount;
         }
         return returnList;
@@ -62,37 +63,63 @@ public class CollectionUtil {
      * 集合截取
      *
      * @param sourceList 数据
-     * @param page       页码 从1开始
-     * @param batchCount 集合数量
-     * @param <T>
-     * @return
+     * @param iPage      分页参数
+     * @param <T>        泛型
+     * @return 截取后的集合
      */
-    public static <T> List<T> batchSubList(List<T> sourceList, Integer page, Integer batchCount) {
+    public static <T> List<T> batchSubList(Collection<T> sourceList, IPage iPage) {
+        if (iPage == null) {
+            return List.of();
+        }
+        return batchSubList(sourceList, iPage.getStartIndex(), iPage.getEndIndex());
+    }
+
+
+    /**
+     * 集合截取
+     *
+     * @param sourceList 数据
+     * @param startIndex 起始索引
+     * @param endIndex   终止缩印(包含)
+     * @param <T>        泛型
+     * @return 截取后的集合
+     */
+    public static <T> List<T> batchSubList(Collection<T> sourceList, Long startIndex, Long endIndex) {
         if (CollUtil.isEmpty(sourceList)) {
-            return new ArrayList<>();
+            return List.of();
         }
 
-        if (ObjUtil.isEmpty(batchCount)
-                || batchCount < 1) {
-            return sourceList;
+        if (ObjUtil.isEmpty(endIndex)
+                || endIndex < 0) {
+            endIndex = -1L;
         }
 
-        if (ObjUtil.isEmpty(page) || page < 1) {
-            page = 1;
+        if (endIndex == 0) {
+            return List.of();
         }
 
-        int startIndex = (page - 1) * batchCount;
-        List<T> returnList = new ArrayList<>();
+        if (ObjUtil.isEmpty(startIndex)
+                || startIndex < 0) {
+            startIndex = 0L;
+        }
+
+        if (startIndex == 0
+                && endIndex == -1) {
+            return new ArrayList<>(sourceList);
+        }
+
         if (startIndex < sourceList.size()) {
-            int endIndex = 0;
-            if (sourceList.size() - batchCount < startIndex) {
-                endIndex = sourceList.size();
-            } else {
-                endIndex = startIndex + batchCount;
-            }
-            returnList.addAll(sourceList.subList(startIndex, endIndex));
+            return new ArrayList<>(sourceList).subList(startIndex.intValue(), endIndex.intValue() + 1);
         }
-        return returnList;
+        return List.of();
+    }
+
+    public static void main(String[] args) {
+        List<String> list = List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
+
+        List<String> strings = batchSubList(list, 0L, 5L);
+        System.out.println(strings);
+
     }
 
     /**
@@ -194,7 +221,7 @@ public class CollectionUtil {
                                            BiConsumer<T, List<T>> fieldBiConsumer,
                                            @NotNull K superFieldValue) {
         if (CollUtil.isEmpty(nodes)) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         if (Objects.isNull(superFieldValue)) {

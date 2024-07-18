@@ -15,7 +15,6 @@ import org.springframework.lang.Nullable;
 import top.mingempty.commons.util.StringUtil;
 
 import java.beans.Introspector;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -142,7 +141,7 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
     public static <T> List<T> getBeanListOfType(Class<T> beanClass) {
         Map<String, T> beanMapOfType = gainBeanMapOfType(beanClass);
         if (MapUtil.isEmpty(beanMapOfType)) {
-            return Collections.emptyList();
+            return List.of();
         }
         return beanMapOfType
                 .entrySet()

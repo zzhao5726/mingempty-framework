@@ -1,6 +1,7 @@
 package top.mingempty.condition;
 
 
+import cn.hutool.core.util.StrUtil;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.Ordered;
@@ -8,7 +9,6 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 import top.mingempty.util.EnvironmentUtil;
 
 import java.util.ArrayList;
@@ -23,6 +23,8 @@ import java.util.Objects;
  * 通过配置文件中指定的前缀进行注入bean
  * <p>
  * bean注入时，若注解{@link ConditionalOnHavingProperties}存在，则进行判断，判断配置文件中是否有指定的前缀，若存在，则允许注入，反之亦然。
+ *
+ * @author zzhao
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class HavingPropertiesCondition implements Condition {
@@ -42,7 +44,7 @@ public class HavingPropertiesCondition implements Condition {
 
             String prefix = allAnnotationAttribute.getString("prefix").trim();
 
-            if (StringUtils.hasText(prefix) && !prefix.endsWith(".")) {
+            if (StrUtil.isNotBlank(prefix) && !prefix.endsWith(".")) {
                 prefix = prefix + ".";
             }
             String[] valueS = (String[]) allAnnotationAttribute.get("value");
@@ -51,9 +53,9 @@ public class HavingPropertiesCondition implements Condition {
             }
             String finalPrefix = prefix;
             if (Arrays.stream(valueS).anyMatch(value
-                            -> !EnvironmentUtil.startsWith(
-                            finalPrefix.concat(value.endsWith(".")
-                                    ? value : value.concat("."))))) {
+                    -> !EnvironmentUtil.startsWith(
+                    finalPrefix.concat(value.endsWith(".")
+                            ? value : value.concat("."))))) {
                 //存在是则注入
                 return Boolean.FALSE;
             }
