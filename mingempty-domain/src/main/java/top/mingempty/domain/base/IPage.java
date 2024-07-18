@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import top.mingempty.domain.enums.DirectionEnum;
 
 
@@ -16,6 +17,7 @@ import top.mingempty.domain.enums.DirectionEnum;
  */
 @Data
 @EqualsAndHashCode
+@Accessors(chain = true)
 @Schema(title = "分页参数数据模型", description = "分页参数数据模型")
 public class IPage {
 
@@ -56,7 +58,7 @@ public class IPage {
      * 查询起始索引
      */
     @Schema(title = "查询终止索引", description = "查询终止索引")
-    private long endIndex = -1;
+    private long endIndex = 0;
 
     /**
      * 是否查询总数量
@@ -114,7 +116,7 @@ public class IPage {
     }
 
     public long getPageSize() {
-        if (pageSize < 1) {
+        if (pageSize < 0) {
             this.pageSize = 10;
         }
         return this.pageSize;
@@ -124,7 +126,7 @@ public class IPage {
      * 获取查询起始索引
      */
     public long getStartIndex() {
-        if (this.startIndex < 0) {
+        if (this.startIndex == 0) {
             this.startIndex = (this.getPageNo() - 1) * this.getPageSize();
         }
         if (this.startIndex < 0) {
@@ -137,7 +139,7 @@ public class IPage {
         if (this.endIndex == 0) {
             this.endIndex = this.getStartIndex() + this.getPageSize() - 1;
         }
-        if (this.endIndex < -1) {
+        if (this.endIndex < -2) {
             this.endIndex = -1L;
         }
         return this.endIndex;
