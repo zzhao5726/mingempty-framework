@@ -27,20 +27,6 @@ public class RemoveDefaultOpenApiEnvironmentPostProcessor implements Environment
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 
         List<String> removeKeys = new CopyOnWriteArrayList<>();
-        environment.getSystemEnvironment()
-                .entrySet()
-                .parallelStream()
-                .forEach(entry -> {
-                    if (entry.getKey().startsWith("springdoc")) {
-                        if (!environment.getSystemProperties().containsKey(entry.getKey())) {
-                            environment.getSystemProperties().put(entry.getKey().replace("springdoc", "me.openapi.spring"), entry.getValue());
-                        }
-                        removeKeys.add(entry.getKey());
-                    }
-                });
-        removeKeys.parallelStream().forEach(key -> environment.getSystemEnvironment().remove(key));
-
-        removeKeys.clear();
 
         environment.getSystemProperties()
                 .entrySet()
@@ -53,7 +39,9 @@ public class RemoveDefaultOpenApiEnvironmentPostProcessor implements Environment
                         removeKeys.add(entry.getKey());
                     }
                 });
-        removeKeys.parallelStream().forEach(key -> environment.getSystemEnvironment().remove(key));
+        removeKeys.parallelStream().forEach(key -> environment.getSystemProperties().remove(key));
+
+        removeKeys.clear();
     }
 
     /**

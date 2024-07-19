@@ -81,6 +81,12 @@ public class StopWatch {
     private long startTimeNanos;
 
     /**
+     * 结束时间
+     */
+    @Getter
+    private long endTimeNanos;
+
+    /**
      * 最后一次任务对象
      */
     private TaskInfo lastTaskInfo;
@@ -174,10 +180,10 @@ public class StopWatch {
         if (null == this.currentTaskName) {
             throw new IllegalStateException("Can't stop StopWatch: it's not running");
         }
-        long nanoTime = System.nanoTime();
+        endTimeNanos = System.nanoTime();
         final long lastTime = System.nanoTime() - this.startTimeNanos;
         this.totalTimeNanos += lastTime;
-        this.lastTaskInfo = new TaskInfo(this.currentTaskName, lastTime, this.startTimeNanos, nanoTime);
+        this.lastTaskInfo = new TaskInfo(this.currentTaskName, lastTime, this.startTimeNanos, endTimeNanos);
         if (null != this.taskList) {
             this.taskList.add(this.lastTaskInfo);
         }
