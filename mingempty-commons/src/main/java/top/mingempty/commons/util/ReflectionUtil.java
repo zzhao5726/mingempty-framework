@@ -23,6 +23,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 反射工具类
+ *
+ * @author zzhao
+ */
 @Slf4j
 public class ReflectionUtil {
 
@@ -194,7 +199,7 @@ public class ReflectionUtil {
      * @param t 对象
      * @return
      */
-    public static <T,V> V getValue(String f, T t) {
+    public static <T, V> V getValue(String f, T t) {
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(t.getClass());
             PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();

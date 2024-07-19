@@ -24,6 +24,7 @@
         <module>../mingempty-concurrent-spring-boot3-starter</module>
         <module>../spring-cloud-starter-mingempty-openfeign</module>
         <module>../mingempty-gateway</module>
+        <module>../mingempty-jdbc-spring-boot3-starter</module>
     </modules>
 
     <properties>
@@ -66,6 +67,9 @@
         <hutool.version>5.8.28</hutool.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <springdoc-openapi-starte.version>2.6.0</springdoc-openapi-starte.version>
+        <hikari.version>5.1.0</hikari.version>
+        <c3p0.version>0.10.1</c3p0.version>
+        <druid.version>1.2.23</druid.version>
 
     </properties>
 
@@ -242,6 +246,34 @@
                 <version>${transmittable-thread-local.version}</version>
             </dependency>
 
+            <!--数据库连接池 HikariCP -->
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikari.version}</version>
+            </dependency>
+
+            <!--数据库连接池 c3p0 -->
+            <dependency>
+                <groupId>com.mchange</groupId>
+                <artifactId>c3p0</artifactId>
+                <version>${c3p0.version}</version>
+            </dependency>
+
+            <!--数据库连接池 druid-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+
+            <!--数据库连接池 druid-spring-boot-starter-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+
 
             <!--👆👆👆👆👆👆👆👆👆👆👆👆👆👆第三方项目的依赖start 👆👆👆👆👆👆👆👆👆👆👆👆👆👆-->
 
@@ -307,6 +339,13 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-concurrent-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对jdbc的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-jdbc-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
