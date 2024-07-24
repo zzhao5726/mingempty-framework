@@ -26,6 +26,12 @@ public class ThreadPoolProperties {
     private Boolean enabled;
 
     /**
+     * 虚拟线程名称
+     */
+    @Schema(title = "虚拟线程名称", description = "虚拟线程名称")
+    private String virtualName="me-Virtual-Thread";
+
+    /**
      * 核心线程数（默认为CPU核心数除以2取整）
      */
     @Schema(title = "核心线程数（默认为CPU核心数除以2取整）", description = "核心线程数（默认为CPU核心数除以2取整）")
@@ -73,7 +79,7 @@ public class ThreadPoolProperties {
      * 线程别名
      */
     @Schema(title = "线程别名", description = "线程别名")
-    private String threadName = "Bt-Delegating-ThreadPool-%d";
+    private String threadName = "me-Delegating-ThreadPool-%d";
 
 
     /**
