@@ -42,8 +42,9 @@ public class DatasourceAutoConfigure {
      */
     @Bean
     @ConditionalOnClass(name = "io.seata.rm.datasource.DataSourceProxy")
-    @ConditionalOnExpression("#{'${me.datasource.enabled-auto-seata-data-source-proxy}'.equals('true') " +
-            "and '${me.datasource.seata-data-source-proxy-mode}'.equals('AT')}")
+    @ConditionalOnExpression("#{'${me.datasource.enabled-seata}'.equals('true') " +
+            " and '${me.datasource.enabled-auto-seata-data-source-proxy}'.equals('true')"+
+            " and '${me.datasource.seata-data-source-proxy-mode}'.equals('AT')}")
     public SeataAtAspect seataAtAspect() {
         return new SeataAtAspect();
     }
@@ -56,8 +57,9 @@ public class DatasourceAutoConfigure {
      */
     @Bean
     @ConditionalOnClass(name = "io.seata.rm.datasource.DataSourceProxy")
-    @ConditionalOnExpression("#{'${me.datasource.enabled-auto-seata-data-source-proxy}'.equals('true') " +
-            "and '${me.datasource.seata-data-source-proxy-mode}'.equals('XA')}")
+    @ConditionalOnExpression("#{'${me.datasource.enabled-seata}'.equals('true') " +
+            " and '${me.datasource.enabled-auto-seata-data-source-proxy}'.equals('true')"+
+            " and '${me.datasource.seata-data-source-proxy-mode}'.equals('XA')}")
     public SeataXaAspect seataXaAspect() {
         return new SeataXaAspect();
     }
