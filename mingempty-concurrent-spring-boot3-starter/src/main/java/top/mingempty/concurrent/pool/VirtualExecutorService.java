@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class VirtualExecutorService implements DisposableBean, ExecutorService {
 
 
-    private final ExecutorService VIRTUAL_EXECUTOR_SERVICE = Executors.newVirtualThreadPerTaskExecutor();
+    private final ExecutorService VIRTUAL_EXECUTOR_SERVICE;
 
     /**
      * 线程结束时超时时间
@@ -41,12 +41,16 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
     private final TimeUnit unit;
 
     public VirtualExecutorService() {
-        this(null, null);
+        this("me-Virtual-Thread", null, null);
     }
 
-    public VirtualExecutorService(Long timeout, TimeUnit unit) {
+    public VirtualExecutorService(String virtualName, Long timeout, TimeUnit unit) {
         this.timeout = timeout == null ? 1L : timeout;
         this.unit = unit == null ? TimeUnit.MINUTES : unit;
+        this.VIRTUAL_EXECUTOR_SERVICE = Executors.newThreadPerTaskExecutor(Thread
+                .ofVirtual()
+                .name(virtualName == null ? "me-Virtual-Thread" : virtualName, 0)
+                .factory());
     }
 
     /**
