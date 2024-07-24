@@ -54,7 +54,8 @@ public class ConcurrentConfig {
     @Bean
     @Primary
     public VirtualExecutorService virtualExecutorService(ThreadPoolProperties threadPoolProperties) {
-        return new VirtualExecutorService(threadPoolProperties.getAwaitTermination(),
+        return new VirtualExecutorService(threadPoolProperties.getVirtualName(),
+                threadPoolProperties.getAwaitTermination(),
                 threadPoolProperties.getAwaitTerminationTimeUnit());
     }
 
