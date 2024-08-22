@@ -1,7 +1,6 @@
 package top.mingempty.util;
 
 import cn.hutool.core.map.MapUtil;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinitionCustomizer;
@@ -27,16 +26,12 @@ import java.util.stream.Collectors;
  */
 public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationContextAware {
 
-    @Getter
     private static DefaultListableBeanFactory DEFAULT_LISTABLE_BEAN_FACTORY;
 
-    @Getter
     private static ConfigurableListableBeanFactory CONFIGURABLE_LISTABLE_BEAN_FACTORY;
 
-    @Getter
     private static ApplicationContext APPLICATION_CONTEXT;
 
-    @Getter
     private static GenericApplicationContext GENERIC_APPLICATION_CONTEXT;
 
 
@@ -73,7 +68,7 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
      * @param className 类名称
      */
     public static void destroy(String className) {
-        DEFAULT_LISTABLE_BEAN_FACTORY.destroySingleton(Introspector.decapitalize(ClassUtils.getShortName(className)));
+        gainDefaultListableBeanFactory().destroySingleton(Introspector.decapitalize(ClassUtils.getShortName(className)));
     }
 
 
@@ -85,8 +80,8 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
      * @return 获取的bean
      */
     public static <T> T gainBean(String beanName) {
-        if (APPLICATION_CONTEXT.containsBean(beanName)) {
-            return (T) APPLICATION_CONTEXT.getBean(beanName);
+        if (gainApplicationContext().containsBean(beanName)) {
+            return (T) gainApplicationContext().getBean(beanName);
         } else {
             return null;
         }
@@ -101,7 +96,7 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
      */
     public static <T> T gainBean(Class<T> beanClass) {
         try {
-            return APPLICATION_CONTEXT.getBean(beanClass);
+            return gainApplicationContext().getBean(beanClass);
         } catch (Exception e) {
             return null;
         }
@@ -116,7 +111,7 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
      * @return
      */
     public static <T> T gainBean(String name, Class<T> beanClass) {
-        return getApplicationContext().getBean(name, beanClass);
+        return gainApplicationContext().getBean(name, beanClass);
     }
 
 
@@ -128,7 +123,7 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
      * @return
      */
     public static <T> Map<String, T> gainBeanMapOfType(Class<T> beanClass) {
-        return APPLICATION_CONTEXT.getBeansOfType(beanClass);
+        return gainApplicationContext().getBeansOfType(beanClass);
     }
 
     /**
@@ -181,8 +176,8 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
      * @param <T>       泛型
      */
     public static <T> void registerSingleton(Class<T> beanClass) {
-        DEFAULT_LISTABLE_BEAN_FACTORY.registerSingleton(StringUtil.beanName(beanClass.getName()),
-                DEFAULT_LISTABLE_BEAN_FACTORY.createBean(beanClass));
+        gainDefaultListableBeanFactory().registerSingleton(StringUtil.beanName(beanClass.getName()),
+                gainDefaultListableBeanFactory().createBean(beanClass));
     }
 
 
@@ -198,7 +193,7 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
     @SneakyThrows
     public static <T> void registerBean(@Nullable String beanName, Class<T> beanClass,
                                         @Nullable Supplier<T> supplier, BeanDefinitionCustomizer... customizers) {
-        GENERIC_APPLICATION_CONTEXT.registerBean(beanName, beanClass, supplier, customizers);
+        gainGenericApplicationContext().registerBean(beanName, beanClass, supplier, customizers);
     }
 
     /**
@@ -206,19 +201,31 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
      *
      * @return
      */
-    public static ApplicationContext getApplicationContext() {
+    public static ApplicationContext gainApplicationContext() {
         return APPLICATION_CONTEXT;
     }
 
+    public static DefaultListableBeanFactory gainDefaultListableBeanFactory() {
+        return DEFAULT_LISTABLE_BEAN_FACTORY;
+    }
+
+    public static ConfigurableListableBeanFactory gainConfigurableListableBeanFactory() {
+        return CONFIGURABLE_LISTABLE_BEAN_FACTORY;
+    }
+
+    public static GenericApplicationContext gainGenericApplicationContext() {
+        return GENERIC_APPLICATION_CONTEXT;
+    }
+
     public static boolean containsBean(String name) {
-        return APPLICATION_CONTEXT.containsBean(name);
+        return gainApplicationContext().containsBean(name);
     }
 
     public static boolean isSingleton(String name) {
-        return APPLICATION_CONTEXT.isSingleton(name);
+        return gainApplicationContext().isSingleton(name);
     }
 
     public static Class<?> getType(String name) {
-        return APPLICATION_CONTEXT.getType(name);
+        return gainApplicationContext().getType(name);
     }
 }

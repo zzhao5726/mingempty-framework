@@ -3,8 +3,9 @@ package top.mingempty.cache.redis.annotation;
 
 import org.springframework.context.annotation.Import;
 import top.mingempty.cache.local.annotation.EnabledLocalCache;
-import top.mingempty.cache.redis.config.RedisDiasbleDefaultCacheConfig;
 import top.mingempty.cache.redis.config.RedisCacheConfig;
+import top.mingempty.cache.redis.config.RedisDiasbleDefaultCacheConfig;
+import top.mingempty.cache.redis.config.RedisObjectMapperConfig;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -23,7 +24,7 @@ import java.lang.annotation.Target;
 @EnabledLocalCache
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Import({RedisDiasbleDefaultCacheConfig.class, RedisCacheConfig.class})
+@Import({RedisDiasbleDefaultCacheConfig.class, RedisObjectMapperConfig.class, RedisCacheConfig.class})
 public @interface EnabledRedisCache {
 
 }

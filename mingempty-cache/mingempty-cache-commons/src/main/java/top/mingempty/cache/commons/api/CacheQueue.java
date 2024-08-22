@@ -1,6 +1,5 @@
 package top.mingempty.cache.commons.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import top.mingempty.domain.base.IPage;
 import top.mingempty.domain.other.GlobalConstant;
 
@@ -431,206 +430,206 @@ public interface CacheQueue {
     /**
      * 从指定键的列表中弹出并删除第一个元素。
      *
-     * @param <E>         元素的类型
-     * @param key         列表的键
-     * @param elementType 元素的类型类
+     * @param <E>    元素的类型
+     * @param key    列表的键
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
-    default <E> E queueLpop(String key, Class<E> elementType) {
-        return queueLpopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, elementType);
+    default <E> E queueLpop(String key, Class<E> eClass) {
+        return queueLpopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, eClass);
     }
 
     /**
      * 从指定实例和键的列表中弹出并删除第一个元素。
      *
-     * @param <E>         元素的类型
-     * @param instanceId  实例ID
-     * @param key         列表的键
-     * @param elementType 元素的类型类
+     * @param <E>        元素的类型
+     * @param instanceId 实例ID
+     * @param key        列表的键
+     * @param eClass     元素的类型类
      * @return 被弹出的元素
      */
-    <E> E queueLpopForInstance(String instanceId, String key, Class<E> elementType);
+    <E> E queueLpopForInstance(String instanceId, String key, Class<E> eClass);
 
     /**
      * 从指定键的列表中在指定时间内弹出并删除第一个元素。
      *
-     * @param <E>         元素的类型
-     * @param key         列表的键
-     * @param timeout     等待时间（毫秒）
-     * @param elementType 元素的类型类
+     * @param <E>     元素的类型
+     * @param key     列表的键
+     * @param timeout 等待时间（毫秒）
+     * @param eClass  元素的类型类
      * @return 被弹出的元素
      */
-    default <E> E queueLpop(String key, long timeout, Class<E> elementType) {
-        return queueLpopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, timeout, elementType);
+    default <E> E queueLpop(String key, long timeout, Class<E> eClass) {
+        return queueLpopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, timeout, eClass);
     }
 
     /**
      * 从指定实例和键的列表在指定时间内中弹出并删除第一个元素。
      *
-     * @param <E>         元素的类型
-     * @param instanceId  实例ID
-     * @param key         列表的键
-     * @param timeout     等待时间（毫秒）
-     * @param elementType 元素的类型类
+     * @param <E>        元素的类型
+     * @param instanceId 实例ID
+     * @param key        列表的键
+     * @param timeout    等待时间（毫秒）
+     * @param eClass     元素的类型类
      * @return 被弹出的元素
      */
-    default <E> E queueLpopForInstance(String instanceId, String key, long timeout, Class<E> elementType) {
-        return queueLpopForInstance(instanceId, key, timeout, TimeUnit.MILLISECONDS, elementType);
+    default <E> E queueLpopForInstance(String instanceId, String key, long timeout, Class<E> eClass) {
+        return queueLpopForInstance(instanceId, key, timeout, TimeUnit.MILLISECONDS, eClass);
     }
 
     /**
      * 从指定键的列表中在指定时间内弹出并删除第一个元素。
      *
-     * @param <E>         元素的类型
-     * @param key         列表的键
-     * @param timeout     等待时间
-     * @param unit        等待时间单位
-     * @param elementType 元素的类型类
+     * @param <E>     元素的类型
+     * @param key     列表的键
+     * @param timeout 等待时间
+     * @param unit    等待时间单位
+     * @param eClass  元素的类型类
      * @return 被弹出的元素
      */
-    default <E> E queueLpop(String key, long timeout, TimeUnit unit, Class<E> elementType) {
-        return queueLpopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, timeout, unit, elementType);
+    default <E> E queueLpop(String key, long timeout, TimeUnit unit, Class<E> eClass) {
+        return queueLpopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, timeout, unit, eClass);
     }
 
     /**
      * 从指定实例和键的列表中在指定时间内弹出并删除第一个元素。
      *
-     * @param <E>         元素的类型
-     * @param instanceId  实例ID
-     * @param key         列表的键
-     * @param elementType 元素的类型类
-     * @param timeout     等待时间
-     * @param unit        等待时间单位
+     * @param <E>        元素的类型
+     * @param instanceId 实例ID
+     * @param key        列表的键
+     * @param eClass     元素的类型类
+     * @param timeout    等待时间
+     * @param unit       等待时间单位
      * @return 被弹出的元素
      */
-    <E> E queueLpopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> elementType);
+    <E> E queueLpopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> eClass);
 
     /**
      * 从指定键的列表中弹出并删除最后一个元素。
      *
-     * @param <E>         元素的类型
-     * @param key         列表的键
-     * @param elementType 元素的类型类
+     * @param <E>    元素的类型
+     * @param key    列表的键
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
-    default <E> E queueRPop(String key, Class<E> elementType) {
-        return queueRPopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, elementType);
+    default <E> E queueRPop(String key, Class<E> eClass) {
+        return queueRPopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, eClass);
     }
 
     /**
      * 从指定实例和键的列表中弹出并删除最后一个元素。
      *
-     * @param <E>         元素的类型
-     * @param instanceId  实例ID
-     * @param key         列表的键
-     * @param elementType 元素的类型类
+     * @param <E>        元素的类型
+     * @param instanceId 实例ID
+     * @param key        列表的键
+     * @param eClass     元素的类型类
      * @return 被弹出的元素
      */
-    <E> E queueRPopForInstance(String instanceId, String key, Class<E> elementType);
+    <E> E queueRPopForInstance(String instanceId, String key, Class<E> eClass);
 
     /**
      * 从指定键的列表中在指定时间内弹出并删除最后一个元素。
      *
-     * @param <E>         元素的类型
-     * @param key         列表的键
-     * @param elementType 元素的类型类
-     * @param timeout     等待时间
+     * @param <E>     元素的类型
+     * @param key     列表的键
+     * @param eClass  元素的类型类
+     * @param timeout 等待时间
      * @return 被弹出的元素
      */
-    default <E> E queueRPop(String key, long timeout, Class<E> elementType) {
-        return queueRPopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, timeout, elementType);
+    default <E> E queueRPop(String key, long timeout, Class<E> eClass) {
+        return queueRPopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, timeout, eClass);
     }
 
     /**
      * 从指定实例和键的列表中在指定时间内弹出并删除最后一个元素。
      *
-     * @param <E>         元素的类型
-     * @param instanceId  实例ID
-     * @param key         列表的键
-     * @param elementType 元素的类型类
-     * @param timeout     等待时间
+     * @param <E>        元素的类型
+     * @param instanceId 实例ID
+     * @param key        列表的键
+     * @param eClass     元素的类型类
+     * @param timeout    等待时间
      * @return 被弹出的元素
      */
-    default <E> E queueRPopForInstance(String instanceId, String key, long timeout, Class<E> elementType) {
-        return queueRPopForInstance(instanceId, key, timeout, TimeUnit.MILLISECONDS, elementType);
+    default <E> E queueRPopForInstance(String instanceId, String key, long timeout, Class<E> eClass) {
+        return queueRPopForInstance(instanceId, key, timeout, TimeUnit.MILLISECONDS, eClass);
     }
 
     /**
      * 从指定键的列表中在指定时间内弹出并删除最后一个元素。
      *
-     * @param <E>         元素的类型
-     * @param key         列表的键
-     * @param timeout     等待时间
-     * @param unit        等待时间单位
-     * @param elementType 元素的类型类
+     * @param <E>     元素的类型
+     * @param key     列表的键
+     * @param timeout 等待时间
+     * @param unit    等待时间单位
+     * @param eClass  元素的类型类
      * @return 被弹出的元素
      */
-    default <E> E queueRPop(String key, long timeout, TimeUnit unit, Class<E> elementType) {
-        return queueRPopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, timeout, unit, elementType);
+    default <E> E queueRPop(String key, long timeout, TimeUnit unit, Class<E> eClass) {
+        return queueRPopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, timeout, unit, eClass);
     }
 
     /**
      * 从指定实例和键的列表中在指定时间内弹出并删除最后一个元素。
      *
-     * @param <E>         元素的类型
-     * @param instanceId  实例ID
-     * @param key         列表的键
-     * @param timeout     等待时间
-     * @param unit        等待时间单位
-     * @param elementType 元素的类型类
+     * @param <E>        元素的类型
+     * @param instanceId 实例ID
+     * @param key        列表的键
+     * @param timeout    等待时间
+     * @param unit       等待时间单位
+     * @param eClass     元素的类型类
      * @return 被弹出的元素
      */
-    <E> E queueRPopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> elementType);
+    <E> E queueRPopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> eClass);
 
     /**
      * 从指定键的列表中在指定时间内弹出并删除最后一个元素。
      *
-     * @param <E>         元素的类型
-     * @param key         列表的键
-     * @param listTypeReference 元素的类型类
+     * @param <E>    元素的类型
+     * @param key    列表的键
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
-    default <E> List<E> queueAll(String key, TypeReference<List<E>> listTypeReference) {
-        return queueAllForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, listTypeReference);
+    default <E> List<E> queueAll(String key, Class<E> eClass) {
+        return queueAllForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, eClass);
     }
 
     /**
      * 从指定实例和键的列表中在指定时间内弹出并删除最后一个元素。
      *
-     * @param <E>         元素的类型
-     * @param instanceId  实例ID
-     * @param key         列表的键
-     * @param listTypeReference 元素的类型类
+     * @param <E>        元素的类型
+     * @param instanceId 实例ID
+     * @param key        列表的键
+     * @param eClass     元素的类型类
      * @return 被弹出的元素
      */
-    default <E> List<E> queueAllForInstance(String instanceId, String key, TypeReference<List<E>> listTypeReference) {
-        return queuePageForInstance(instanceId, key, IPage.build(1, 0).setSearchCount(false), listTypeReference);
+    default <E> List<E> queueAllForInstance(String instanceId, String key, Class<E> eClass) {
+        return queuePageForInstance(instanceId, key, IPage.build(1, 0).setSearchCount(false), eClass);
     }
 
     /**
      * 从指定键的列表中在指定时间内弹出并删除最后一个元素。
      *
-     * @param <E>         元素的类型
-     * @param key         列表的键
-     * @param iPage       分页参数
-     * @param listTypeReference 元素的类型类
+     * @param <E>    元素的类型
+     * @param key    列表的键
+     * @param iPage  分页参数
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
-    default <E> List<E> queuePage(String key, final IPage iPage, TypeReference<List<E>> listTypeReference) {
-        return queuePageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage, listTypeReference);
+    default <E> List<E> queuePage(String key, final IPage iPage, Class<E> eClass) {
+        return queuePageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage, eClass);
     }
 
     /**
      * 从指定实例和键的列表中在指定时间内弹出并删除最后一个元素。
      *
-     * @param <E>         元素的类型
-     * @param instanceId  实例ID
-     * @param key         列表的键
-     * @param iPage       分页参数
-     * @param listTypeReference 元素的类型类
+     * @param <E>        元素的类型
+     * @param instanceId 实例ID
+     * @param key        列表的键
+     * @param iPage      分页参数
+     * @param eClass     元素的类型类
      * @return 被弹出的元素
      */
-    <E> List<E> queuePageForInstance(String instanceId, String key, final IPage iPage, TypeReference<List<E>> listTypeReference);
+    <E> List<E> queuePageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass);
 
     /**
      * 从指定键的列表中删除指定索引的元素。
@@ -698,27 +697,27 @@ public interface CacheQueue {
     /**
      * 从指定键的列表中获取指定索引的元素。
      *
-     * @param <E>         元素的类型
-     * @param key         列表的键
-     * @param index       要获取的索引
-     * @param elementType 元素的类型类
+     * @param <E>    元素的类型
+     * @param key    列表的键
+     * @param index  要获取的索引
+     * @param eClass 元素的类型类
      * @return 指定索引的元素
      */
-    default <E> E queueGet(String key, int index, Class<E> elementType) {
-        return queueGetForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, index, elementType);
+    default <E> E queueGet(String key, int index, Class<E> eClass) {
+        return queueGetForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, index, eClass);
     }
 
     /**
      * 从指定实例和键的列表中获取指定索引的元素。
      *
-     * @param <E>         元素的类型
-     * @param instanceId  实例ID
-     * @param key         列表的键
-     * @param index       要获取的索引
-     * @param elementType 元素的类型类
+     * @param <E>        元素的类型
+     * @param instanceId 实例ID
+     * @param key        列表的键
+     * @param index      要获取的索引
+     * @param eClass     元素的类型类
      * @return 指定索引的元素
      */
-    <E> E queueGetForInstance(String instanceId, String key, int index, Class<E> elementType);
+    <E> E queueGetForInstance(String instanceId, String key, int index, Class<E> eClass);
 
     /**
      * 检查指定键的列表是否包含指定元素。

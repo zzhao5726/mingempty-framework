@@ -1,6 +1,5 @@
 package top.mingempty.cache.redis.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
 import org.springframework.data.redis.connection.zset.Aggregate;
@@ -10,7 +9,6 @@ import top.mingempty.cache.commons.api.CacheZSet;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -43,11 +41,11 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param instanceId        实例ID
      * @param key               元素的键
      * @param pattern           元素格式
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 操作结果
      */
     @Override
-    default <E> Map<E, Double> zsetScanForInstance(String instanceId, String key, String pattern,  Class<E> elementType) {
+    default <E> Map<E, Double> zsetScanForInstance(String instanceId, String key, String pattern,  Class<E> eClass) {
         if (pattern == null) {
             pattern = "*";
         }
@@ -57,7 +55,7 @@ public interface RedisCacheZSet extends CacheZSet {
         if (!pattern.endsWith("*")) {
             pattern = pattern.concat("*");
         }
-        return zsetScanForInstance(instanceId, key, ScanOptions.scanOptions().match(pattern).build(), elementType);
+        return zsetScanForInstance(instanceId, key, ScanOptions.scanOptions().match(pattern).build(), eClass);
     }
 
     /**
@@ -65,11 +63,11 @@ public interface RedisCacheZSet extends CacheZSet {
      *
      * @param key               元素的键
      * @param options           元素格式
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 操作结果
      */
-    default <E> Map<E, Double> zsetScan(String key, ScanOptions options,  Class<E> elementType) {
-        return zsetScanForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, options, elementType);
+    default <E> Map<E, Double> zsetScan(String key, ScanOptions options,  Class<E> eClass) {
+        return zsetScanForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, options, eClass);
     }
 
     /**
@@ -78,10 +76,10 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param instanceId        实例ID
      * @param key               元素的键
      * @param options           元素格式
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 操作结果
      */
-    <E> Map<E, Double> zsetScanForInstance(String instanceId, String key, ScanOptions options,  Class<E> elementType);
+    <E> Map<E, Double> zsetScanForInstance(String instanceId, String key, ScanOptions options,  Class<E> eClass);
 
     /**
      * 移除指定实例和键的有序集合中，值在指定范围内的所有元素。
@@ -124,12 +122,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param <E>         元素类型
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @param aggregate:  分数的聚合方式，可以是 Aggregate.SUM 或者 Aggregate.MIN 或者 Aggregate.MAX。
      * @return 集合中的所有元素
      */
-    default <E> Map<E, Double> zsetIntersectWithStore(String key, Collection<String> otherKeys, Class<E> elementType, Aggregate aggregate) {
-        return zsetIntersectWithStoreForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, elementType, aggregate);
+    default <E> Map<E, Double> zsetIntersectWithStore(String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate) {
+        return zsetIntersectWithStoreForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, eClass, aggregate);
     }
 
     /**
@@ -139,12 +137,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @param aggregate:  分数的聚合方式，可以是 Aggregate.SUM 或者 Aggregate.MIN 或者 Aggregate.MAX。
      * @return 集合中的所有元素
      */
-    default <E> Map<E, Double> zsetIntersectWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType, Aggregate aggregate) {
-        return zsetIntersectWithStoreForInstance(instanceId, key, otherKeys, elementType, aggregate, Weights.fromSetCount(1 + otherKeys.size()));
+    default <E> Map<E, Double> zsetIntersectWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate) {
+        return zsetIntersectWithStoreForInstance(instanceId, key, otherKeys, eClass, aggregate, Weights.fromSetCount(1 + otherKeys.size()));
     }
 
     /**
@@ -153,13 +151,13 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param <E>         元素类型
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @param aggregate:  分数的聚合方式，可以是 Aggregate.SUM 或者 Aggregate.MIN 或者 Aggregate.MAX。
      * @param weights:    每个集合的权重，如果集合数量大于1，则必须指定 weights
      * @return 集合中的所有元素
      */
-    default <E> Map<E, Double> zsetIntersectWithStore(String key, Collection<String> otherKeys, Class<E> elementType, Aggregate aggregate, Weights weights) {
-        return zsetIntersectWithStoreForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, elementType, aggregate, weights);
+    default <E> Map<E, Double> zsetIntersectWithStore(String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate, Weights weights) {
+        return zsetIntersectWithStoreForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, eClass, aggregate, weights);
     }
 
     /**
@@ -169,12 +167,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @param aggregate:  分数的聚合方式，可以是 Aggregate.SUM 或者 Aggregate.MIN 或者 Aggregate.MAX。
      * @param weights:    每个集合的权重，如果集合数量大于1，则必须指定 weights
      * @return 集合中的所有元素
      */
-    <E> Map<E, Double> zsetIntersectWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType, Aggregate aggregate, Weights weights);
+    <E> Map<E, Double> zsetIntersectWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate, Weights weights);
 
     /**
      * 计算给定的集合和多个其他集合的交集，并将结果保存到指定的集合中。
@@ -360,12 +358,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param <E>         元素类型
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @param aggregate:  分数的聚合方式，可以是 Aggregate.SUM 或者 Aggregate.MIN 或者 Aggregate.MAX。
      * @return 集合中的所有元素
      */
-    default <E> Map<E, Double> zsetUnionWithStore(String key, Collection<String> otherKeys, Class<E> elementType, Aggregate aggregate) {
-        return zsetUnionWithStoreForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, elementType, aggregate);
+    default <E> Map<E, Double> zsetUnionWithStore(String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate) {
+        return zsetUnionWithStoreForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, eClass, aggregate);
     }
 
     /**
@@ -375,12 +373,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @param aggregate:  分数的聚合方式，可以是 Aggregate.SUM 或者 Aggregate.MIN 或者 Aggregate.MAX。
      * @return 集合中的所有元素
      */
-    default <E> Map<E, Double> zsetUnionWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType, Aggregate aggregate) {
-        return zsetUnionWithStoreForInstance(instanceId, key, otherKeys, elementType, aggregate, Weights.fromSetCount(1 + otherKeys.size()));
+    default <E> Map<E, Double> zsetUnionWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate) {
+        return zsetUnionWithStoreForInstance(instanceId, key, otherKeys, eClass, aggregate, Weights.fromSetCount(1 + otherKeys.size()));
     }
 
     /**
@@ -389,13 +387,13 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param <E>         元素类型
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @param aggregate:  分数的聚合方式，可以是 Aggregate.SUM 或者 Aggregate.MIN 或者 Aggregate.MAX。
      * @param weights:    每个集合的权重，如果集合数量大于1，则必须指定 weights
      * @return 集合中的所有元素
      */
-    default <E> Map<E, Double> zsetUnionWithStore(String key, Collection<String> otherKeys, Class<E> elementType, Aggregate aggregate, Weights weights) {
-        return zsetUnionWithStoreForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, elementType, aggregate, weights);
+    default <E> Map<E, Double> zsetUnionWithStore(String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate, Weights weights) {
+        return zsetUnionWithStoreForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, eClass, aggregate, weights);
     }
 
     /**
@@ -405,12 +403,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @param aggregate:  分数的聚合方式，可以是 Aggregate.SUM 或者 Aggregate.MIN 或者 Aggregate.MAX。
      * @param weights:    每个集合的权重，如果集合数量大于1，则必须指定 weights
      * @return 集合中的所有元素
      */
-    <E> Map<E, Double> zsetUnionWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType, Aggregate aggregate, Weights weights);
+    <E> Map<E, Double> zsetUnionWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate, Weights weights);
 
     /**
      * 计算给定的集合和多个其他集合的并集，并将结果保存到指定的集合中。
@@ -597,13 +595,13 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param key               有序集合的键
      * @param lowerBound        下边界
      * @param upperBound        上边界
-     * @param listTypeReference 类型引用
+     * @param eClass 类型引用
      * @param <E>               元素类型
      * @return 指定范围的元素集合
      */
     @Override
-    default <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, TypeReference<List<E>> listTypeReference) {
-        return zsetRangeByLexForInstance(instanceId, key, Range.closed(lowerBound, upperBound), listTypeReference);
+    default <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, Class<E> eClass) {
+        return zsetRangeByLexForInstance(instanceId, key, Range.closed(lowerBound, upperBound), eClass);
     }
 
     /**
@@ -611,12 +609,12 @@ public interface RedisCacheZSet extends CacheZSet {
      *
      * @param key               有序集合的键
      * @param range             范围
-     * @param listTypeReference 类型引用
+     * @param eClass 类型引用
      * @param <E>               元素类型
      * @return 指定范围的元素集合
      */
-    default <E> Set<E> zsetRangeByLex(String key, Range<String> range, TypeReference<List<E>> listTypeReference) {
-        return zsetRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, range, listTypeReference);
+    default <E> Set<E> zsetRangeByLex(String key, Range<String> range, Class<E> eClass) {
+        return zsetRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, range, eClass);
     }
 
     /**
@@ -625,12 +623,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param instanceId        实例ID
      * @param key               有序集合的键
      * @param range             范围
-     * @param listTypeReference 类型引用
+     * @param eClass 类型引用
      * @param <E>               元素类型
      * @return 指定范围的元素集合
      */
-    default <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, Range<String> range, TypeReference<List<E>> listTypeReference) {
-        return zsetRangeByLexForInstance(instanceId, key, range, Limit.unlimited(), listTypeReference);
+    default <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, Range<String> range, Class<E> eClass) {
+        return zsetRangeByLexForInstance(instanceId, key, range, Limit.unlimited(), eClass);
     }
 
     /**
@@ -640,12 +638,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param lowerBound        下边界
      * @param upperBound        上边界
      * @param limit             限制
-     * @param listTypeReference 类型引用
+     * @param eClass 类型引用
      * @param <E>               元素类型
      * @return 指定范围的元素集合
      */
-    default <E> Set<E> zsetRangeByLex(String key, String lowerBound, String upperBound, Limit limit, TypeReference<List<E>> listTypeReference) {
-        return zsetRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, lowerBound, upperBound, limit, listTypeReference);
+    default <E> Set<E> zsetRangeByLex(String key, String lowerBound, String upperBound, Limit limit, Class<E> eClass) {
+        return zsetRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, lowerBound, upperBound, limit, eClass);
     }
 
     /**
@@ -656,12 +654,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param lowerBound        下边界
      * @param upperBound        上边界
      * @param limit             限制
-     * @param listTypeReference 类型引用
+     * @param eClass 类型引用
      * @param <E>               元素类型
      * @return 指定范围的元素集合
      */
-    default <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, Limit limit, TypeReference<List<E>> listTypeReference) {
-        return zsetRangeByLexForInstance(instanceId, key, Range.closed(lowerBound, upperBound), limit, listTypeReference);
+    default <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, Limit limit, Class<E> eClass) {
+        return zsetRangeByLexForInstance(instanceId, key, Range.closed(lowerBound, upperBound), limit, eClass);
     }
 
     /**
@@ -670,12 +668,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param key               有序集合的键
      * @param range             范围
      * @param limit             限制
-     * @param listTypeReference 类型引用
+     * @param eClass 类型引用
      * @param <E>               元素类型
      * @return 指定范围的元素集合
      */
-    default <E> Set<E> zsetRangeByLex(String key, Range<String> range, Limit limit, TypeReference<List<E>> listTypeReference) {
-        return zsetRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, range, limit, listTypeReference);
+    default <E> Set<E> zsetRangeByLex(String key, Range<String> range, Limit limit, Class<E> eClass) {
+        return zsetRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, range, limit, eClass);
     }
 
     /**
@@ -685,11 +683,11 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param key               有序集合的键
      * @param range             范围
      * @param limit             限制
-     * @param listTypeReference 类型引用
+     * @param eClass 类型引用
      * @param <E>               元素类型
      * @return 指定范围的元素集合
      */
-    <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, Range<String> range, Limit limit, TypeReference<List<E>> listTypeReference);
+    <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, Range<String> range, Limit limit, Class<E> eClass);
 
     /**
      * 根据字典序获取并存储指定实例中指定范围的元素。
@@ -1250,13 +1248,13 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param key               有序集合的键
      * @param lowerBound        下边界
      * @param upperBound        上边界
-     * @param listTypeReference 类型引用，用于指定元素的类型
+     * @param eClass 类型引用，用于指定元素的类型
      * @param <E>               元素类型
      * @return 反向获取的元素集合
      */
     @Override
-    default <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, TypeReference<List<E>> listTypeReference) {
-        return zsetReverseRangeByLexForInstance(instanceId, key, Range.closed(lowerBound, upperBound), listTypeReference);
+    default <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, Class<E> eClass) {
+        return zsetReverseRangeByLexForInstance(instanceId, key, Range.closed(lowerBound, upperBound), eClass);
     }
 
     /**
@@ -1264,12 +1262,12 @@ public interface RedisCacheZSet extends CacheZSet {
      *
      * @param key               有序集合的键
      * @param range             字典范围（包含下限和上限）
-     * @param listTypeReference 类型引用，用于指定元素的类型
+     * @param eClass 类型引用，用于指定元素的类型
      * @param <E>               元素类型
      * @return 反向获取的元素集合
      */
-    default <E> Set<E> zsetReverseRangeByLex(String key, Range<String> range, TypeReference<List<E>> listTypeReference) {
-        return zsetReverseRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, range, listTypeReference);
+    default <E> Set<E> zsetReverseRangeByLex(String key, Range<String> range, Class<E> eClass) {
+        return zsetReverseRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, range, eClass);
     }
 
     /**
@@ -1278,12 +1276,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param instanceId        实例 ID
      * @param key               有序集合的键
      * @param range             字典范围（包含下限和上限）
-     * @param listTypeReference 类型引用，用于指定元素的类型
+     * @param eClass 类型引用，用于指定元素的类型
      * @param <E>               元素类型
      * @return 反向获取的元素集合
      */
-    default <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, Range<String> range, TypeReference<List<E>> listTypeReference) {
-        return zsetReverseRangeByLexForInstance(instanceId, key, range, Limit.unlimited(), listTypeReference);
+    default <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, Range<String> range, Class<E> eClass) {
+        return zsetReverseRangeByLexForInstance(instanceId, key, range, Limit.unlimited(), eClass);
     }
 
     /**
@@ -1293,12 +1291,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param lowerBound        下边界
      * @param upperBound        上边界
      * @param limit             限制条件（例如最大数量）
-     * @param listTypeReference 类型引用，用于指定元素的类型
+     * @param eClass 类型引用，用于指定元素的类型
      * @param <E>               元素类型
      * @return 反向获取的元素集合
      */
-    default <E> Set<E> zsetReverseRangeByLex(String key, String lowerBound, String upperBound, Limit limit, TypeReference<List<E>> listTypeReference) {
-        return zsetReverseRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, lowerBound, upperBound, limit, listTypeReference);
+    default <E> Set<E> zsetReverseRangeByLex(String key, String lowerBound, String upperBound, Limit limit, Class<E> eClass) {
+        return zsetReverseRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, lowerBound, upperBound, limit, eClass);
     }
 
     /**
@@ -1309,12 +1307,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param lowerBound        下边界
      * @param upperBound        上边界
      * @param limit             限制条件（例如最大数量）
-     * @param listTypeReference 类型引用，用于指定元素的类型
+     * @param eClass 类型引用，用于指定元素的类型
      * @param <E>               元素类型
      * @return 反向获取的元素集合
      */
-    default <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, Limit limit, TypeReference<List<E>> listTypeReference) {
-        return zsetReverseRangeByLexForInstance(instanceId, key, Range.closed(lowerBound, upperBound), limit, listTypeReference);
+    default <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, Limit limit, Class<E> eClass) {
+        return zsetReverseRangeByLexForInstance(instanceId, key, Range.closed(lowerBound, upperBound), limit, eClass);
     }
 
     /**
@@ -1323,12 +1321,12 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param key               有序集合的键
      * @param range             字典范围（包含下限和上限）
      * @param limit             限制条件（例如最大数量）
-     * @param listTypeReference 类型引用，用于指定元素的类型
+     * @param eClass 类型引用，用于指定元素的类型
      * @param <E>               元素类型
      * @return 反向获取的元素集合
      */
-    default <E> Set<E> zsetReverseRangeByLex(String key, Range<String> range, Limit limit, TypeReference<List<E>> listTypeReference) {
-        return zsetReverseRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, range, limit, listTypeReference);
+    default <E> Set<E> zsetReverseRangeByLex(String key, Range<String> range, Limit limit, Class<E> eClass) {
+        return zsetReverseRangeByLexForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, range, limit, eClass);
     }
 
     /**
@@ -1338,11 +1336,11 @@ public interface RedisCacheZSet extends CacheZSet {
      * @param key               有序集合的键
      * @param range             字典范围（包含下限和上限）
      * @param limit             限制条件（例如最大数量）
-     * @param listTypeReference 类型引用，用于指定元素的类型
+     * @param eClass 类型引用，用于指定元素的类型
      * @param <E>               元素类型
      * @return 反向获取的元素集合
      */
-    <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, Range<String> range, Limit limit, TypeReference<List<E>> listTypeReference);
+    <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, Range<String> range, Limit limit, Class<E> eClass);
 
     /**
      * 根据指定的字典范围从指定的实例中反向获取元素，并存储到目标键中，并设置过期时间和时间单位。

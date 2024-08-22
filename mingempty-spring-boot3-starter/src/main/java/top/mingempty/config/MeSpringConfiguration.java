@@ -1,12 +1,15 @@
 package top.mingempty.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import top.mingempty.commons.util.JsonUtil;
 import top.mingempty.domain.MeProperties;
 import top.mingempty.util.BeanFactoryUtil;
 import top.mingempty.util.EnvironmentUtil;
@@ -20,8 +23,16 @@ import top.mingempty.util.SpringContextUtil;
  */
 @EnableConfigurationProperties(MeProperties.class)
 @ComponentScan(basePackages = "top.mingempty.advice")
-@ConditionalOnProperty(prefix = "me",name = "enabled", havingValue = "true", matchIfMissing = true)
-public class MeConfiguration implements Ordered {
+@ConditionalOnProperty(prefix = "me", name = "enabled", havingValue = "true", matchIfMissing = true)
+public class MeSpringConfiguration implements Ordered {
+
+    @Bean
+    @Primary
+    @ConditionalOnMissingBean(name = {"objectMapper", "jacksonObjectMapper"})
+    public static ObjectMapper objectMapper() {
+        return JsonUtil.DEFAULT_OBJECT_MAPPER;
+    }
+
 
     @Bean
     @ConditionalOnMissingBean(name = "springContextUtil")

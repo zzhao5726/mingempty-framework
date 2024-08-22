@@ -6,10 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import top.mingempty.domain.function.SerializableFunction;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
 import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -195,23 +192,54 @@ public class ReflectionUtil {
     /**
      * 获取对应字段的值
      *
-     * @param f 字段
-     * @param t 对象
+     * @param fieldName 字段
+     * @param obj       对象
      * @return
      */
-    public static <T, V> V getValue(String f, T t) {
+    public static <T, V> V getValue(String fieldName, T obj) {
+        Assert.notNull(fieldName, "fieldName must not be null");
+        Assert.notNull(obj, "obj must not be null");
+
         try {
-            BeanInfo beanInfo = Introspector.getBeanInfo(t.getClass());
-            PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();
-            for (PropertyDescriptor descriptor : descriptors) {
-                if (descriptor.getName().equals(f)) {
-                    return (V) descriptor.getReadMethod().invoke(t);
+            List<Field> declaredFieldsAll = ReflectionUtil.getDeclaredFieldsAll(obj.getClass());
+            if (CollUtil.isNotEmpty(declaredFieldsAll)) {
+                for (Field field : declaredFieldsAll) {
+                    if (fieldName.equals(field.getName())) {
+                        return (V) field.get(obj);
+                    }
                 }
             }
-        } catch (IntrospectionException | IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             log.error("根据字段名获取属性值失败", e);
         }
         return null;
+    }
+
+
+    /**
+     * 设置对应字段的值
+     *
+     * @param fieldName 字段
+     * @param obj       对象
+     * @param v         对象的值
+     */
+    public static <T, V> void setValue(String fieldName, T obj, V v) {
+        Assert.notNull(fieldName, "fieldName must not be null");
+        Assert.notNull(obj, "obj must not be null");
+        try {
+            List<Field> declaredFieldsAll = ReflectionUtil.getDeclaredFieldsAll(obj.getClass());
+            if (CollUtil.isNotEmpty(declaredFieldsAll)) {
+                for (Field field : declaredFieldsAll) {
+                    if (fieldName.equals(field.getName())) {
+                        field.setAccessible(true);
+                        field.set(obj, v);
+                        return;
+                    }
+                }
+            }
+        } catch (IllegalAccessException e) {
+            log.error("根据字段名修改属性值失败", e);
+        }
     }
 
     public static Class<?> classForName(String className) {

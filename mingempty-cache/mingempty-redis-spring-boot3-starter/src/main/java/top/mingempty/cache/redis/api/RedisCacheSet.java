@@ -1,11 +1,9 @@
 package top.mingempty.cache.redis.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.data.redis.core.ScanOptions;
 import top.mingempty.cache.commons.api.CacheSet;
 import top.mingempty.domain.other.GlobalConstant;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -35,11 +33,11 @@ public interface RedisCacheSet extends CacheSet {
      * @param instanceId        实例ID
      * @param key               元素的键
      * @param pattern           元素格式
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 操作结果
      */
     @Override
-    default <E> Set<E> setScanForInstance(String instanceId, String key, String pattern, TypeReference<List<E>> listTypeReference) {
+    default <E> Set<E> setScanForInstance(String instanceId, String key, String pattern, Class<E> eClass) {
         if (pattern == null) {
             pattern = "*";
         }
@@ -49,7 +47,7 @@ public interface RedisCacheSet extends CacheSet {
         if (!pattern.endsWith("*")) {
             pattern = pattern.concat("*");
         }
-        return setScanForInstance(instanceId, key, ScanOptions.scanOptions().match(pattern).build(), listTypeReference);
+        return setScanForInstance(instanceId, key, ScanOptions.scanOptions().match(pattern).build(), eClass);
     }
 
     /**
@@ -57,11 +55,11 @@ public interface RedisCacheSet extends CacheSet {
      *
      * @param key               元素的键
      * @param options           元素格式
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 操作结果
      */
-    default <E> Set<E> setScan(String key, ScanOptions options, TypeReference<List<E>> listTypeReference) {
-        return setScanForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, options, listTypeReference);
+    default <E> Set<E> setScan(String key, ScanOptions options, Class<E> eClass) {
+        return setScanForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, options, eClass);
     }
 
     /**
@@ -70,9 +68,9 @@ public interface RedisCacheSet extends CacheSet {
      * @param instanceId        实例ID
      * @param key               元素的键
      * @param options           元素格式
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 操作结果
      */
-    <E> Set<E> setScanForInstance(String instanceId, String key, ScanOptions options, TypeReference<List<E>> listTypeReference);
+    <E> Set<E> setScanForInstance(String instanceId, String key, ScanOptions options, Class<E> eClass);
 
 }

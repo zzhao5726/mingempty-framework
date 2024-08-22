@@ -1,7 +1,6 @@
 package top.mingempty.cache.local.api.impl;
 
 import cn.hutool.core.lang.Pair;
-import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.CacheManager;
 import top.mingempty.cache.local.api.LocalCacheApi;
@@ -242,11 +241,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param field      要获取值的字段
-     * @param valueType  值的类型
+     * @param eClass  值的类型
      * @return 字段的值
      */
     @Override
-    public <E> E mapGetFieldForInstance(String instanceId, String key, String field, Class<E> valueType) {
+    public <E> E mapGetFieldForInstance(String instanceId, String key, String field, Class<E> eClass) {
         return null;
     }
 
@@ -256,25 +255,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param fields     要获取值的字段数组
-     * @param valueType  值的类型
+     * @param eClass  值的类型
      * @return 字段的值列表
      */
     @Override
-    public <E> List<E> mapMultiGetForInstance(String instanceId, String key, Collection<String> fields, Class<E> valueType) {
-        return List.of();
-    }
-
-    /**
-     * 获取指定实例和键的映射中指定字段的值，并将其转换为指定的类型。
-     *
-     * @param instanceId        实例ID
-     * @param key               映射的键
-     * @param fields            要获取值的字段数组
-     * @param listTypeReference 值的类型
-     * @return 字段的值列表
-     */
-    @Override
-    public <E> List<E> mapMultiGetForInstance(String instanceId, String key, Collection<String> fields, TypeReference<List<E>> listTypeReference) {
+    public <E> List<E> mapMultiGetForInstance(String instanceId, String key, Collection<String> fields, Class<E> eClass) {
         return List.of();
     }
 
@@ -283,11 +268,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 映射中的所有键-值对
      */
     @Override
-    public <E> Map<String, E> mapGetForInstance(String instanceId, String key, Class<E> valueType) {
+    public <E> Map<String, E> mapGetForInstance(String instanceId, String key, Class<E> eClass) {
         return Map.of();
     }
 
@@ -297,11 +282,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param iPage      分页参数
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 映射中的所有键-值对
      */
     @Override
-    public <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, IPage iPage, Class<E> valueType) {
+    public <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, IPage iPage, Class<E> eClass) {
         return Map.of();
     }
 
@@ -401,11 +386,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId        实例ID
      * @param key               映射的键
-     * @param listTypeReference 值的类型
+     * @param eClass 值的类型
      * @return 映射键内所有的值
      */
     @Override
-    public <E> List<E> mapValuesForInstance(String instanceId, String key, TypeReference<List<E>> listTypeReference) {
+    public <E> List<E> mapValuesForInstance(String instanceId, String key, Class<E> eClass) {
         return List.of();
     }
 
@@ -427,11 +412,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 随机的数据
      */
     @Override
-    public <E> Pair<String, E> mapRandomEntryForInstance(String instanceId, String key, Class<E> valueType) {
+    public <E> Pair<String, E> mapRandomEntryForInstance(String instanceId, String key, Class<E> eClass) {
         return null;
     }
 
@@ -441,11 +426,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param count      随机取的数量
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 随机的数据
      */
     @Override
-    public <E> Map<String, E> mapRandomEntriesForInstance(String instanceId, String key, long count, Class<E> valueType) {
+    public <E> Map<String, E> mapRandomEntriesForInstance(String instanceId, String key, long count, Class<E> eClass) {
         return Map.of();
     }
 
@@ -455,11 +440,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param pattern    元素格式
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 随机的数据
      */
     @Override
-    public <E> Map<String, E> mapScanForInstance(String instanceId, String key, String pattern, Class<E> valueType) {
+    public <E> Map<String, E> mapScanForInstance(String instanceId, String key, String pattern, Class<E> eClass) {
         return Map.of();
     }
 
@@ -569,11 +554,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         列表的键
-     * @param elementType 元素的类型类
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> E queueLpopForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> E queueLpopForInstance(String instanceId, String key, Class<E> eClass) {
         return null;
     }
 
@@ -584,11 +569,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key         列表的键
      * @param timeout     等待时间
      * @param unit        等待时间单位
-     * @param elementType 元素的类型类
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> E queueLpopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> elementType) {
+    public <E> E queueLpopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> eClass) {
         return null;
     }
 
@@ -597,11 +582,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         列表的键
-     * @param elementType 元素的类型类
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> E queueRPopForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> E queueRPopForInstance(String instanceId, String key, Class<E> eClass) {
         return null;
     }
 
@@ -612,11 +597,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key         列表的键
      * @param timeout     等待时间
      * @param unit        等待时间单位
-     * @param elementType 元素的类型类
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> E queueRPopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> elementType) {
+    public <E> E queueRPopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> eClass) {
         return null;
     }
 
@@ -626,11 +611,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId        实例ID
      * @param key               列表的键
      * @param iPage             分页参数
-     * @param listTypeReference 元素的类型类
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> List<E> queuePageForInstance(String instanceId, String key, IPage iPage, TypeReference<List<E>> listTypeReference) {
+    public <E> List<E> queuePageForInstance(String instanceId, String key, IPage iPage, Class<E> eClass) {
         return List.of();
     }
 
@@ -679,11 +664,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId  实例ID
      * @param key         列表的键
      * @param index       要获取的索引
-     * @param elementType 元素的类型类
+     * @param eClass 元素的类型类
      * @return 指定索引的元素
      */
     @Override
-    public <E> E queueGetForInstance(String instanceId, String key, int index, Class<E> elementType) {
+    public <E> E queueGetForInstance(String instanceId, String key, int index, Class<E> eClass) {
         return null;
     }
 
@@ -799,11 +784,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId        实例ID
      * @param key               元素的键
      * @param pattern           元素格式
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 操作结果
      */
     @Override
-    public <E> Set<E> setScanForInstance(String instanceId, String key, String pattern, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setScanForInstance(String instanceId, String key, String pattern, Class<E> eClass) {
         return Set.of();
     }
 
@@ -812,11 +797,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> E setPopForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> E setPopForInstance(String instanceId, String key, Class<E> eClass) {
         return null;
     }
 
@@ -825,11 +810,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> E setRandomMemberForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> E setRandomMemberForInstance(String instanceId, String key, Class<E> eClass) {
         return null;
     }
 
@@ -839,11 +824,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param count             返回的元素个数
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> List<E> setRandomMembersForInstance(String instanceId, String key, long count, TypeReference<List<E>> listTypeReference) {
+    public <E> List<E> setRandomMembersForInstance(String instanceId, String key, long count, Class<E> eClass) {
         return List.of();
     }
 
@@ -853,11 +838,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param count             返回的元素个数
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> Set<E> setDistinctRandomMembersForInstance(String instanceId, String key, long count, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setDistinctRandomMembersForInstance(String instanceId, String key, long count, Class<E> eClass) {
         return Set.of();
     }
 
@@ -867,11 +852,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param iPage             分页参数
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> setGetPageForInstance(String instanceId, String key, IPage iPage, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setGetPageForInstance(String instanceId, String key, IPage iPage, Class<E> eClass) {
         return Set.of();
     }
 
@@ -880,11 +865,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId        实例ID
      * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> setDifferenceForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setDifferenceForInstance(String instanceId, Collection<String> keys, Class<E> eClass) {
         return Set.of();
     }
 
@@ -908,11 +893,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId        实例ID
      * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> setIntersectForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setIntersectForInstance(String instanceId, Collection<String> keys, Class<E> eClass) {
         return Set.of();
     }
 
@@ -936,11 +921,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId        实例ID
      * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> setUnionForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setUnionForInstance(String instanceId, Collection<String> keys, Class<E> eClass) {
         return Set.of();
     }
 
@@ -988,11 +973,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         存储的键
-     * @param elementType 对象的类型类
+     * @param vClass 对象的类型类
      * @return 获取的对象值
      */
     @Override
-    public <V> V getObjForInstance(String instanceId, String key, Class<V> elementType) {
+    public <V> V getObjForInstance(String instanceId, String key, Class<V> vClass) {
         return null;
     }
 
@@ -1001,11 +986,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId        实例ID
      * @param key               存储的键
-     * @param listTypeReference 列表中元素的类型类
+     * @param eClass 列表中元素的类型类
      * @return 获取的对象列表值
      */
     @Override
-    public <E> List<E> getListForInstance(String instanceId, String key, TypeReference<List<E>> listTypeReference) {
+    public <E> List<E> getListForInstance(String instanceId, String key, Class<E> eClass) {
         return List.of();
     }
 
@@ -1026,11 +1011,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId  实例ID
      * @param keys        键的集合
-     * @param elementType 元素的类型类对象
+     * @param eClass 元素的类型类对象
      * @return 对象值的列表
      */
     @Override
-    public <E> List<E> multiGetObjForInstance(String instanceId, Collection<String> keys, Class<E> elementType) {
+    public <E> List<E> multiGetObjForInstance(String instanceId, Collection<String> keys, Class<E> eClass) {
         return List.of();
     }
 
@@ -1039,11 +1024,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId        实例ID
      * @param keys              键的集合
-     * @param listTypeReference 列表元素的类型类对象
+     * @param eClass 列表元素的类型类对象
      * @return 列表值的列表
      */
     @Override
-    public <E> List<List<E>> multiGetListForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference) {
+    public <E> List<List<E>> multiGetListForInstance(String instanceId, Collection<String> keys, Class<E> eClass) {
         return List.of();
     }
 
@@ -1183,11 +1168,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId  实例ID
      * @param key         元素的键
      * @param pattern     元素格式
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 操作结果
      */
     @Override
-    public <E> Map<E, Double> zsetScanForInstance(String instanceId, String key, String pattern, Class<E> elementType) {
+    public <E> Map<E, Double> zsetScanForInstance(String instanceId, String key, String pattern, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1305,11 +1290,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> zsetDifferenceForInstance(String instanceId, String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetDifferenceForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1335,11 +1320,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其他的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 多个集合的差异
      */
     @Override
-    public <E> Map<E, Double> zsetDifferenceWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType) {
+    public <E> Map<E, Double> zsetDifferenceWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1349,11 +1334,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> zsetIntersectForInstance(String instanceId, String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetIntersectForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1363,11 +1348,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Map<E, Double> zsetIntersectWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType) {
+    public <E> Map<E, Double> zsetIntersectWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1393,11 +1378,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> zsetUnionForInstance(String instanceId, String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetUnionForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1407,11 +1392,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Map<E, Double> zsetUnionWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType) {
+    public <E> Map<E, Double> zsetUnionWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1436,11 +1421,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> E zsetRandomMembersForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> E zsetRandomMembersForInstance(String instanceId, String key, Class<E> eClass) {
         return null;
     }
 
@@ -1450,11 +1435,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param count             返回的元素个数
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> Set<E> zsetDistinctRandomMembersForInstance(String instanceId, String key, long count, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetDistinctRandomMembersForInstance(String instanceId, String key, long count, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1464,11 +1449,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param count       返回的元素个数
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> Map<E, Double> zsetDistinctRandomMembersWithScoreForInstance(String instanceId, String key, long count, Class<E> elementType) {
+    public <E> Map<E, Double> zsetDistinctRandomMembersWithScoreForInstance(String instanceId, String key, long count, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1477,11 +1462,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         有序集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Pair对象
      */
     @Override
-    public <E> Pair<E, Double> zsetPopMaxForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> Pair<E, Double> zsetPopMaxForInstance(String instanceId, String key, Class<E> eClass) {
         return null;
     }
 
@@ -1492,11 +1477,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key         有序集合的键
      * @param expiry      过期时间
      * @param unit        时间单位
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Pair对象
      */
     @Override
-    public <E> Pair<E, Double> zsetPopMaxForInstance(String instanceId, String key, long expiry, TimeUnit unit, Class<E> elementType) {
+    public <E> Pair<E, Double> zsetPopMaxForInstance(String instanceId, String key, long expiry, TimeUnit unit, Class<E> eClass) {
         return null;
     }
 
@@ -1506,11 +1491,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId  实例ID
      * @param key         有序集合的键
      * @param count       弹出元素的数量
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Map对象
      */
     @Override
-    public <E> Map<E, Double> zsetPopMaxForInstance(String instanceId, String key, long count, Class<E> elementType) {
+    public <E> Map<E, Double> zsetPopMaxForInstance(String instanceId, String key, long count, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1519,11 +1504,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         有序集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Pair对象
      */
     @Override
-    public <E> Pair<E, Double> zsetPopMinForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> Pair<E, Double> zsetPopMinForInstance(String instanceId, String key, Class<E> eClass) {
         return null;
     }
 
@@ -1534,11 +1519,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key         有序集合的键
      * @param expiry      过期时间
      * @param unit        时间单位
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Pair对象
      */
     @Override
-    public <E> Pair<E, Double> zsetPopMinForInstance(String instanceId, String key, long expiry, TimeUnit unit, Class<E> elementType) {
+    public <E> Pair<E, Double> zsetPopMinForInstance(String instanceId, String key, long expiry, TimeUnit unit, Class<E> eClass) {
         return null;
     }
 
@@ -1548,11 +1533,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param instanceId  实例ID
      * @param key         有序集合的键
      * @param count       弹出元素的数量
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Map对象
      */
     @Override
-    public <E> Map<E, Double> zsetPopMinForInstance(String instanceId, String key, long count, Class<E> elementType) {
+    public <E> Map<E, Double> zsetPopMinForInstance(String instanceId, String key, long count, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1576,11 +1561,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key               有序集合的键
      * @param min               最小值
      * @param max               最大值
-     * @param listTypeReference 类型引用
+     * @param eClass 类型引用
      * @return 指定范围的元素集合
      */
     @Override
-    public <E> Set<E> zsetRangeForInstance(String instanceId, String key, long min, long max, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetRangeForInstance(String instanceId, String key, long min, long max, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1591,11 +1576,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key               有序集合的键
      * @param lowerBound        下边界
      * @param upperBound        上边界
-     * @param listTypeReference 类型引用
+     * @param eClass 类型引用
      * @return 指定范围的元素集合
      */
     @Override
-    public <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1606,11 +1591,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key               有序集合的键
      * @param min               最小值
      * @param max               最大值
-     * @param listTypeReference 类型引用
+     * @param eClass 类型引用
      * @return 指定范围的元素集合
      */
     @Override
-    public <E> Set<E> zsetRangeByScoreForInstance(String instanceId, String key, double min, double max, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetRangeByScoreForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1623,11 +1608,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param max               最大值
      * @param offset            偏移量
      * @param count             数量
-     * @param listTypeReference 类型引用
+     * @param eClass 类型引用
      * @return 指定范围的元素集合
      */
     @Override
-    public <E> Set<E> zsetRangeByScoreForInstance(String instanceId, String key, double min, double max, long offset, long count, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetRangeByScoreForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1638,11 +1623,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key         有序集合的键
      * @param min         最小值
      * @param max         最大值
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @return 指定范围的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, Class<E> elementType) {
+    public <E> Map<E, Double> zsetRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1655,11 +1640,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param max         最大值
      * @param offset      偏移量
      * @param count       数量
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @return 指定范围的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> elementType) {
+    public <E> Map<E, Double> zsetRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1670,11 +1655,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key         有序集合的键
      * @param start       起始位置
      * @param end         结束位置
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @return 指定范围的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetRangeWithScoresForInstance(String instanceId, String key, long start, long end, Class<E> elementType) {
+    public <E> Map<E, Double> zsetRangeWithScoresForInstance(String instanceId, String key, long start, long end, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1719,11 +1704,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key               有序集合的键
      * @param min               最小分数
      * @param max               最大分数
-     * @param listTypeReference 类型引用，用于指定元素的类型
+     * @param eClass 类型引用，用于指定元素的类型
      * @return 反向获取的元素集合
      */
     @Override
-    public <E> Set<E> zsetReverseRangeForInstance(String instanceId, String key, long min, long max, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetReverseRangeForInstance(String instanceId, String key, long min, long max, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1734,11 +1719,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key               有序集合的键
      * @param lowerBound        下边界
      * @param upperBound        上边界
-     * @param listTypeReference 类型引用，用于指定元素的类型
+     * @param eClass 类型引用，用于指定元素的类型
      * @return 反向获取的元素集合
      */
     @Override
-    public <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, String lowerBound, String upperBound, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1749,11 +1734,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key               有序集合的键
      * @param min               最小分数
      * @param max               最大分数
-     * @param listTypeReference 类型引用，用于指定元素的类型
+     * @param eClass 类型引用，用于指定元素的类型
      * @return 反向获取的元素集合
      */
     @Override
-    public <E> Set<E> zsetReverseRangeByScoreForInstance(String instanceId, String key, double min, double max, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetReverseRangeByScoreForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1766,11 +1751,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param max               最大分数
      * @param offset            偏移量
      * @param count             数量
-     * @param listTypeReference 类型引用，用于指定元素的类型
+     * @param eClass 类型引用，用于指定元素的类型
      * @return 反向获取的元素集合
      */
     @Override
-    public <E> Set<E> zsetReverseRangeByScoreForInstance(String instanceId, String key, double min, double max, long offset, long count, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetReverseRangeByScoreForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         return Set.of();
     }
 
@@ -1781,11 +1766,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key         有序集合的键
      * @param min         最小分数
      * @param max         最大分数
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @return 反向获取的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetReverseRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, Class<E> elementType) {
+    public <E> Map<E, Double> zsetReverseRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1798,11 +1783,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param max         最大分数
      * @param offset      偏移量
      * @param count       数量
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @return 反向获取的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetReverseRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> elementType) {
+    public <E> Map<E, Double> zsetReverseRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         return Map.of();
     }
 
@@ -1813,11 +1798,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      * @param key         有序集合的键
      * @param start       开始索引
      * @param end         结束索引
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @return 反向获取的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetReverseRangeWithScoresForInstance(String instanceId, String key, long start, long end, Class<E> elementType) {
+    public <E> Map<E, Double> zsetReverseRangeWithScoresForInstance(String instanceId, String key, long start, long end, Class<E> eClass) {
         return Map.of();
     }
 
