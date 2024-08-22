@@ -22,6 +22,11 @@ public class RedisCacheProperties {
     private boolean enabledRedis = true;
 
     /**
+     * 注入基于Spring-Security配置的ObjectMapper
+     */
+    private boolean enabledSecurity = true;
+
+    /**
      * 默认的redis缓存配置
      */
     @NestedConfigurationProperty

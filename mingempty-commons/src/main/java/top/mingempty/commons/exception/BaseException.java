@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import top.mingempty.commons.trace.TraceContext;
 import top.mingempty.commons.trace.constants.TraceConstant;
-import top.mingempty.commons.util.JacksonUtil;
+import top.mingempty.commons.util.JsonUtil;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -145,7 +145,7 @@ public class BaseException extends RuntimeException implements Serializable {
                 .ifPresent(message -> sb.append("[").append(message).append("]"));
         if (MapUtil.isNotEmpty(this.errorProperties)) {
             sb.append("[");
-            sb.append(JacksonUtil.toStr(this.errorProperties));
+            sb.append(JsonUtil.toStr(this.errorProperties));
             sb.append("]");
         }
         return sb.toString();

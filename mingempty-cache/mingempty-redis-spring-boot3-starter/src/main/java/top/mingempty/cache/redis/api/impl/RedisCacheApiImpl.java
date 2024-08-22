@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,13 +27,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
+import top.mingempty.cache.redis.api.RedisCacheApi;
 import top.mingempty.cache.redis.entity.wapper.RedisCacheManagerWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedisTemplateWapper;
 import top.mingempty.cache.redis.entity.wapper.RedissonClientWapper;
 import top.mingempty.cache.redis.entity.wapper.RedissonRxClientWapper;
-import top.mingempty.cache.redis.api.RedisCacheApi;
 import top.mingempty.commons.util.CollectionUtil;
-import top.mingempty.commons.util.JacksonUtil;
+import top.mingempty.commons.util.JsonUtil;
 import top.mingempty.domain.base.IPage;
 
 import java.nio.charset.StandardCharsets;
@@ -348,7 +347,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public String counterForInstance(String instanceId, String key) {
         ValueOperations<String, Object> ops = redisTemplateWapper.getResolvedRouter(instanceId).opsForValue();
         Object object = ops.get(key);
-        return object != null ? JacksonUtil.toStr(redisObjectMapper, object) : null;
+        return object != null ? JsonUtil.toStr(redisObjectMapper, object) : null;
     }
 
     /**
@@ -517,17 +516,17 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param field      要获取值的字段
-     * @param valueType  值的类型
+     * @param eClass     值的类型
      * @return 字段的值
      */
     @Override
-    public <E> E mapGetFieldForInstance(String instanceId, String key, String field, Class<E> valueType) {
+    public <E> E mapGetFieldForInstance(String instanceId, String key, String field, Class<E> eClass) {
         try {
             Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().get(key, field);
             if (object == null) {
                 return null;
             }
-            return JacksonUtil.toObj(redisObjectMapper, object, valueType);
+            return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("map get field error", e);
             return null;
@@ -540,45 +539,17 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param fields     要获取值的字段数组
-     * @param valueType  值的类型
+     * @param eClass     值的类型
      * @return 字段的值列表
      */
     @Override
-    public <E> List<E> mapMultiGetForInstance(String instanceId, String key, Collection<String> fields, Class<E> valueType) {
+    public <E> List<E> mapMultiGetForInstance(String instanceId, String key, Collection<String> fields, Class<E> eClass) {
         try {
             if (CollUtil.isEmpty(fields)) {
                 return List.of();
             }
             List<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().multiGet(key, new ArrayList<>(fields));
-            if (CollUtil.isEmpty(objects)) {
-                return List.of();
-            }
-            return objects.parallelStream()
-                    .map(object -> JacksonUtil.toObj(redisObjectMapper, object, valueType))
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("map multi get error", e);
-            return List.of();
-        }
-    }
-
-    /**
-     * 获取指定实例和键的映射中指定字段的值，并将其转换为指定的类型。
-     *
-     * @param instanceId        实例ID
-     * @param key               映射的键
-     * @param fields            要获取值的字段数组
-     * @param listTypeReference 值的类型
-     * @return 字段的值列表
-     */
-    @Override
-    public <E> List<E> mapMultiGetForInstance(String instanceId, String key, Collection<String> fields, TypeReference<List<E>> listTypeReference) {
-        try {
-            if (CollUtil.isEmpty(fields)) {
-                return List.of();
-            }
-            List<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().multiGet(key, new ArrayList<>(fields));
-            return JacksonUtil.toList(redisObjectMapper, objects, listTypeReference);
+            return JsonUtil.toList(redisObjectMapper, objects, eClass);
         } catch (Exception e) {
             log.error("map multi get error", e);
             return List.of();
@@ -590,16 +561,16 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param valueType  映射中值的类型
+     * @param eClass     映射中值的类型
      * @return 映射中的所有键-值对
      */
     @Override
-    public <E> Map<String, E> mapGetForInstance(String instanceId, String key, Class<E> valueType) {
+    public <E> Map<String, E> mapGetForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             Map<Object, Object> entries = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().entries(key);
             return entries.entrySet()
                     .stream()
-                    .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> JacksonUtil.toObj(redisObjectMapper, e.getValue(), valueType)));
+                    .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> JsonUtil.toObj(redisObjectMapper, e.getValue(), eClass)));
         } catch (Exception e) {
             log.error("map get error", e);
             return Map.of();
@@ -612,15 +583,15 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param iPage      分页参数
-     * @param valueType  映射中值的类型
+     * @param eClass     映射中值的类型
      * @return 映射中的所有键-值对
      */
     @Override
-    public <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, IPage iPage, Class<E> valueType) {
+    public <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, IPage iPage, Class<E> eClass) {
         try {
             Set<String> keys = mapKeysPageForInstance(instanceId, key, iPage);
             List<String> keyList = new ArrayList<>(keys);
-            List<E> multiGet = mapMultiGetForInstance(instanceId, key, keyList, valueType);
+            List<E> multiGet = mapMultiGetForInstance(instanceId, key, keyList, eClass);
             Map<String, E> map = new HashMap<>();
             for (int i = 0; i < keyList.size(); i++) {
                 map.put(keyList.get(i), multiGet.get(i));
@@ -739,7 +710,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             }
             return fields.parallelStream()
                     .map(field
-                            -> JacksonUtil.toStr(redisObjectMapper, field))
+                            -> JsonUtil.toStr(redisObjectMapper, field))
                     .collect(Collectors.toSet());
         } catch (Exception e) {
             log.error("map keys error", e);
@@ -775,16 +746,16 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 获取映射键内所有的值。
      *
-     * @param instanceId        实例ID
-     * @param key               映射的键
-     * @param listTypeReference 值的类型
+     * @param instanceId 实例ID
+     * @param key        映射的键
+     * @param eClass     值的类型
      * @return 映射键内所有的值
      */
     @Override
-    public <E> List<E> mapValuesForInstance(String instanceId, String key, TypeReference<List<E>> listTypeReference) {
+    public <E> List<E> mapValuesForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             List<Object> values = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().values(key);
-            return JacksonUtil.toList(redisObjectMapper, values, listTypeReference);
+            return JsonUtil.toList(redisObjectMapper, values, eClass);
         } catch (Exception e) {
             log.error("map values error", e);
             return List.of();
@@ -814,18 +785,18 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param valueType  映射中值的类型
+     * @param eClass     映射中值的类型
      * @return 随机的数据
      */
     @Override
-    public <E> Pair<String, E> mapRandomEntryForInstance(String instanceId, String key, Class<E> valueType) {
+    public <E> Pair<String, E> mapRandomEntryForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             Map.Entry<Object, Object> entry =
                     redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().randomEntry(key);
             if (ObjUtil.isEmpty(entry)) {
                 return null;
             }
-            return Pair.of(JacksonUtil.toStr(redisObjectMapper, entry.getKey()), JacksonUtil.toObj(redisObjectMapper, entry.getValue(), valueType));
+            return Pair.of(JsonUtil.toStr(redisObjectMapper, entry.getKey()), JsonUtil.toObj(redisObjectMapper, entry.getValue(), eClass));
         } catch (Exception e) {
             log.error("map random_entry error", e);
             return null;
@@ -838,11 +809,11 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param count      随机取的数量
-     * @param valueType  映射中值的类型
+     * @param eClass     映射中值的类型
      * @return 随机的数据
      */
     @Override
-    public <E> Map<String, E> mapRandomEntriesForInstance(String instanceId, String key, long count, Class<E> valueType) {
+    public <E> Map<String, E> mapRandomEntriesForInstance(String instanceId, String key, long count, Class<E> eClass) {
         try {
             if (count == 0) {
                 return Map.of();
@@ -852,31 +823,27 @@ public class RedisCacheApiImpl implements RedisCacheApi {
                 if (CollUtil.isEmpty(randomKeysForInstance)) {
                     return Map.of();
                 }
-                List<Object> objectList = mapMultiGetForInstance(instanceId, key, randomKeysForInstance, new TypeReference<>() {
-                });
+                List<E> objectList = mapMultiGetForInstance(instanceId, key, randomKeysForInstance, eClass);
                 Map<String, E> map = new HashMap<>(objectList.size());
-
                 for (int i = 0; i < randomKeysForInstance.size(); i++) {
-                    map.put(randomKeysForInstance.get(i), JacksonUtil.toObj(redisObjectMapper, objectList.get(i), valueType));
+                    map.put(randomKeysForInstance.get(i), JsonUtil.toObj(redisObjectMapper, objectList.get(i), eClass));
                 }
                 return map;
             }
-
             if (count == 1) {
-                Pair<String, E> pair = mapRandomEntryForInstance(instanceId, key, valueType);
+                Pair<String, E> pair = mapRandomEntryForInstance(instanceId, key, eClass);
                 if (ObjUtil.isEmpty(pair)) {
                     return Map.of();
                 }
                 return Map.of(pair.getKey(), pair.getValue());
             }
-
             Map<Object, Object> objectMap = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().randomEntries(key, count);
             if (CollUtil.isEmpty(objectMap)) {
                 return Map.of();
             }
             return objectMap.entrySet()
                     .parallelStream()
-                    .collect(Collectors.toMap(entry -> JacksonUtil.toStr(redisObjectMapper, entry.getKey()), entry -> JacksonUtil.toObj(redisObjectMapper, entry.getValue(), valueType)));
+                    .collect(Collectors.toMap(entry -> JsonUtil.toStr(redisObjectMapper, entry.getKey()), entry -> JsonUtil.toObj(redisObjectMapper, entry.getValue(), eClass)));
 
         } catch (Exception e) {
             log.error("map random entries error", e);
@@ -895,7 +862,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public String mapRandomKeyForInstance(String instanceId, String key) {
         try {
             Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().randomKey(key);
-            return JacksonUtil.toStr(redisObjectMapper, object);
+            return JsonUtil.toStr(redisObjectMapper, object);
         } catch (Exception e) {
             log.error("map random key error", e);
             return null;
@@ -921,7 +888,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
                 return List.of();
             }
             return object.parallelStream()
-                    .map(field -> JacksonUtil.toStr(redisObjectMapper, field))
+                    .map(field -> JsonUtil.toStr(redisObjectMapper, field))
                     .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("map random keys error", e);
@@ -935,15 +902,15 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param options    元素格式
-     * @param valueType  映射中值的类型
+     * @param eClass     映射中值的类型
      * @return 随机的数据
      */
     @Override
-    public <E> Map<String, E> mapScanForInstance(String instanceId, String key, ScanOptions options, Class<E> valueType) {
+    public <E> Map<String, E> mapScanForInstance(String instanceId, String key, ScanOptions options, Class<E> eClass) {
         try (Cursor<Map.Entry<Object, Object>> scanCursor =
                      redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().scan(key, options)) {
             return scanCursor.stream().parallel()
-                    .collect(Collectors.toMap(entry -> JacksonUtil.toStr(redisObjectMapper, entry.getKey()), entry -> JacksonUtil.toObj(redisObjectMapper, entry.getValue(), valueType)));
+                    .collect(Collectors.toMap(entry -> JsonUtil.toStr(redisObjectMapper, entry.getKey()), entry -> JsonUtil.toObj(redisObjectMapper, entry.getValue(), eClass)));
 
         } catch (Exception e) {
             log.error("Error while set scan key", e);
@@ -1067,14 +1034,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         列表的键
-     * @param elementType 元素的类型类
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> E queueLpopForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> E queueLpopForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForList().leftPop(key);
-            return JacksonUtil.toObj(redisObjectMapper, object, elementType);
+            return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("queue lpop error", e);
             return null;
@@ -1088,14 +1055,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param key         列表的键
      * @param timeout     等待时间
      * @param unit        等待时间单位
-     * @param elementType 元素的类型类
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> E queueLpopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> elementType) {
+    public <E> E queueLpopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> eClass) {
         try {
             Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForList().leftPop(key, timeout, unit);
-            return JacksonUtil.toObj(redisObjectMapper, object, elementType);
+            return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("queue lpop error", e);
             return null;
@@ -1107,14 +1074,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         列表的键
-     * @param elementType 元素的类型类
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> E queueRPopForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> E queueRPopForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForList().rightPop(key);
-            return JacksonUtil.toObj(redisObjectMapper, object, elementType);
+            return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("queue rpop error", e);
             return null;
@@ -1128,14 +1095,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param key         列表的键
      * @param timeout     等待时间
      * @param unit        等待时间单位
-     * @param elementType 元素的类型类
+     * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> E queueRPopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> elementType) {
+    public <E> E queueRPopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> eClass) {
         try {
             Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForList().rightPop(key, timeout, unit);
-            return JacksonUtil.toObj(redisObjectMapper, object, elementType);
+            return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("queue rpop error", e);
             return null;
@@ -1145,14 +1112,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 从指定实例和键的列表中在指定时间内弹出并删除最后一个元素。
      *
-     * @param instanceId        实例ID
-     * @param key               列表的键
-     * @param iPage             分页参数
-     * @param listTypeReference 元素的类型类
+     * @param instanceId 实例ID
+     * @param key        列表的键
+     * @param iPage      分页参数
+     * @param eClass     元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> List<E> queuePageForInstance(String instanceId, String key, final IPage iPage, TypeReference<List<E>> listTypeReference) {
+    public <E> List<E> queuePageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass) {
         try {
             List<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForList()
                     .range(key, iPage.getStartIndex(), iPage.getEndIndex());
@@ -1160,7 +1127,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             if (iPage.isSearchCount()) {
                 iPage.setTotal(queueSizeForInstance(instanceId, key));
             }
-            return JacksonUtil.toList(redisObjectMapper, objects, listTypeReference);
+            return JsonUtil.toList(redisObjectMapper, objects, eClass);
         } catch (Exception e) {
             log.error("queue rpop error", e);
             return null;
@@ -1232,14 +1199,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId  实例ID
      * @param key         列表的键
      * @param index       要获取的索引
-     * @param elementType 元素的类型类
+     * @param eClass 元素的类型类
      * @return 指定索引的元素
      */
     @Override
-    public <E> E queueGetForInstance(String instanceId, String key, int index, Class<E> elementType) {
+    public <E> E queueGetForInstance(String instanceId, String key, int index, Class<E> eClass) {
         try {
             Object object = queueGetForInstance(instanceId, key, index);
-            return JacksonUtil.toObj(redisObjectMapper, object, elementType);
+            return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("queue get error", e);
             return null;
@@ -1410,14 +1377,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> E setPopForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> E setPopForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().pop(key);
-            return JacksonUtil.toObj(redisObjectMapper, object, elementType);
+            return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("set pop error", e);
             return null;
@@ -1429,14 +1396,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> E setRandomMemberForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> E setRandomMemberForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().randomMember(key);
-            return JacksonUtil.toObj(redisObjectMapper, object, elementType);
+            return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("set random member error", e);
             return null;
@@ -1446,20 +1413,20 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 获取指定实例和键的集合中的随机多个元素（可能重复）。
      *
-     * @param instanceId        实例ID
-     * @param key               集合的键
-     * @param count             返回的元素个数
-     * @param listTypeReference 元素的类型
+     * @param instanceId 实例ID
+     * @param key        集合的键
+     * @param count      返回的元素个数
+     * @param eClass     元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> List<E> setRandomMembersForInstance(String instanceId, String key, long count, TypeReference<List<E>> listTypeReference) {
+    public <E> List<E> setRandomMembersForInstance(String instanceId, String key, long count, Class<E> eClass) {
         try {
             if (count <= 0) {
                 return List.of();
             }
             List<Object> object = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().randomMembers(key, count);
-            return JacksonUtil.toList(redisObjectMapper, object, listTypeReference);
+            return JsonUtil.toList(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("set random members error", e);
             return null;
@@ -1469,14 +1436,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 获取指定实例和键的集合中的随机多个元素。
      *
-     * @param instanceId        实例ID
-     * @param key               集合的键
-     * @param count             返回的元素个数
-     * @param listTypeReference 元素的类型
+     * @param instanceId 实例ID
+     * @param key        集合的键
+     * @param count      返回的元素个数
+     * @param eClass     元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> Set<E> setDistinctRandomMembersForInstance(String instanceId, String key, long count, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setDistinctRandomMembersForInstance(String instanceId, String key, long count, Class<E> eClass) {
         try {
             if (count <= 0) {
                 return Set.of();
@@ -1486,7 +1453,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
-            return new HashSet<>(JacksonUtil.toList(redisObjectMapper, objects, listTypeReference));
+            return new HashSet<>(JsonUtil.toList(redisObjectMapper, objects, eClass));
         } catch (Exception e) {
             log.error("set  distinct random members error", e);
             return Set.of();
@@ -1496,17 +1463,17 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 获取指定实例和键的集合中的所有元素。
      *
-     * @param instanceId        实例ID
-     * @param key               集合的键
-     * @param listTypeReference 元素的类型
+     * @param instanceId 实例ID
+     * @param key        集合的键
+     * @param eClass     元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> setGetPageForInstance(String instanceId, String key, final IPage iPage, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setGetPageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass) {
         try {
             Set<Object> members = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().members(key);
             List<Object> objectList = CollectionUtil.batchSubList(members, iPage);
-            List<E> list = JacksonUtil.toList(redisObjectMapper, objectList, listTypeReference);
+            List<E> list = JsonUtil.toList(redisObjectMapper, objectList, eClass);
             if (CollUtil.isEmpty(list)) {
                 return Set.of();
             }
@@ -1520,19 +1487,19 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 计算多个集合之间的差异，返回一个包含在第一个集合中但不在其他任何集合中的元素的集合。
      *
-     * @param instanceId        实例ID
-     * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param instanceId 实例ID
+     * @param keys       集合的键
+     * @param eClass     元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> setDifferenceForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setDifferenceForInstance(String instanceId, Collection<String> keys, Class<E> eClass) {
         if (CollUtil.isEmpty(keys)) {
             return Set.of();
         }
         try {
             Set<Object> difference = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().difference(keys);
-            List<E> list = JacksonUtil.toList(redisObjectMapper, difference, listTypeReference);
+            List<E> list = JsonUtil.toList(redisObjectMapper, difference, eClass);
             if (CollUtil.isEmpty(list)) {
                 return Set.of();
             }
@@ -1571,19 +1538,19 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 计算给定的多个集合的交集。
      *
-     * @param instanceId        实例ID
-     * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param instanceId 实例ID
+     * @param keys       集合的键
+     * @param eClass     元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> setIntersectForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setIntersectForInstance(String instanceId, Collection<String> keys, Class<E> eClass) {
         if (CollUtil.isEmpty(keys)) {
             return Set.of();
         }
         try {
             Set<Object> intersect = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().intersect(keys);
-            List<E> list = JacksonUtil.toList(redisObjectMapper, intersect, listTypeReference);
+            List<E> list = JsonUtil.toList(redisObjectMapper, intersect, eClass);
             if (CollUtil.isEmpty(list)) {
                 return Set.of();
             }
@@ -1623,19 +1590,19 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 计算给定的多个集合的交集。
      *
-     * @param instanceId        实例ID
-     * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param instanceId 实例ID
+     * @param keys       集合的键
+     * @param eClass     元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> setUnionForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setUnionForInstance(String instanceId, Collection<String> keys, Class<E> eClass) {
         if (CollUtil.isEmpty(keys)) {
             return Set.of();
         }
         try {
             Set<Object> union = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().union(keys);
-            List<E> list = JacksonUtil.toList(redisObjectMapper, union, listTypeReference);
+            List<E> list = JsonUtil.toList(redisObjectMapper, union, eClass);
             if (CollUtil.isEmpty(list)) {
                 return Set.of();
             }
@@ -1675,17 +1642,17 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 获取符合指定格式的元素集合
      *
-     * @param instanceId        实例ID
-     * @param key               元素的键
-     * @param options           元素格式
-     * @param listTypeReference 元素的类型
+     * @param instanceId 实例ID
+     * @param key        元素的键
+     * @param options    元素格式
+     * @param eClass     元素的类型
      * @return 操作结果
      */
     @Override
-    public <E> Set<E> setScanForInstance(String instanceId, String key, ScanOptions options, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> setScanForInstance(String instanceId, String key, ScanOptions options, Class<E> eClass) {
         try (Cursor<Object> scanCursor = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().scan(key, options)) {
-            return new HashSet<>(JacksonUtil.toList(redisObjectMapper, scanCursor.stream().parallel()
-                    .collect(Collectors.toSet()), listTypeReference));
+            return new HashSet<>(JsonUtil.toList(redisObjectMapper, scanCursor.stream().parallel()
+                    .collect(Collectors.toSet()), eClass));
         } catch (Exception e) {
             log.error("Error while set scan key", e);
             return Set.of();
@@ -1703,7 +1670,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public byte[] getBytesForInstance(String instanceId, String key) {
         try {
             Object object = getObjForInstance(instanceId, key);
-            String str = JacksonUtil.toStr(redisObjectMapper, object);
+            String str = JsonUtil.toStr(redisObjectMapper, object);
             if (str != null) {
                 return str.getBytes(StandardCharsets.UTF_8);
             }
@@ -1724,7 +1691,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public String getStrForInstance(String instanceId, String key) {
         try {
             Object object = getObjForInstance(instanceId, key);
-            return JacksonUtil.toStr(redisObjectMapper, object);
+            return JsonUtil.toStr(redisObjectMapper, object);
         } catch (Exception e) {
             log.error("get str error", e);
         }
@@ -1736,14 +1703,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         存储的键
-     * @param elementType 对象的类型类
+     * @param vClass 对象的类型类
      * @return 获取的对象值
      */
     @Override
-    public <V> V getObjForInstance(String instanceId, String key, Class<V> elementType) {
+    public <V> V getObjForInstance(String instanceId, String key, Class<V> vClass) {
         try {
             Object object = getObjForInstance(instanceId, key);
-            return JacksonUtil.toObj(redisObjectMapper, object, elementType);
+            return JsonUtil.toObj(redisObjectMapper, object, vClass);
         } catch (Exception e) {
             log.error("set get error", e);
         }
@@ -1753,16 +1720,16 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 从指定实例中获取指定键的对象列表值。
      *
-     * @param instanceId        实例ID
-     * @param key               存储的键
-     * @param listTypeReference 列表中元素的类型类
+     * @param instanceId 实例ID
+     * @param key        存储的键
+     * @param eClass     列表中元素的类型类
      * @return 获取的对象列表值
      */
     @Override
-    public <E> List<E> getListForInstance(String instanceId, String key, TypeReference<List<E>> listTypeReference) {
+    public <E> List<E> getListForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             Object object = getObjForInstance(instanceId, key);
-            return JacksonUtil.toList(redisObjectMapper, object, listTypeReference);
+            return JsonUtil.toList(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("get list error", e);
         }
@@ -1784,7 +1751,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
                 return List.of();
             }
             return objectList.parallelStream()
-                    .map(obj -> JacksonUtil.toStr(redisObjectMapper, obj))
+                    .map(obj -> JsonUtil.toStr(redisObjectMapper, obj))
                     .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("multi get str error", e);
@@ -1798,18 +1765,18 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId  实例ID
      * @param keys        键的集合
-     * @param elementType 元素的类型类对象
+     * @param eClass 元素的类型类对象
      * @return 对象值的列表
      */
     @Override
-    public <E> List<E> multiGetObjForInstance(String instanceId, Collection<String> keys, Class<E> elementType) {
+    public <E> List<E> multiGetObjForInstance(String instanceId, Collection<String> keys, Class<E> eClass) {
         try {
             List<Object> objectList = multiGetObjForInstance(instanceId, keys);
             if (CollUtil.isEmpty(objectList)) {
                 return List.of();
             }
             return objectList.parallelStream()
-                    .map(obj -> JacksonUtil.toObj(redisObjectMapper, obj, elementType))
+                    .map(obj -> JsonUtil.toObj(redisObjectMapper, obj, eClass))
                     .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("multi get obj error", e);
@@ -1820,20 +1787,20 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 根据多个键获取列表值。
      *
-     * @param instanceId        实例ID
-     * @param keys              键的集合
-     * @param listTypeReference 列表元素的类型类对象
+     * @param instanceId 实例ID
+     * @param keys       键的集合
+     * @param eClass     列表元素的类型类对象
      * @return 列表值的列表
      */
     @Override
-    public <E> List<List<E>> multiGetListForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference) {
+    public <E> List<List<E>> multiGetListForInstance(String instanceId, Collection<String> keys, Class<E> eClass) {
         try {
             List<Object> objectList = multiGetObjForInstance(instanceId, keys);
             if (CollUtil.isEmpty(objectList)) {
                 return List.of();
             }
             return objectList.parallelStream()
-                    .map(obj -> JacksonUtil.toList(redisObjectMapper, obj, listTypeReference))
+                    .map(obj -> JsonUtil.toList(redisObjectMapper, obj, eClass))
                     .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("multi get list error", e);
@@ -2115,13 +2082,13 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId  实例ID
      * @param key         元素的键
      * @param options     元素格式
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 操作结果
      */
     @Override
-    public <E> Map<E, Double> zsetScanForInstance(String instanceId, String key, ScanOptions options, Class<E> elementType) {
+    public <E> Map<E, Double> zsetScanForInstance(String instanceId, String key, ScanOptions options, Class<E> eClass) {
         try (Cursor<ZSetOperations.TypedTuple<Object>> tupleCursor = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().scan(key, options)) {
-            return tupleCursor.stream().parallel().collect(Collectors.toMap(tuple -> JacksonUtil.toObj(tuple.getValue(), elementType), ZSetOperations.TypedTuple::getScore, (v1, v2) -> v1));
+            return tupleCursor.stream().parallel().collect(Collectors.toMap(tuple -> JsonUtil.toObj(tuple.getValue(), eClass), ZSetOperations.TypedTuple::getScore, (v1, v2) -> v1));
         } catch (Exception e) {
             log.error("zset scan error", e);
             return Map.of();
@@ -2168,21 +2135,21 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 计算一个集合和多个集合之间的差异，返回一个包含在第一个集合中但不在其他集合中的元素的集合。
      *
-     * @param <E>               元素类型
-     * @param instanceId        实例ID
-     * @param key               集合的键
-     * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param <E>        元素类型
+     * @param instanceId 实例ID
+     * @param key        集合的键
+     * @param otherKeys  其它集合的键的集合
+     * @param eClass     元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> zsetDifferenceForInstance(String instanceId, String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetDifferenceForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
             Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().difference(key, otherKeys);
             if (ObjUtil.isEmpty(objects)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, objects, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, objects, eClass));
         } catch (Exception e) {
             log.error("zset difference error", e);
             return Set.of();
@@ -2219,15 +2186,15 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其他的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 多个集合的差异
      */
     @Override
-    public <E> Map<E, Double> zsetDifferenceWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType) {
+    public <E> Map<E, Double> zsetDifferenceWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().differenceWithScores(key, otherKeys);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset difference with store error", e);
             return Map.of();
@@ -2237,21 +2204,21 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 计算给定的集合和多个其他集合的交集。
      *
-     * @param <E>               元素类型
-     * @param instanceId        实例ID
-     * @param key               集合的键
-     * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param <E>        元素类型
+     * @param instanceId 实例ID
+     * @param key        集合的键
+     * @param otherKeys  其它集合的键的集合
+     * @param eClass     元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> zsetIntersectForInstance(String instanceId, String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetIntersectForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
             Set<Object> intersect = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().intersect(key, otherKeys);
             if (CollUtil.isEmpty(intersect)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, intersect, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, intersect, eClass));
         } catch (Exception e) {
             log.error("zset intersect error", e);
             return Set.of();
@@ -2265,15 +2232,15 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Map<E, Double> zsetIntersectWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType) {
+    public <E> Map<E, Double> zsetIntersectWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().intersectWithScores(key, otherKeys);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset intersect with store error", e);
             return Map.of();
@@ -2286,17 +2253,17 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @param aggregate   :  分数的聚合方式，可以是 Aggregate.SUM 或者 Aggregate.MIN 或者 Aggregate.MAX。
      * @param weights     :    每个集合的权重，如果集合数量大于1，则必须指定 weights
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Map<E, Double> zsetIntersectWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType, Aggregate aggregate, Weights weights) {
+    public <E> Map<E, Double> zsetIntersectWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate, Weights weights) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().intersectWithScores(key, otherKeys, aggregate, weights);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset intersect with store error", e);
             return Map.of();
@@ -2355,21 +2322,21 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 计算给定的集合和多个其他集合的并集。
      *
-     * @param instanceId        实例ID
-     * @param key               集合的键
-     * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param instanceId 实例ID
+     * @param key        集合的键
+     * @param otherKeys  其它集合的键的集合
+     * @param eClass     元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> zsetUnionForInstance(String instanceId, String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetUnionForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
             Set<Object> intersect
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().union(key, otherKeys);
             if (CollUtil.isEmpty(intersect)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, intersect, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, intersect, eClass));
         } catch (Exception e) {
             log.error("zset union error", e);
             return Set.of();
@@ -2382,15 +2349,15 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Map<E, Double> zsetUnionWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType) {
+    public <E> Map<E, Double> zsetUnionWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().unionWithScores(key, otherKeys);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset union with store error", e);
             return Map.of();
@@ -2403,17 +2370,17 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param otherKeys   其它集合的键的集合
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @param aggregate   :  分数的聚合方式，可以是 Aggregate.SUM 或者 Aggregate.MIN 或者 Aggregate.MAX。
      * @param weights     :    每个集合的权重，如果集合数量大于1，则必须指定 weights
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Map<E, Double> zsetUnionWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> elementType, Aggregate aggregate, Weights weights) {
+    public <E> Map<E, Double> zsetUnionWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate, Weights weights) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().unionWithScores(key, otherKeys, aggregate, weights);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset union with store error", e);
             return Map.of();
@@ -2475,14 +2442,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> E zsetRandomMembersForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> E zsetRandomMembersForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().randomMember(key);
-            return JacksonUtil.toObj(object, elementType);
+            return JsonUtil.toObj(object, eClass);
         } catch (Exception e) {
             log.error("zset random member error", e);
             return null;
@@ -2492,14 +2459,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 从一个特定的集合中随机选择一定数量的不同元素，并返回一个包含这些元素的集合。
      *
-     * @param instanceId        实例ID
-     * @param key               集合的键
-     * @param count             返回的元素个数
-     * @param listTypeReference 元素的类型
+     * @param instanceId 实例ID
+     * @param key        集合的键
+     * @param count      返回的元素个数
+     * @param eClass     元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> Set<E> zsetDistinctRandomMembersForInstance(String instanceId, String key, long count, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetDistinctRandomMembersForInstance(String instanceId, String key, long count, Class<E> eClass) {
         try {
             if (count <= 0) {
                 return Set.of();
@@ -2509,7 +2476,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, objects, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, objects, eClass));
         } catch (Exception e) {
             log.error("zset  distinct random members error", e);
             return Set.of();
@@ -2522,18 +2489,18 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId  实例ID
      * @param key         集合的键
      * @param count       返回的元素个数
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
     @Override
-    public <E> Map<E, Double> zsetDistinctRandomMembersWithScoreForInstance(String instanceId, String key, long count, Class<E> elementType) {
+    public <E> Map<E, Double> zsetDistinctRandomMembersWithScoreForInstance(String instanceId, String key, long count, Class<E> eClass) {
         try {
             if (count <= 0) {
                 return Map.of();
             }
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().distinctRandomMembersWithScore(key, count);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset  distinct random members with score error", e);
             return Map.of();
@@ -2545,18 +2512,18 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         有序集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Pair对象
      */
     @Override
-    public <E> Pair<E, Double> zsetPopMaxForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> Pair<E, Double> zsetPopMaxForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             ZSetOperations.TypedTuple<Object> typedTuple
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMax(key);
             if (ObjUtil.isEmpty(typedTuple)) {
                 return null;
             }
-            return Pair.of(JacksonUtil.toObj(redisObjectMapper, typedTuple.getValue(), elementType), typedTuple.getScore());
+            return Pair.of(JsonUtil.toObj(redisObjectMapper, typedTuple.getValue(), eClass), typedTuple.getScore());
         } catch (Exception e) {
             log.error("zset  pop max error", e);
             return null;
@@ -2570,18 +2537,18 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param key         有序集合的键
      * @param expiry      过期时间
      * @param unit        时间单位
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Pair对象
      */
     @Override
-    public <E> Pair<E, Double> zsetPopMaxForInstance(String instanceId, String key, long expiry, TimeUnit unit, Class<E> elementType) {
+    public <E> Pair<E, Double> zsetPopMaxForInstance(String instanceId, String key, long expiry, TimeUnit unit, Class<E> eClass) {
         try {
             ZSetOperations.TypedTuple<Object> typedTuple
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMax(key, expiry, unit);
             if (ObjUtil.isEmpty(typedTuple)) {
                 return null;
             }
-            return Pair.of(JacksonUtil.toObj(redisObjectMapper, typedTuple.getValue(), elementType), typedTuple.getScore());
+            return Pair.of(JsonUtil.toObj(redisObjectMapper, typedTuple.getValue(), eClass), typedTuple.getScore());
         } catch (Exception e) {
             log.error("zset  pop max error", e);
             return null;
@@ -2594,19 +2561,19 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId  实例ID
      * @param key         有序集合的键
      * @param count       弹出元素的数量
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Map对象
      */
     @Override
     public <E> Map<E, Double> zsetPopMaxForInstance(String instanceId, String key, long count, Class<
-            E> elementType) {
+            E> eClass) {
         try {
             if (count <= 0) {
                 return Map.of();
             }
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMax(key, count);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset  pop max count error", e);
             return Map.of();
@@ -2618,18 +2585,18 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId  实例ID
      * @param key         有序集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Pair对象
      */
     @Override
-    public <E> Pair<E, Double> zsetPopMinForInstance(String instanceId, String key, Class<E> elementType) {
+    public <E> Pair<E, Double> zsetPopMinForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             ZSetOperations.TypedTuple<Object> typedTuple
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMin(key);
             if (ObjUtil.isEmpty(typedTuple)) {
                 return null;
             }
-            return Pair.of(JacksonUtil.toObj(redisObjectMapper, typedTuple.getValue(), elementType), typedTuple.getScore());
+            return Pair.of(JsonUtil.toObj(redisObjectMapper, typedTuple.getValue(), eClass), typedTuple.getScore());
         } catch (Exception e) {
             log.error("zset  pop min error", e);
             return null;
@@ -2643,18 +2610,18 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param key         有序集合的键
      * @param expiry      过期时间
      * @param unit        时间单位
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Pair对象
      */
     @Override
-    public <E> Pair<E, Double> zsetPopMinForInstance(String instanceId, String key, long expiry, TimeUnit unit, Class<E> elementType) {
+    public <E> Pair<E, Double> zsetPopMinForInstance(String instanceId, String key, long expiry, TimeUnit unit, Class<E> eClass) {
         try {
             ZSetOperations.TypedTuple<Object> typedTuple
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMin(key, expiry, unit);
             if (ObjUtil.isEmpty(typedTuple)) {
                 return null;
             }
-            return Pair.of(JacksonUtil.toObj(redisObjectMapper, typedTuple.getValue(), elementType), typedTuple.getScore());
+            return Pair.of(JsonUtil.toObj(redisObjectMapper, typedTuple.getValue(), eClass), typedTuple.getScore());
         } catch (Exception e) {
             log.error("zset  pop min error", e);
             return null;
@@ -2667,19 +2634,19 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param instanceId  实例ID
      * @param key         有序集合的键
      * @param count       弹出元素的数量
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 包含弹出元素及其分数的Map对象
      */
     @Override
     public <E> Map<E, Double> zsetPopMinForInstance(String instanceId, String key, long count, Class<
-            E> elementType) {
+            E> eClass) {
         try {
             if (count <= 0) {
                 return Map.of();
             }
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMin(key, count);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset  pop min count error", e);
             return Map.of();
@@ -2708,22 +2675,22 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 获取指定实例中指定范围的元素。
      *
-     * @param instanceId        实例ID
-     * @param key               有序集合的键
-     * @param min               最小值
-     * @param max               最大值
-     * @param listTypeReference 类型引用
-     * @param <E>               元素类型
+     * @param instanceId 实例ID
+     * @param key        有序集合的键
+     * @param min        最小值
+     * @param max        最大值
+     * @param eClass     类型引用
+     * @param <E>        元素类型
      * @return 指定范围的元素集合
      */
     @Override
-    public <E> Set<E> zsetRangeForInstance(String instanceId, String key, long min, long max, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetRangeForInstance(String instanceId, String key, long min, long max, Class<E> eClass) {
         try {
             Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().range(key, min, max);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, objects, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, objects, eClass));
         } catch (Exception e) {
             log.error("zset range error", e);
             return Set.of();
@@ -2733,22 +2700,22 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 根据字典序获取指定实例中指定范围的元素。
      *
-     * @param instanceId        实例ID
-     * @param key               有序集合的键
-     * @param range             范围
-     * @param limit             限制
-     * @param listTypeReference 类型引用
-     * @param <E>               元素类型
+     * @param instanceId 实例ID
+     * @param key        有序集合的键
+     * @param range      范围
+     * @param limit      限制
+     * @param eClass     类型引用
+     * @param <E>        元素类型
      * @return 指定范围的元素集合
      */
     @Override
-    public <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, Range<String> range, Limit limit, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, Range<String> range, Limit limit, Class<E> eClass) {
         try {
             Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeByLex(key, range, limit);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, objects, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, objects, eClass));
         } catch (Exception e) {
             log.error("zset range by lex error", e);
             return Set.of();
@@ -2758,22 +2725,22 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 根据分数获取指定实例中指定范围的元素。
      *
-     * @param instanceId        实例ID
-     * @param key               有序集合的键
-     * @param min               最小值
-     * @param max               最大值
-     * @param listTypeReference 类型引用
-     * @param <E>               元素类型
+     * @param instanceId 实例ID
+     * @param key        有序集合的键
+     * @param min        最小值
+     * @param max        最大值
+     * @param eClass     类型引用
+     * @param <E>        元素类型
      * @return 指定范围的元素集合
      */
     @Override
-    public <E> Set<E> zsetRangeByScoreForInstance(String instanceId, String key, double min, double max, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetRangeByScoreForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         try {
             Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeByScore(key, min, max);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, objects, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, objects, eClass));
         } catch (Exception e) {
             log.error("zset range by score error", e);
             return Set.of();
@@ -2783,24 +2750,24 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 根据分数和偏移量获取指定实例中指定范围的元素。
      *
-     * @param instanceId        实例ID
-     * @param key               有序集合的键
-     * @param min               最小值
-     * @param max               最大值
-     * @param offset            偏移量
-     * @param count             数量
-     * @param listTypeReference 类型引用
-     * @param <E>               元素类型
+     * @param instanceId 实例ID
+     * @param key        有序集合的键
+     * @param min        最小值
+     * @param max        最大值
+     * @param offset     偏移量
+     * @param count      数量
+     * @param eClass     类型引用
+     * @param <E>        元素类型
      * @return 指定范围的元素集合
      */
     @Override
-    public <E> Set<E> zsetRangeByScoreForInstance(String instanceId, String key, double min, double max, long offset, long count, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetRangeByScoreForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         try {
             Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeByScore(key, min, max, offset, count);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, objects, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, objects, eClass));
         } catch (Exception e) {
             log.error("zset range by score error", e);
             return Set.of();
@@ -2814,16 +2781,16 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param key         有序集合的键
      * @param min         最小值
      * @param max         最大值
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @param <E>         元素类型
      * @return 指定范围的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, Class<E> elementType) {
+    public <E> Map<E, Double> zsetRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeByScoreWithScores(key, min, max);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset range by score with scores error", e);
             return Map.of();
@@ -2840,16 +2807,16 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param max         最大值
      * @param offset      偏移量
      * @param count       数量
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @param <E>         元素类型
      * @return 指定范围的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> elementType) {
+    public <E> Map<E, Double> zsetRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeByScoreWithScores(key, min, max, offset, count);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset range by score with scores error", e);
             return Map.of();
@@ -2863,16 +2830,16 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param key         有序集合的键
      * @param start       起始位置
      * @param end         结束位置
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @param <E>         元素类型
      * @return 指定范围的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetRangeWithScoresForInstance(String instanceId, String key, long start, long end, Class<E> elementType) {
+    public <E> Map<E, Double> zsetRangeWithScoresForInstance(String instanceId, String key, long start, long end, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeWithScores(key, start, end);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset range with scores error", e);
             return Map.of();
@@ -2930,22 +2897,22 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 根据指定的字典范围和限制条件从指定的实例中反向获取元素，并将其作为集合返回。
      *
-     * @param instanceId        实例 ID
-     * @param key               有序集合的键
-     * @param range             字典范围（包含下限和上限）
-     * @param limit             限制条件（例如最大数量）
-     * @param listTypeReference 类型引用，用于指定元素的类型
-     * @param <E>               元素类型
+     * @param instanceId 实例 ID
+     * @param key        有序集合的键
+     * @param range      字典范围（包含下限和上限）
+     * @param limit      限制条件（例如最大数量）
+     * @param eClass     类型引用，用于指定元素的类型
+     * @param <E>        元素类型
      * @return 反向获取的元素集合
      */
     @Override
-    public <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, Range<String> range, Limit limit, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, Range<String> range, Limit limit, Class<E> eClass) {
         try {
             Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByLex(key, range, limit);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, objects, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, objects, eClass));
         } catch (Exception e) {
             log.error("zset reverse range by lex error", e);
             return Set.of();
@@ -2955,23 +2922,23 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 根据指定的分数范围从指定的实例中反向获取元素，并将其作为集合返回。
      *
-     * @param instanceId        实例 ID
-     * @param key               有序集合的键
-     * @param min               最小分数
-     * @param max               最大分数
-     * @param listTypeReference 类型引用，用于指定元素的类型
-     * @param <E>               元素类型
+     * @param instanceId 实例 ID
+     * @param key        有序集合的键
+     * @param min        最小分数
+     * @param max        最大分数
+     * @param eClass     类型引用，用于指定元素的类型
+     * @param <E>        元素类型
      * @return 反向获取的元素集合
      */
     @Override
-    public <E> Set<E> zsetReverseRangeForInstance(String instanceId, String key, long min, long max, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetReverseRangeForInstance(String instanceId, String key, long min, long max, Class<E> eClass) {
         try {
             Set<Object> objects
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRange(key, min, max);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, objects, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, objects, eClass));
         } catch (Exception e) {
             log.error("zset reverse range error", e);
             return Set.of();
@@ -2981,22 +2948,22 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 根据指定的分数范围从指定的实例中反向获取元素，并将其作为集合返回。
      *
-     * @param instanceId        实例 ID
-     * @param key               有序集合的键
-     * @param min               最小分数
-     * @param max               最大分数
-     * @param listTypeReference 类型引用，用于指定元素的类型
-     * @param <E>               元素类型
+     * @param instanceId 实例 ID
+     * @param key        有序集合的键
+     * @param min        最小分数
+     * @param max        最大分数
+     * @param eClass     类型引用，用于指定元素的类型
+     * @param <E>        元素类型
      * @return 反向获取的元素集合
      */
     @Override
-    public <E> Set<E> zsetReverseRangeByScoreForInstance(String instanceId, String key, double min, double max, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetReverseRangeByScoreForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         try {
             Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScore(key, min, max);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, objects, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, objects, eClass));
         } catch (Exception e) {
             log.error("zset reverse range by score error", e);
             return Set.of();
@@ -3006,24 +2973,24 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     /**
      * 根据指定的分数范围和分页信息从指定的实例中反向获取元素，并将其作为集合返回。
      *
-     * @param instanceId        实例 ID
-     * @param key               有序集合的键
-     * @param min               最小分数
-     * @param max               最大分数
-     * @param offset            偏移量
-     * @param count             数量
-     * @param listTypeReference 类型引用，用于指定元素的类型
-     * @param <E>               元素类型
+     * @param instanceId 实例 ID
+     * @param key        有序集合的键
+     * @param min        最小分数
+     * @param max        最大分数
+     * @param offset     偏移量
+     * @param count      数量
+     * @param eClass     类型引用，用于指定元素的类型
+     * @param <E>        元素类型
      * @return 反向获取的元素集合
      */
     @Override
-    public <E> Set<E> zsetReverseRangeByScoreForInstance(String instanceId, String key, double min, double max, long offset, long count, TypeReference<List<E>> listTypeReference) {
+    public <E> Set<E> zsetReverseRangeByScoreForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         try {
             Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScore(key, min, max, offset, count);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
-            return new LinkedHashSet<>(JacksonUtil.toList(redisObjectMapper, objects, listTypeReference));
+            return new LinkedHashSet<>(JsonUtil.toList(redisObjectMapper, objects, eClass));
         } catch (Exception e) {
             log.error("zset reverse range by score error", e);
             return Set.of();
@@ -3037,16 +3004,16 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param key         有序集合的键
      * @param min         最小分数
      * @param max         最大分数
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @param <E>         元素类型
      * @return 反向获取的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetReverseRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, Class<E> elementType) {
+    public <E> Map<E, Double> zsetReverseRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScoreWithScores(key, min, max);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset reverse range by score with scores error", e);
             return Map.of();
@@ -3062,16 +3029,16 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param max         最大分数
      * @param offset      偏移量
      * @param count       数量
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @param <E>         元素类型
      * @return 反向获取的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetReverseRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> elementType) {
+    public <E> Map<E, Double> zsetReverseRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScoreWithScores(key, min, max, offset, count);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset reverse range by score with scores error", e);
             return Map.of();
@@ -3085,16 +3052,16 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @param key         有序集合的键
      * @param start       开始索引
      * @param end         结束索引
-     * @param elementType 元素类型
+     * @param eClass 元素类型
      * @param <E>         元素类型
      * @return 反向获取的元素及其分数的映射
      */
     @Override
-    public <E> Map<E, Double> zsetReverseRangeWithScoresForInstance(String instanceId, String key, long start, long end, Class<E> elementType) {
+    public <E> Map<E, Double> zsetReverseRangeWithScoresForInstance(String instanceId, String key, long start, long end, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
                     = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeWithScores(key, start, end);
-            return zsetWithScores(typedTuples, elementType);
+            return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset reverse range with scores error", e);
             return Map.of();
@@ -3419,18 +3386,18 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * 将TypedTuple转换为Map
      *
      * @param typedTuples zset数据
-     * @param elementType 类型
+     * @param eClass 类型
      * @param <E>         泛型
      * @return map
      */
-    private <E> Map<E, Double> zsetWithScores(Set<ZSetOperations.TypedTuple<Object>> typedTuples, Class<E> elementType) {
+    private <E> Map<E, Double> zsetWithScores(Set<ZSetOperations.TypedTuple<Object>> typedTuples, Class<E> eClass) {
         if (CollUtil.isEmpty(typedTuples)) {
             return Map.of();
         }
 
         Map<E, Double> map = new LinkedHashMap<>();
         for (ZSetOperations.TypedTuple<Object> typedTuple : typedTuples) {
-            map.put(JacksonUtil.toObj(redisObjectMapper, typedTuple.getValue(), elementType), typedTuple.getScore());
+            map.put(JsonUtil.toObj(redisObjectMapper, typedTuple.getValue(), eClass), typedTuple.getScore());
         }
         return map;
     }

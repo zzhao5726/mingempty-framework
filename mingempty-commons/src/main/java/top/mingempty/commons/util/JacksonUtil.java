@@ -1,25 +1,24 @@
 package top.mingempty.commons.util;
 
-import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.CollectionLikeType;
+import com.fasterxml.jackson.databind.type.MapType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -30,18 +29,8 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import lombok.extern.slf4j.Slf4j;
 import top.mingempty.domain.other.DatePattern;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.Writer;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,13 +41,32 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
+/**
+ * Jackson工具类
+ *
+ * @author zzhao
+ */
 public class JacksonUtil {
 
+    public static final class MapTypeReference<V> extends TypeReference<Map<String, Object>> {
+        public MapTypeReference() {
+            MapType mapType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, Object.class);
+            ReflectionUtil.setValue("_type", this, mapType);
+        }
+    }
+
     /**
-     * 对外暴露用于redis中序列化使用
+     * 泛型集合类型
+     *
+     * @param <V>
      */
-    public volatile static ObjectMapper DEFAULT_OBJECT_MAPPER;
+    public static final class ListTypeReference<V> extends TypeReference<List<V>> {
+        public ListTypeReference(Class<V> vClass) {
+            CollectionLikeType collectionLikeType = TypeFactory.defaultInstance().constructCollectionLikeType(List.class, vClass);
+            ReflectionUtil.setValue("_type", this, collectionLikeType);
+
+        }
+    }
 
     /**
      * 序列化级别，默认只序列化属性值发生过改变的字段
@@ -66,21 +74,17 @@ public class JacksonUtil {
      * NON_EMPTY：序列化非空字符串和非空的字段
      * NON_DEFAULT：序列化属性值发生过改变的字段
      */
-    private volatile static JsonInclude.Include DEFAULT_PROPERTY_INCLUSION = JsonInclude.Include.NON_NULL;
+    private final static JsonInclude.Include DEFAULT_PROPERTY_INCLUSION = JsonInclude.Include.NON_NULL;
 
     /**
      * 是否缩进JSON格式
      */
-    private volatile static boolean IS_ENABLE_INDENT_OUTPUT = false;
+    private final static boolean IS_ENABLE_INDENT_OUTPUT = false;
 
     /**
      * 是否携带类路径
      */
-    private volatile static boolean ACTIVATE_DEFAULT_TYPING = false;
-
-    static {
-        DEFAULT_OBJECT_MAPPER = build();
-    }
+    private final static boolean ACTIVATE_DEFAULT_TYPING = false;
 
     /**
      * 根据配置参数构建一个定制化的ObjectMapper实例。
@@ -127,33 +131,27 @@ public class JacksonUtil {
      */
     public static ObjectMapper build(boolean isEnableIndentOutput, JsonInclude.Include include,
                                      boolean activateDefaultTyping, Map<Class<?>, String> datePatternMap) {
+        return build(isEnableIndentOutput, include, Collections.emptyList(), activateDefaultTyping, Collections.emptyMap());
+    }
+
+    /**
+     * 根据是否启用缩进输出、JSON属性的包含策略、是否激活默认类型化以及日期格式映射表构建ObjectMapper实例。
+     * 此方法允许对日期时间的序列化和反序列化进行细粒度控制。
+     *
+     * @param isEnableIndentOutput  是否启用缩进输出，用于美化JSON格式
+     * @param include               JSON属性的包含策略，决定如何处理null值
+     * @param modules               添加注册的模块
+     * @param activateDefaultTyping 是否激活默认类型化，用于自动处理泛型和继承类型
+     * @param datePatternMap        日期格式映射表，关联日期类型和对应的格式字符串
+     * @return 配置后的ObjectMapper实例
+     */
+    public static ObjectMapper build(boolean isEnableIndentOutput, JsonInclude.Include include, List<Module> modules,
+                                     boolean activateDefaultTyping, Map<Class<?>, String> datePatternMap) {
         // 处理日期格式映射表为空的情况
         if (datePatternMap == null) {
             datePatternMap = Collections.emptyMap();
         }
-
-        // 从日期格式映射表中获取或默认指定日期时间的序列化格式
-        String localDateTimeSerializer = datePatternMap.getOrDefault(LocalDateTime.class, DatePattern.PURE_DATETIME_MS_PATTERN);
-        String localTimeSerializer = datePatternMap.getOrDefault(LocalDate.class, DatePattern.PURE_DATE_PATTERN);
-        String localDateSerializer = datePatternMap.getOrDefault(LocalTime.class, DatePattern.PURE_TIME_MS_PATTERN);
         String dateSerializer = datePatternMap.getOrDefault(Date.class, DatePattern.PURE_DATETIME_MS_PATTERN);
-
-        // 配置Java 8日期时间模块
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class,
-                new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(localDateTimeSerializer)));
-        javaTimeModule.addSerializer(LocalDate.class,
-                new LocalDateSerializer(DateTimeFormatter.ofPattern(localTimeSerializer)));
-        javaTimeModule.addSerializer(LocalTime.class,
-                new LocalTimeSerializer(DateTimeFormatter.ofPattern(localDateSerializer)));
-
-        javaTimeModule.addDeserializer(LocalDateTime.class,
-                new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(localDateTimeSerializer)));
-        javaTimeModule.addDeserializer(LocalDate.class,
-                new LocalDateDeserializer(DateTimeFormatter.ofPattern(localTimeSerializer)));
-        javaTimeModule.addDeserializer(LocalTime.class,
-                new LocalTimeDeserializer(DateTimeFormatter.ofPattern(localDateSerializer)));
-
         // 使用Builder模式构建ObjectMapper实例，配置各种序列化和反序列化选项
         JsonMapper.Builder builder = JsonMapper.builder()
                 .configure(SerializationFeature.INDENT_OUTPUT, isEnableIndentOutput)
@@ -162,10 +160,9 @@ public class JacksonUtil {
                 //识别Java8时间
                 .addModule(new ParameterNamesModule())
                 .addModule(new Jdk8Module())
-                .addModule(javaTimeModule)
+                .addModule(getJavaTimeModule(datePatternMap))
                 .serializationInclusion(include)
                 //设置日期格式
-
                 .defaultDateFormat(new SimpleDateFormat(dateSerializer))
                 //序列化BigDecimal时之间输出原始数字还是科学计数, 默认false, 即是否以toPlainString()科学计数方式来输出
                 .disable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
@@ -198,7 +195,8 @@ public class JacksonUtil {
                 //识别Guava包的类
                 .addModule(new GuavaModule())
                 //允许更改基础{@link VisibilityChecker}配置的便捷方法，以更改自动检测的属性类型的详细信息。
-                .visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+                .visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
+                ;
 
         // 根据配置决定是否激活默认类型化
         if (activateDefaultTyping) {
@@ -208,718 +206,41 @@ public class JacksonUtil {
                     JsonTypeInfo.As.PROPERTY);
         }
 
+        //添加注册模块
+        if (CollUtil.isNotEmpty(modules)) {
+            builder.addModules(modules);
+        }
+
         return builder.build();
     }
 
-
     /**
-     * 设置序列化级别
-     * NON_NULL：序列化非空的字段
-     * NON_EMPTY：序列化非空字符串和非空的字段
-     * NON_DEFAULT：序列化属性值发生过改变的字段
-     */
-    public static void setSerializationInclusion(JsonInclude.Include inclusion) {
-        DEFAULT_PROPERTY_INCLUSION = inclusion;
-        DEFAULT_OBJECT_MAPPER = build(IS_ENABLE_INDENT_OUTPUT, DEFAULT_PROPERTY_INCLUSION, ACTIVATE_DEFAULT_TYPING);
-
-    }
-
-    /**
-     * 设置是否开启JSON格式美化
+     * 配置JDK8日期时间模块
      *
-     * @param isEnableIndentOutput 为true表示开启, 默认false
+     * @param datePatternMap
+     * @return
      */
-    public static void setIndentOutput(boolean isEnableIndentOutput) {
-        IS_ENABLE_INDENT_OUTPUT = isEnableIndentOutput;
-        DEFAULT_OBJECT_MAPPER = build(IS_ENABLE_INDENT_OUTPUT, DEFAULT_PROPERTY_INCLUSION, ACTIVATE_DEFAULT_TYPING);
-    }
+    private static JavaTimeModule getJavaTimeModule(Map<Class<?>, String> datePatternMap) {
+        // 从日期格式映射表中获取或默认指定日期时间的序列化格式
+        String localDateTimeSerializer = datePatternMap.getOrDefault(LocalDateTime.class, DatePattern.PURE_DATETIME_MS_PATTERN);
+        String localTimeSerializer = datePatternMap.getOrDefault(LocalDate.class, DatePattern.PURE_DATE_PATTERN);
+        String localDateSerializer = datePatternMap.getOrDefault(LocalTime.class, DatePattern.PURE_TIME_MS_PATTERN);
 
-    /**
-     * 是否携带类路径
-     *
-     * @param activateDefaultTyping 为true表示开启, 默认false
-     */
-    public static void setDefaultTyping(boolean activateDefaultTyping) {
-        ACTIVATE_DEFAULT_TYPING = activateDefaultTyping;
-        DEFAULT_OBJECT_MAPPER = build(IS_ENABLE_INDENT_OUTPUT, DEFAULT_PROPERTY_INCLUSION, ACTIVATE_DEFAULT_TYPING);
-    }
+        // 配置Java 8日期时间模块
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDateTime.class,
+                new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(localDateTimeSerializer)));
+        javaTimeModule.addSerializer(LocalDate.class,
+                new LocalDateSerializer(DateTimeFormatter.ofPattern(localTimeSerializer)));
+        javaTimeModule.addSerializer(LocalTime.class,
+                new LocalTimeSerializer(DateTimeFormatter.ofPattern(localDateSerializer)));
 
-    /**
-     * JSON反序列化
-     */
-    public static <V> V toObj(Object object, Class<V> vClass) {
-        return toObj(DEFAULT_OBJECT_MAPPER, object, vClass);
-    }
-
-    /**
-     * JSON反序列化
-     */
-    public static <V> V toObj(ObjectMapper objectMapper, Object object, Class<V> vClass) {
-        if (objectMapper == null) {
-            throw new NullPointerException("objectMapper is null");
-        }
-
-        if (null == object) {
-            return null;
-        }
-
-        if (object.getClass().equals(vClass)) {
-            return (V) object;
-        }
-
-        try {
-            switch (object) {
-                case JsonParser jsonParser -> {
-                    return objectMapper.readValue(jsonParser, vClass);
-                }
-                case InputStream inputStream -> {
-                    return objectMapper.readValue(inputStream, vClass);
-                }
-                case Reader reader -> {
-                    return objectMapper.readValue(reader, vClass);
-                }
-                case String str -> {
-                    return objectMapper.readValue(str, vClass);
-                }
-                case File file -> {
-                    return objectMapper.readValue(file, vClass);
-                }
-                case URL url -> {
-                    return objectMapper.readValue(url, vClass);
-                }
-                case byte[] bytes -> {
-                    return objectMapper.readValue(bytes, vClass);
-                }
-                default -> {
-                    return objectMapper.readValue(toStr(objectMapper, object), vClass);
-                }
-            }
-        } catch (IOException ioException) {
-            log.error("json to obj error, object: {}", object, ioException);
-            return null;
-        }
-    }
-
-    /**
-     * JSON反序列化
-     */
-    public static <V> List<V> toList(Object object, TypeReference<List<V>> vTypeReference) {
-        return toList(DEFAULT_OBJECT_MAPPER, object, vTypeReference);
-    }
-
-    /**
-     * JSON反序列化
-     */
-    public static <V> List<V> toList(ObjectMapper objectMapper, Object object, TypeReference<List<V>> vTypeReference) {
-        return toObj(objectMapper, object, vTypeReference);
-    }
-
-
-    /**
-     * JSON反序列化
-     */
-    public static <V> V toObj(Object object, TypeReference<V> vTypeReference) {
-        return toObj(DEFAULT_OBJECT_MAPPER, object, vTypeReference);
-    }
-
-    /**
-     * JSON反序列化
-     */
-    public static <V> V toObj(ObjectMapper objectMapper, Object object, TypeReference<V> vTypeReference) {
-        if (objectMapper == null) {
-            throw new NullPointerException("objectMapper is null");
-        }
-
-        if (null == object) {
-            return null;
-        }
-
-        try {
-            switch (object) {
-                case JsonParser jsonParser -> {
-                    return objectMapper.readValue(jsonParser, vTypeReference);
-                }
-                case InputStream inputStream -> {
-                    return objectMapper.readValue(inputStream, vTypeReference);
-                }
-                case Reader reader -> {
-                    return objectMapper.readValue(reader, vTypeReference);
-                }
-                case String str -> {
-                    return objectMapper.readValue(str, vTypeReference);
-                }
-                case File file -> {
-                    return objectMapper.readValue(file, vTypeReference);
-                }
-                case URL url -> {
-                    return objectMapper.readValue(url, vTypeReference);
-                }
-                case byte[] bytes -> {
-                    return objectMapper.readValue(bytes, vTypeReference);
-                }
-                default -> {
-                    return objectMapper.readValue(toStr(objectMapper, object), vTypeReference);
-                }
-            }
-        } catch (IOException ioException) {
-            log.error("json to obj error, object: {}", object, ioException);
-            return null;
-        }
-    }
-
-
-    /**
-     * 序列化为JSON
-     */
-    public static <V> String toStr(V v) {
-        return toStr(DEFAULT_OBJECT_MAPPER, v);
-    }
-
-    /**
-     * 序列化为JSON
-     */
-    public static <V> String toStr(ObjectMapper objectMapper, V v) {
-        try {
-            if (ObjUtil.isEmpty(v)) {
-                return null;
-            }
-            if (String.class.equals(v.getClass())) {
-                return (String) v;
-            }
-            return objectMapper.writeValueAsString(v);
-        } catch (JsonProcessingException e) {
-            log.error("jackson to error, obj: {}", v, e);
-            return null;
-        }
-    }
-
-    /**
-     * 序列化为JSON并写入文件
-     */
-    public static <V> void toFile(String path, V v) {
-        toFile(DEFAULT_OBJECT_MAPPER, path, v);
-    }
-
-    /**
-     * 序列化为JSON并写入文件
-     */
-    public static <V> void toFile(ObjectMapper objectMapper, String path, V v) {
-        toFile(DEFAULT_OBJECT_MAPPER, path, v, false);
-    }
-
-
-    /**
-     * 序列化为JSON并写入文件
-     *
-     * @param path   文件路径
-     * @param v      要序列化的对象
-     * @param append 如果 true，则数据将写入文件的末尾而不是开头
-     */
-    public static <V> void toFile(ObjectMapper objectMapper, String path, V v, boolean append) {
-        try (Writer writer = new FileWriter(path, append)) {
-            objectMapper.writer().writeValues(writer).write(v);
-            writer.flush();
-        } catch (Exception e) {
-            log.error("jackson to file error, path: {}, obj: {}", path, v, e);
-        }
-    }
-
-    /**
-     * 将对象转换为JsonNode
-     *
-     * @param object 要转换的对象
-     * @return JsonNode
-     */
-    public static JsonNode toNode(Object object) {
-        return toNode(DEFAULT_OBJECT_MAPPER, object);
-    }
-
-    /**
-     * 将对象转换为JsonNode
-     *
-     * @param objectMapper 对象映射器
-     * @param object       要转换的对象
-     * @return JsonNode
-     */
-    public static JsonNode toNode(ObjectMapper objectMapper, Object object) {
-        if (objectMapper == null) {
-            throw new NullPointerException("objectMapper is null");
-        }
-
-        if (null == object) {
-            return null;
-        }
-        try {
-            switch (object) {
-                case JsonParser jsonParser -> {
-                    return objectMapper.readTree(jsonParser);
-                }
-                case InputStream inputStream -> {
-                    return objectMapper.readTree(inputStream);
-                }
-                case Reader reader -> {
-                    return objectMapper.readTree(reader);
-                }
-                case String str -> {
-                    return objectMapper.readTree(str);
-                }
-                case File file -> {
-                    return objectMapper.readTree(file);
-                }
-                case URL url -> {
-                    return objectMapper.readTree(url);
-                }
-                case byte[] bytes -> {
-                    return objectMapper.readTree(bytes);
-                }
-                default -> {
-                    return objectMapper.readTree(toStr(objectMapper, object));
-                }
-            }
-        } catch (IOException ioException) {
-            log.error("json to node error, object: {}", object, ioException);
-            return new ObjectNode(objectMapper.getNodeFactory());
-        }
-    }
-
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return String
-     */
-    public static String getString(String jsonStr, String key) {
-        return getString(DEFAULT_OBJECT_MAPPER, jsonStr, key);
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return String
-     */
-    public static String getString(ObjectMapper objectMapper, String jsonStr, String key) {
-        if (StrUtil.isEmpty(jsonStr)) {
-            return null;
-        }
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            if (null != node) {
-                return node.get(key).toString();
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            log.error("jackson get string error, json: {}, pullWaybillKey: {}", jsonStr, key, e);
-            return null;
-        }
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return int
-     */
-    public static Integer getInt(String jsonStr, String key) {
-        return getInt(DEFAULT_OBJECT_MAPPER, jsonStr, key);
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return int
-     */
-    public static Integer getInt(ObjectMapper objectMapper, String jsonStr, String key) {
-        if (StrUtil.isEmpty(jsonStr)) {
-            return null;
-        }
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            if (null != node) {
-                return node.get(key).intValue();
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            log.error("jackson get int error, json: {}, pullWaybillKey: {}", jsonStr, key, e);
-            return null;
-        }
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return long
-     */
-    public static Long getLong(String jsonStr, String key) {
-        return getLong(DEFAULT_OBJECT_MAPPER, jsonStr, key);
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return long
-     */
-    public static Long getLong(ObjectMapper objectMapper, String jsonStr, String key) {
-        if (StrUtil.isEmpty(jsonStr)) {
-            return null;
-        }
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            if (null != node) {
-                return node.get(key).longValue();
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            log.error("jackson get long error, json: {}, pullWaybillKey: {}", jsonStr, key, e);
-            return null;
-        }
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return double
-     */
-    public static Double getDouble(String jsonStr, String key) {
-        return getDouble(DEFAULT_OBJECT_MAPPER, jsonStr, key);
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return double
-     */
-    public static Double getDouble(ObjectMapper objectMapper, String jsonStr, String key) {
-        if (StrUtil.isEmpty(jsonStr)) {
-            return null;
-        }
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            if (null != node) {
-                return node.get(key).doubleValue();
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            log.error("jackson get double error, json: {}, pullWaybillKey: {}", jsonStr, key, e);
-            return null;
-        }
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return double
-     */
-    public static BigInteger getBigInteger(String jsonStr, String key) {
-        return getBigInteger(DEFAULT_OBJECT_MAPPER, jsonStr, key);
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return double
-     */
-    public static BigInteger getBigInteger(ObjectMapper objectMapper, String jsonStr, String key) {
-        if (StrUtil.isEmpty(jsonStr)) {
-            return new BigInteger(String.valueOf(0.00));
-        }
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            if (null != node) {
-                return node.get(key).bigIntegerValue();
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            log.error("jackson get biginteger error, json: {}, pullWaybillKey: {}", jsonStr, key, e);
-            return null;
-        }
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return double
-     */
-    public static BigDecimal getBigDecimal(String jsonStr, String key) {
-        return getBigDecimal(DEFAULT_OBJECT_MAPPER, jsonStr, key);
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return double
-     */
-    public static BigDecimal getBigDecimal(ObjectMapper objectMapper, String jsonStr, String key) {
-        if (StrUtil.isEmpty(jsonStr)) {
-            return null;
-        }
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            if (null != node) {
-                return node.get(key).decimalValue();
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            log.error("jackson get bigdecimal error, json: {}, pullWaybillKey: {}", jsonStr, key, e);
-            return null;
-        }
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return boolean
-     */
-    public static Boolean getBoolean(String jsonStr, String key) {
-        return getBoolean(DEFAULT_OBJECT_MAPPER, jsonStr, key);
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return boolean
-     */
-    public static Boolean getBoolean(ObjectMapper objectMapper, String jsonStr, String key) {
-        if (StrUtil.isEmpty(jsonStr)) {
-            return false;
-        }
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            if (null != node) {
-                return node.get(key).booleanValue();
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            log.error("jackson get boolean error, json: {}, pullWaybillKey: {}", jsonStr, key, e);
-            return false;
-        }
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return boolean, 默认为false
-     */
-    public static byte[] getByte(String jsonStr, String key) {
-        return getByte(DEFAULT_OBJECT_MAPPER, jsonStr, key);
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return boolean, 默认为false
-     */
-    public static byte[] getByte(ObjectMapper objectMapper, String jsonStr, String key) {
-        if (StrUtil.isEmpty(jsonStr)) {
-            return null;
-        }
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            if (null != node) {
-                return node.get(key).binaryValue();
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            log.error("jackson get byte error, json: {}, pullWaybillKey: {}", jsonStr, key, e);
-            return null;
-        }
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return boolean, 默认为false
-     */
-    public static <T> List<T> getList(String jsonStr, String key) {
-        return getList(DEFAULT_OBJECT_MAPPER, jsonStr, key);
-    }
-
-    /**
-     * 从json串中获取某个字段
-     *
-     * @return boolean, 默认为false
-     */
-    public static <T> List<T> getList(ObjectMapper objectMapper, String jsonStr, String key) {
-        if (StrUtil.isEmpty(jsonStr)) {
-            return null;
-        }
-        String string = getString(objectMapper, jsonStr, key);
-        return toList(string, new TypeReference<>() {
-        });
-    }
-
-    /**
-     * 向json中添加属性
-     *
-     * @return json
-     */
-    public static <T> String add(String jsonStr, String key, T value) {
-        return add(DEFAULT_OBJECT_MAPPER, jsonStr, key, value);
-    }
-
-    /**
-     * 向json中添加属性
-     *
-     * @return json
-     */
-    public static <T> String add(ObjectMapper objectMapper, String jsonStr, String key, T value) {
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            add(objectMapper, node, key, value);
-            return node.toString();
-        } catch (IOException e) {
-            log.error("jackson add error, json: {}, key: {}, value: {}", jsonStr, key, value, e);
-            return jsonStr;
-        }
-    }
-
-    /**
-     * 向json中添加属性
-     */
-    private static <T> void add(ObjectMapper objectMapper, JsonNode jsonNode, String key, T value) {
-        switch (value) {
-            case String s -> ((ObjectNode) jsonNode).put(key, s);
-            case Short i -> ((ObjectNode) jsonNode).put(key, i);
-            case Integer i -> ((ObjectNode) jsonNode).put(key, i);
-            case Long l -> ((ObjectNode) jsonNode).put(key, l);
-            case Float v -> ((ObjectNode) jsonNode).put(key, v);
-            case Double v -> ((ObjectNode) jsonNode).put(key, v);
-            case BigDecimal bigDecimal -> ((ObjectNode) jsonNode).put(key, bigDecimal);
-            case BigInteger bigInteger -> ((ObjectNode) jsonNode).put(key, bigInteger);
-            case Boolean b -> ((ObjectNode) jsonNode).put(key, b);
-            case byte[] bytes -> ((ObjectNode) jsonNode).put(key, bytes);
-            case null, default -> ((ObjectNode) jsonNode).put(key, toStr(objectMapper, value));
-        }
-    }
-
-    /**
-     * 除去json中的某个属性
-     *
-     * @return json
-     */
-    public static String remove(String jsonStr, String key) {
-        return remove(DEFAULT_OBJECT_MAPPER, jsonStr, key);
-    }
-
-    /**
-     * 除去json中的某个属性
-     *
-     * @return json
-     */
-    public static String remove(ObjectMapper objectMapper, String jsonStr, String key) {
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            ((ObjectNode) node).remove(key);
-            return node.toPrettyString();
-        } catch (IOException e) {
-            log.error("jackson remove error, json: {}, pullWaybillKey: {}", jsonStr, key, e);
-            return jsonStr;
-        }
-    }
-
-    /**
-     * 修改json中的属性
-     */
-    public static <T> String update(String jsonStr, String key, T value) {
-        return update(DEFAULT_OBJECT_MAPPER, jsonStr, key, value);
-    }
-
-    /**
-     * 修改json中的属性
-     */
-    public static <T> String update(ObjectMapper objectMapper, String jsonStr, String key, T value) {
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            ((ObjectNode) node).remove(key);
-            add(objectMapper, node, key, value);
-            return node.toPrettyString();
-        } catch (IOException e) {
-            log.error("jackson update error, json: {}, pullWaybillKey: {}, value: {}", jsonStr, key, value, e);
-            return jsonStr;
-        }
-    }
-
-    /**
-     * 格式化Json(美化)
-     *
-     * @return json
-     */
-    public static String formatPretty(String jsonStr) {
-        return formatPretty(DEFAULT_OBJECT_MAPPER, jsonStr);
-    }
-
-    /**
-     * 格式化Json(美化)
-     *
-     * @return json
-     */
-    public static String formatPretty(ObjectMapper objectMapper, String jsonStr) {
-        try {
-            JsonNode node = objectMapper.readTree(jsonStr);
-            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-        } catch (IOException e) {
-            log.error("jackson format json error, json: {}", jsonStr, e);
-            return jsonStr;
-        }
-    }
-
-    /**
-     * 判断字符串是否是json
-     *
-     * @return json
-     */
-    public static boolean isJson(String jsonStr) {
-        return isJson(DEFAULT_OBJECT_MAPPER, jsonStr);
-    }
-
-    /**
-     * 判断字符串是否是json
-     *
-     * @return json
-     */
-    public static boolean isJson(ObjectMapper objectMapper, String jsonStr) {
-        if (jsonStr == null) {
-            return false;
-        }
-
-        String trimmedJsonStr = jsonStr.trim();
-        if (isJsonStartEndValid(trimmedJsonStr)) {
-            try {
-                objectMapper.readTree(trimmedJsonStr);
-                return true;
-            } catch (JsonProcessingException e) {
-                // 这里捕获更具体的异常类型，比如JsonParseException和JsonMappingException
-                // 通过日志级别和异常类型提供更详细的错误信息
-                logJsonProcessingException(e);
-                return false;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isJsonStartEndValid(String str) {
-        // 优化判断逻辑的有效性，使其更清晰
-        return str.startsWith("{") && str.endsWith("}")
-                || str.startsWith("[") && str.endsWith("]");
-    }
-
-    private static void logJsonProcessingException(JsonProcessingException e) {
-        // 根据异常类型进行更细致的日志记录
-        if (e instanceof UnrecognizedPropertyException) {
-            log.warn("Unrecognized property in JSON.", e);
-        } else {
-            if (log.isDebugEnabled()) {
-                log.error("Jackson JSON parsing error.", e);
-            } else {
-                log.warn("Jackson JSON parsing error.", e);
-            }
-        }
+        javaTimeModule.addDeserializer(LocalDateTime.class,
+                new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(localDateTimeSerializer)));
+        javaTimeModule.addDeserializer(LocalDate.class,
+                new LocalDateDeserializer(DateTimeFormatter.ofPattern(localTimeSerializer)));
+        javaTimeModule.addDeserializer(LocalTime.class,
+                new LocalTimeDeserializer(DateTimeFormatter.ofPattern(localDateSerializer)));
+        return javaTimeModule;
     }
 }
-

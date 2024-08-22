@@ -1,6 +1,5 @@
 package top.mingempty.cache.commons.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.util.Collection;
@@ -134,7 +133,7 @@ public interface CacheStr extends CacheCounter {
      * @param override   是否覆盖已有值
      * @return 操作是否成功
      */
-    default Boolean putBytesForInstance(String instanceId, String key, byte[] value, long expiry, TimeUnit unit,                                        boolean override) {
+    default Boolean putBytesForInstance(String instanceId, String key, byte[] value, long expiry, TimeUnit unit, boolean override) {
         return putForInstance(instanceId, key, value, expiry, unit, override);
     }
 
@@ -188,25 +187,25 @@ public interface CacheStr extends CacheCounter {
      * 使用默认的实例名。
      * </p>
      *
-     * @param <V>         对象的类型
-     * @param key         存储的键
-     * @param elementType 对象的类型类
+     * @param <V>    对象的类型
+     * @param key    存储的键
+     * @param vClass 对象的类型类
      * @return 获取的对象值
      */
-    default <V> V getObj(String key, Class<V> elementType) {
-        return getObjForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, elementType);
+    default <V> V getObj(String key, Class<V> vClass) {
+        return getObjForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, vClass);
     }
 
     /**
      * 从指定实例中获取指定键的对象值。
      *
-     * @param <V>         对象的类型
-     * @param instanceId  实例ID
-     * @param key         存储的键
-     * @param elementType 对象的类型类
+     * @param <V>        对象的类型
+     * @param instanceId 实例ID
+     * @param key        存储的键
+     * @param vClass     对象的类型类
      * @return 获取的对象值
      */
-    <V> V getObjForInstance(String instanceId, String key, Class<V> elementType);
+    <V> V getObjForInstance(String instanceId, String key, Class<V> vClass);
 
     /**
      * 从缓存中获取指定键的对象列表值。
@@ -214,25 +213,25 @@ public interface CacheStr extends CacheCounter {
      * 使用默认的实例名。
      * </p>
      *
-     * @param <E>               列表中元素的类型
-     * @param key               存储的键
-     * @param listTypeReference 列表中元素的类型类
+     * @param <E>    列表中元素的类型
+     * @param key    存储的键
+     * @param eClass 列表中元素的类型类
      * @return 获取的对象列表值
      */
-    default <E> List<E> getList(String key, TypeReference<List<E>> listTypeReference) {
-        return getListForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, listTypeReference);
+    default <E> List<E> getList(String key, Class<E> eClass) {
+        return getListForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, eClass);
     }
 
     /**
      * 从指定实例中获取指定键的对象列表值。
      *
-     * @param <E>               列表中元素的类型
-     * @param instanceId        实例ID
-     * @param key               存储的键
-     * @param listTypeReference 列表中元素的类型类
+     * @param <E>        列表中元素的类型
+     * @param instanceId 实例ID
+     * @param key        存储的键
+     * @param eClass     列表中元素的类型类
      * @return 获取的对象列表值
      */
-    <E> List<E> getListForInstance(String instanceId, String key, TypeReference<List<E>> listTypeReference);
+    <E> List<E> getListForInstance(String instanceId, String key, Class<E> eClass);
 
     /**
      * 根据多个键获取字符串值。
@@ -262,25 +261,25 @@ public interface CacheStr extends CacheCounter {
      * 使用默认的实例名。
      * </p>
      *
-     * @param <E>         元素的类型
-     * @param keys        键的集合
-     * @param elementType 元素的类型类对象
+     * @param <E>    元素的类型
+     * @param keys   键的集合
+     * @param eClass 元素的类型类对象
      * @return 对象值的列表
      */
-    default <E> List<E> multiGetObj(Collection<String> keys, Class<E> elementType) {
-        return multiGetObjForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, keys, elementType);
+    default <E> List<E> multiGetObj(Collection<String> keys, Class<E> eClass) {
+        return multiGetObjForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, keys, eClass);
     }
 
     /**
      * 根据多个键获取对象值。
      *
-     * @param <E>         元素的类型
-     * @param instanceId  实例ID
-     * @param keys        键的集合
-     * @param elementType 元素的类型类对象
+     * @param <E>        元素的类型
+     * @param instanceId 实例ID
+     * @param keys       键的集合
+     * @param eClass     元素的类型类对象
      * @return 对象值的列表
      */
-    <E> List<E> multiGetObjForInstance(String instanceId, Collection<String> keys, Class<E> elementType);
+    <E> List<E> multiGetObjForInstance(String instanceId, Collection<String> keys, Class<E> eClass);
 
     /**
      * 根据多个键获取列表值。
@@ -288,25 +287,25 @@ public interface CacheStr extends CacheCounter {
      * 使用默认的实例名。
      * </p>
      *
-     * @param <E>         列表元素的类型
-     * @param keys        键的集合
-     * @param listTypeReference 列表元素的类型类对象
+     * @param <E>    列表元素的类型
+     * @param keys   键的集合
+     * @param eClass 列表元素的类型类对象
      * @return 列表值的列表
      */
-    default <E> List<List<E>> multiGetList(Collection<String> keys, TypeReference<List<E>> listTypeReference) {
-        return multiGetListForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, keys, listTypeReference);
+    default <E> List<List<E>> multiGetList(Collection<String> keys, Class<E> eClass) {
+        return multiGetListForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, keys, eClass);
     }
 
     /**
      * 根据多个键获取列表值。
      *
-     * @param <E>         列表元素的类型
-     * @param instanceId  实例ID
-     * @param keys        键的集合
-     * @param listTypeReference 列表元素的类型类对象
+     * @param <E>        列表元素的类型
+     * @param instanceId 实例ID
+     * @param keys       键的集合
+     * @param eClass     列表元素的类型类对象
      * @return 列表值的列表
      */
-    <E> List<List<E>> multiGetListForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference);
+    <E> List<List<E>> multiGetListForInstance(String instanceId, Collection<String> keys, Class<E> eClass);
 
     /**
      * 从缓存中获取指定键的对象值。

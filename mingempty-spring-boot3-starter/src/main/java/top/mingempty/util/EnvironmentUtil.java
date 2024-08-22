@@ -1,6 +1,5 @@
 package top.mingempty.util;
 
-import lombok.Getter;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
@@ -23,10 +22,8 @@ import java.util.stream.Collectors;
  */
 public class EnvironmentUtil implements EnvironmentAware {
 
-    @Getter
     private static Environment ENVIRONMENT;
 
-    @Getter
     private static StandardEnvironment STANDARD_ENVIRONMENT;
 
     /**
@@ -38,7 +35,7 @@ public class EnvironmentUtil implements EnvironmentAware {
     public void setEnvironment(@Nullable Environment environment) {
         ENVIRONMENT = environment;
         if (ENVIRONMENT instanceof StandardEnvironment standardEnvironment) {
-            this.STANDARD_ENVIRONMENT = standardEnvironment;
+            STANDARD_ENVIRONMENT = standardEnvironment;
         }
         initKeyS();
     }
@@ -68,16 +65,14 @@ public class EnvironmentUtil implements EnvironmentAware {
         if (!keyS.isEmpty()) {
             return;
         }
-
-        MutablePropertySources propertySources = STANDARD_ENVIRONMENT.getPropertySources();
+        MutablePropertySources propertySources = gainStandardEnvironment().getPropertySources();
         propertySources.stream().forEach(propertySource -> {
             String name = propertySource.getName();
             if (!name.equals(StandardServletEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME)
                     && !name.equals(StandardServletEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME)) {
                 Object o = propertySource.getSource();
-                if (o instanceof Map) {
-                    Map<String, Object> objectMap = ((Map<String, Object>) o);
-                    keyS.addAll(objectMap.keySet());
+                if (o instanceof Map map) {
+                    ((Set<Map.Entry>) map.entrySet()).stream().map(Map.Entry::getKey).map(Object::toString).forEach(keyS::add);
                 }
             }
         });
@@ -92,8 +87,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static Boolean containsProperty(String key) {
-
-        return ENVIRONMENT.containsProperty(key);
+        return gainEnvironment().containsProperty(key);
     }
 
     /**
@@ -103,7 +97,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static String getRequiredProperty(String key) {
-        return ENVIRONMENT.getRequiredProperty(key);
+        return gainEnvironment().getRequiredProperty(key);
     }
 
     /**
@@ -115,7 +109,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static <T> T getRequiredProperty(String key, Class<T> targetType) {
-        return ENVIRONMENT.getRequiredProperty(key, targetType);
+        return gainEnvironment().getRequiredProperty(key, targetType);
     }
 
     /**
@@ -125,7 +119,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static String resolvePlaceholders(String text) {
-        return ENVIRONMENT.resolvePlaceholders(text);
+        return gainEnvironment().resolvePlaceholders(text);
     }
 
     /**
@@ -135,7 +129,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static String resolveRequiredPlaceholders(String text) {
-        return ENVIRONMENT.resolveRequiredPlaceholders(text);
+        return gainEnvironment().resolveRequiredPlaceholders(text);
     }
 
 
@@ -146,7 +140,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static Boolean acceptsProfiles(Profiles profiles) {
-        return ENVIRONMENT.acceptsProfiles(profiles);
+        return gainEnvironment().acceptsProfiles(profiles);
     }
 
     /**
@@ -156,7 +150,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static Boolean acceptsProfiles(String... profiles) {
-        return ENVIRONMENT.acceptsProfiles(Profiles.of(profiles));
+        return gainEnvironment().acceptsProfiles(Profiles.of(profiles));
     }
 
     /**
@@ -165,7 +159,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static Set<String> getActiveProfiles() {
-        return Arrays.stream(ENVIRONMENT.getActiveProfiles()).collect(Collectors.toSet());
+        return Arrays.stream(gainEnvironment().getActiveProfiles()).collect(Collectors.toSet());
     }
 
     /**
@@ -174,7 +168,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static Set<String> getDefaultProfiles() {
-        return Arrays.stream(ENVIRONMENT.getDefaultProfiles()).collect(Collectors.toSet());
+        return Arrays.stream(gainEnvironment().getDefaultProfiles()).collect(Collectors.toSet());
     }
 
 
@@ -184,7 +178,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static String getProperty(String key) {
-        return ENVIRONMENT.getProperty(key);
+        return gainEnvironment().getProperty(key);
     }
 
     /**
@@ -193,7 +187,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static <T> T getProperty(String key, Class<T> targetType) {
-        return ENVIRONMENT.getProperty(key, targetType);
+        return gainEnvironment().getProperty(key, targetType);
     }
 
     /**
@@ -202,7 +196,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static String getProperty(String key, String defaultValue) {
-        return ENVIRONMENT.getProperty(key, defaultValue);
+        return gainEnvironment().getProperty(key, defaultValue);
     }
 
     /**
@@ -211,7 +205,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * @return
      */
     public static <T> T getProperty(String key, Class<T> targetType, T defaultValue) {
-        return ENVIRONMENT.getProperty(key, targetType, defaultValue);
+        return gainEnvironment().getProperty(key, targetType, defaultValue);
     }
 
 
@@ -233,4 +227,11 @@ public class EnvironmentUtil implements EnvironmentAware {
         return getProperty("server.servlet.context-path", "");
     }
 
+    public static Environment gainEnvironment() {
+        return ENVIRONMENT;
+    }
+
+    public static StandardEnvironment gainStandardEnvironment() {
+        return STANDARD_ENVIRONMENT;
+    }
 }

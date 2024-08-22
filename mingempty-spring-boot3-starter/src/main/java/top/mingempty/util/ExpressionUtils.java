@@ -3,7 +3,6 @@ package top.mingempty.util;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
@@ -26,17 +25,14 @@ public class ExpressionUtils {
     /**
      * Spel表达式解析器
      */
-    @Getter
     private final static SpelExpressionParser SPEL_EXPRESSION_PARSER = new SpelExpressionParser();
 
     /**
      * 方法参数名解析器
      */
-    @Getter
     private final static DefaultParameterNameDiscoverer DEFAULT_PARAMETER_NAME_DISCOVERER = new DefaultParameterNameDiscoverer();
 
     private static final Map<String, SpelExpression> EXPRESSION_CACHE = new ConcurrentHashMap<>(2);
-
 
     /**
      * 获取Expression对象
@@ -222,4 +218,6 @@ public class ExpressionUtils {
         }
         return true;
     }
+
+
 }

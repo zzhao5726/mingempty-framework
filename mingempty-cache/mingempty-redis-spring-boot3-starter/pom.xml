@@ -66,11 +66,13 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- caffeine -->
+        <!--spring-security-core-->
         <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <optional>true</optional>
         </dependency>
+
 
         <!--第三方依赖👆  项目自身依赖👇-->
 

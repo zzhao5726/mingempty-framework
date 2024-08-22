@@ -33,11 +33,11 @@ public interface RedisCacheMap extends CacheMap {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param pattern    元素格式
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 随机的数据
      */
     @Override
-    default <E> Map<String, E> mapScanForInstance(String instanceId, String key, String pattern, Class<E> valueType) {
+    default <E> Map<String, E> mapScanForInstance(String instanceId, String key, String pattern, Class<E> eClass) {
         if (pattern == null) {
             pattern = "*";
         }
@@ -47,7 +47,7 @@ public interface RedisCacheMap extends CacheMap {
         if (!pattern.endsWith("*")) {
             pattern = pattern.concat("*");
         }
-        return mapScanForInstance(instanceId, key, ScanOptions.scanOptions().match(pattern).build(), valueType);
+        return mapScanForInstance(instanceId, key, ScanOptions.scanOptions().match(pattern).build(), eClass);
     }
 
     /**
@@ -56,11 +56,11 @@ public interface RedisCacheMap extends CacheMap {
      * @param <E>       值的类型
      * @param key       映射的键
      * @param options   元素格式
-     * @param valueType 映射中值的类型
+     * @param eClass 映射中值的类型
      * @return 随机的数据
      */
-    default <E> Map<String, E> mapScan(String key, ScanOptions options, Class<E> valueType) {
-        return mapScanForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, options, valueType);
+    default <E> Map<String, E> mapScan(String key, ScanOptions options, Class<E> eClass) {
+        return mapScanForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, options, eClass);
     }
 
     /**
@@ -70,8 +70,8 @@ public interface RedisCacheMap extends CacheMap {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param options    元素格式
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 随机的数据
      */
-    <E> Map<String, E> mapScanForInstance(String instanceId, String key, ScanOptions options, Class<E> valueType);
+    <E> Map<String, E> mapScanForInstance(String instanceId, String key, ScanOptions options, Class<E> eClass);
 }

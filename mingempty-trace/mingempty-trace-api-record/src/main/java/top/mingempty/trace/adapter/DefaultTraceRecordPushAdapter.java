@@ -1,7 +1,7 @@
 package top.mingempty.trace.adapter;
 
 import lombok.extern.slf4j.Slf4j;
-import top.mingempty.commons.util.JacksonUtil;
+import top.mingempty.commons.util.JsonUtil;
 import top.mingempty.domain.enums.ParameteTypeEnum;
 import top.mingempty.trace.domain.Message;
 
@@ -26,10 +26,10 @@ public class DefaultTraceRecordPushAdapter implements TraceRecordPushAdapter {
 
         switch (message.getParameteTypeEnum()) {
             case ParameteTypeEnum.REQUEST -> {
-                log.debug("trace start：[{}]", JacksonUtil.toStr(message));
+                log.debug("trace start：[{}]", JsonUtil.toStr(message));
             }
             case ParameteTypeEnum.RESPONSE -> {
-                log.debug("trace end：[{}]", JacksonUtil.toStr(message));
+                log.debug("trace end：[{}]", JsonUtil.toStr(message));
             }
         }
 

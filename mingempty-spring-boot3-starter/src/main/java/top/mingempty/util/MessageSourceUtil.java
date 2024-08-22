@@ -1,6 +1,5 @@
 package top.mingempty.util;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -18,10 +17,8 @@ import java.util.Locale;
 @Slf4j
 public class MessageSourceUtil implements MessageSourceAware {
 
-    @Getter
     private static MessageSource MESSAGE_SOURCE;
 
-    @Getter
     private static ResourceBundleMessageSource RESOURCE_BUNDLE_MESSAGE_SOURCE;
 
     @Override
@@ -45,7 +42,7 @@ public class MessageSourceUtil implements MessageSourceAware {
         }
 
         if (RESOURCE_BUNDLE_MESSAGE_SOURCE != null) {
-            RESOURCE_BUNDLE_MESSAGE_SOURCE.addBasenames(basenames);
+            gainResourceBundleMessageSource().addBasenames(basenames);
         } else {
             log.warn("Spring Bean NotFund  ResourceBundleMessageSource");
         }
@@ -53,11 +50,11 @@ public class MessageSourceUtil implements MessageSourceAware {
 
 
     public static String getMessage(String code, Object[] args, String defaultMessage) {
-        return MESSAGE_SOURCE.getMessage(code, args, defaultMessage, Locale.CHINA);
+        return gainMessageSource().getMessage(code, args, defaultMessage, Locale.CHINA);
     }
 
     public static String getMessage(String code, Object[] args, String defaultMessage, Locale locale) {
-        return MESSAGE_SOURCE.getMessage(code, args, defaultMessage, locale);
+        return gainMessageSource().getMessage(code, args, defaultMessage, locale);
     }
 
     public static String getMessage(String code, Object[] args) throws NoSuchMessageException {
@@ -65,14 +62,22 @@ public class MessageSourceUtil implements MessageSourceAware {
     }
 
     public static String getMessage(String code, Object[] args, Locale locale) throws NoSuchMessageException {
-        return MESSAGE_SOURCE.getMessage(code, args, locale);
+        return gainMessageSource().getMessage(code, args, locale);
     }
 
     public static String getMessage(MessageSourceResolvable resolvable) throws NoSuchMessageException {
-        return MESSAGE_SOURCE.getMessage(resolvable, Locale.CHINA);
+        return gainMessageSource().getMessage(resolvable, Locale.CHINA);
     }
 
     public static String getMessage(MessageSourceResolvable resolvable, Locale locale) throws NoSuchMessageException {
-        return MESSAGE_SOURCE.getMessage(resolvable, locale);
+        return gainMessageSource().getMessage(resolvable, locale);
+    }
+
+    public static MessageSource gainMessageSource() {
+        return MESSAGE_SOURCE;
+    }
+
+    public static ResourceBundleMessageSource gainResourceBundleMessageSource() {
+        return RESOURCE_BUNDLE_MESSAGE_SOURCE;
     }
 }

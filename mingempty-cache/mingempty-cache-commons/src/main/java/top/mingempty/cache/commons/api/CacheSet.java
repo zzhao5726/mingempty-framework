@@ -1,6 +1,5 @@
 package top.mingempty.cache.commons.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import top.mingempty.domain.base.IPage;
 import top.mingempty.domain.other.GlobalConstant;
 
@@ -308,11 +307,11 @@ public interface CacheSet {
      *
      * @param key               元素的键
      * @param pattern           元素格式
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 操作结果
      */
-    default <E> Set<E> setScan(String key, String pattern, TypeReference<List<E>> listTypeReference) {
-        return setScanForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, pattern, listTypeReference);
+    default <E> Set<E> setScan(String key, String pattern, Class<E> eClass) {
+        return setScanForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, pattern, eClass);
     }
 
     /**
@@ -321,21 +320,21 @@ public interface CacheSet {
      * @param instanceId        实例ID
      * @param key               元素的键
      * @param pattern           元素格式
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 操作结果
      */
-    <E> Set<E> setScanForInstance(String instanceId, String key, String pattern, TypeReference<List<E>> listTypeReference);
+    <E> Set<E> setScanForInstance(String instanceId, String key, String pattern, Class<E> eClass);
 
     /**
      * 获取指定键的集合中的随机一个元素，并移除。
      *
      * @param <E>         元素类型
      * @param key         集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
-    default <E> E setPop(String key, Class<E> elementType) {
-        return setPopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, elementType);
+    default <E> E setPop(String key, Class<E> eClass) {
+        return setPopForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, eClass);
     }
 
     /**
@@ -344,21 +343,21 @@ public interface CacheSet {
      * @param <E>         元素类型
      * @param instanceId  实例ID
      * @param key         集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
-    <E> E setPopForInstance(String instanceId, String key, Class<E> elementType);
+    <E> E setPopForInstance(String instanceId, String key, Class<E> eClass);
 
     /**
      * 获取指定键的集合中的随机一个元素。
      *
      * @param <E>         元素类型
      * @param key         集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
-    default <E> E setRandomMember(String key, Class<E> elementType) {
-        return setRandomMemberForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, elementType);
+    default <E> E setRandomMember(String key, Class<E> eClass) {
+        return setRandomMemberForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, eClass);
     }
 
     /**
@@ -367,10 +366,10 @@ public interface CacheSet {
      * @param <E>         元素类型
      * @param instanceId  实例ID
      * @param key         集合的键
-     * @param elementType 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
-    <E> E setRandomMemberForInstance(String instanceId, String key, Class<E> elementType);
+    <E> E setRandomMemberForInstance(String instanceId, String key, Class<E> eClass);
 
     /**
      * 获取指定键的集合中的随机多个元素（可能重复）。
@@ -378,11 +377,11 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param key               集合的键
      * @param count             返回的元素个数
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
-    default <E> List<E> setRandomMembers(String key, long count, TypeReference<List<E>> listTypeReference) {
-        return setRandomMembersForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, count, listTypeReference);
+    default <E> List<E> setRandomMembers(String key, long count, Class<E> eClass) {
+        return setRandomMembersForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, count, eClass);
     }
 
     /**
@@ -392,10 +391,10 @@ public interface CacheSet {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param count             返回的元素个数
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
-    <E> List<E> setRandomMembersForInstance(String instanceId, String key, long count, TypeReference<List<E>> listTypeReference);
+    <E> List<E> setRandomMembersForInstance(String instanceId, String key, long count, Class<E> eClass);
 
     /**
      * 从一个特定的集合中随机选择一定数量的不同元素，并返回一个包含这些元素的集合。
@@ -403,11 +402,11 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param key               集合的键
      * @param count             返回的元素个数
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
-    default <E> Set<E> setDistinctRandomMembers(String key, long count, TypeReference<List<E>> listTypeReference) {
-        return setDistinctRandomMembersForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, count, listTypeReference);
+    default <E> Set<E> setDistinctRandomMembers(String key, long count, Class<E> eClass) {
+        return setDistinctRandomMembersForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, count, eClass);
     }
 
     /**
@@ -417,21 +416,21 @@ public interface CacheSet {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param count             返回的元素个数
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的随机元素
      */
-    <E> Set<E> setDistinctRandomMembersForInstance(String instanceId, String key, long count, TypeReference<List<E>> listTypeReference);
+    <E> Set<E> setDistinctRandomMembersForInstance(String instanceId, String key, long count, Class<E> eClass);
 
     /**
      * 获取指定键的集合中的所有元素。
      *
      * @param <E>               元素类型
      * @param key               集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setGetAll(String key, TypeReference<List<E>> listTypeReference) {
-        return setGetAllForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, listTypeReference);
+    default <E> Set<E> setGetAll(String key, Class<E> eClass) {
+        return setGetAllForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, eClass);
     }
 
     /**
@@ -440,11 +439,11 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param instanceId        实例ID
      * @param key               集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setGetAllForInstance(String instanceId, String key, TypeReference<List<E>> listTypeReference) {
-        return setGetPageForInstance(instanceId, key, IPage.build(1, 0).setSearchCount(false), listTypeReference);
+    default <E> Set<E> setGetAllForInstance(String instanceId, String key, Class<E> eClass) {
+        return setGetPageForInstance(instanceId, key, IPage.build(1, 0).setSearchCount(false), eClass);
     }
 
     /**
@@ -453,11 +452,11 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param key               集合的键
      * @param iPage             分页参数
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setGetPage(String key, final IPage iPage, TypeReference<List<E>> listTypeReference) {
-        return setGetPageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage, listTypeReference);
+    default <E> Set<E> setGetPage(String key, final IPage iPage, Class<E> eClass) {
+        return setGetPageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage, eClass);
     }
 
     /**
@@ -467,10 +466,10 @@ public interface CacheSet {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param iPage             分页参数
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    <E> Set<E> setGetPageForInstance(String instanceId, String key, final IPage iPage, TypeReference<List<E>> listTypeReference);
+    <E> Set<E> setGetPageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass);
 
     /**
      * 计算两个集合之间的差异，返回一个包含在第一个集合中但不在第二个集合中的元素的集合
@@ -478,11 +477,11 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param key               集合的键
      * @param otherKey          其它集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setDifference(String key, String otherKey, TypeReference<List<E>> listTypeReference) {
-        return setDifferenceForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKey, listTypeReference);
+    default <E> Set<E> setDifference(String key, String otherKey, Class<E> eClass) {
+        return setDifferenceForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKey, eClass);
     }
 
     /**
@@ -492,11 +491,11 @@ public interface CacheSet {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param otherKey          其它集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setDifferenceForInstance(String instanceId, String key, String otherKey, TypeReference<List<E>> listTypeReference) {
-        return setDifferenceForInstance(instanceId, key, Collections.singletonList(otherKey), listTypeReference);
+    default <E> Set<E> setDifferenceForInstance(String instanceId, String key, String otherKey, Class<E> eClass) {
+        return setDifferenceForInstance(instanceId, key, Collections.singletonList(otherKey), eClass);
     }
 
     /**
@@ -505,11 +504,11 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param key               集合的键
      * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setDifference(String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
-        return setDifferenceForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, listTypeReference);
+    default <E> Set<E> setDifference(String key, Collection<String> otherKeys, Class<E> eClass) {
+        return setDifferenceForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, eClass);
     }
 
     /**
@@ -519,14 +518,14 @@ public interface CacheSet {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setDifferenceForInstance(String instanceId, String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
+    default <E> Set<E> setDifferenceForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         List<String> newKeys = new ArrayList<>();
         newKeys.add(key);
         newKeys.addAll(otherKeys);
-        return setDifferenceForInstance(instanceId, newKeys, listTypeReference);
+        return setDifferenceForInstance(instanceId, newKeys, eClass);
     }
 
     /**
@@ -534,11 +533,11 @@ public interface CacheSet {
      *
      * @param <E>               元素类型
      * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setDifference(Collection<String> keys, TypeReference<List<E>> listTypeReference) {
-        return setDifferenceForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, keys, listTypeReference);
+    default <E> Set<E> setDifference(Collection<String> keys, Class<E> eClass) {
+        return setDifferenceForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, keys, eClass);
     }
 
     /**
@@ -547,10 +546,10 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param instanceId        实例ID
      * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    <E> Set<E> setDifferenceForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference);
+    <E> Set<E> setDifferenceForInstance(String instanceId, Collection<String> keys, Class<E> eClass);
 
     /**
      * 计算给定的两个集合的差异，并将结果存储到指定的集合中
@@ -802,11 +801,11 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param key               集合的键
      * @param otherKey          其它集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setIntersect(String key, String otherKey, TypeReference<List<E>> listTypeReference) {
-        return setIntersectForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKey, listTypeReference);
+    default <E> Set<E> setIntersect(String key, String otherKey, Class<E> eClass) {
+        return setIntersectForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKey, eClass);
     }
 
     /**
@@ -816,11 +815,11 @@ public interface CacheSet {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param otherKey          其它集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setIntersectForInstance(String instanceId, String key, String otherKey, TypeReference<List<E>> listTypeReference) {
-        return setIntersectForInstance(instanceId, key, Collections.singletonList(otherKey), listTypeReference);
+    default <E> Set<E> setIntersectForInstance(String instanceId, String key, String otherKey, Class<E> eClass) {
+        return setIntersectForInstance(instanceId, key, Collections.singletonList(otherKey), eClass);
     }
 
     /**
@@ -829,11 +828,11 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param key               集合的键
      * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setIntersect(String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
-        return setIntersectForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, listTypeReference);
+    default <E> Set<E> setIntersect(String key, Collection<String> otherKeys, Class<E> eClass) {
+        return setIntersectForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, eClass);
     }
 
     /**
@@ -843,14 +842,14 @@ public interface CacheSet {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setIntersectForInstance(String instanceId, String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
+    default <E> Set<E> setIntersectForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         List<String> newKeys = new ArrayList<>();
         newKeys.add(key);
         newKeys.addAll(otherKeys);
-        return setIntersectForInstance(instanceId, newKeys, listTypeReference);
+        return setIntersectForInstance(instanceId, newKeys, eClass);
     }
 
     /**
@@ -858,11 +857,11 @@ public interface CacheSet {
      *
      * @param <E>               元素类型
      * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setIntersect(Collection<String> keys, TypeReference<List<E>> listTypeReference) {
-        return setIntersectForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, keys, listTypeReference);
+    default <E> Set<E> setIntersect(Collection<String> keys, Class<E> eClass) {
+        return setIntersectForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, keys, eClass);
     }
 
     /**
@@ -871,10 +870,10 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param instanceId        实例ID
      * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    <E> Set<E> setIntersectForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference);
+    <E> Set<E> setIntersectForInstance(String instanceId, Collection<String> keys, Class<E> eClass);
 
     /**
      * 计算给定两个集合的交集，并将结果存储在destKey中。
@@ -1126,11 +1125,11 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param key               集合的键
      * @param otherKey          其它集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setUnion(String key, String otherKey, TypeReference<List<E>> listTypeReference) {
-        return setUnionForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKey, listTypeReference);
+    default <E> Set<E> setUnion(String key, String otherKey, Class<E> eClass) {
+        return setUnionForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKey, eClass);
     }
 
     /**
@@ -1140,11 +1139,11 @@ public interface CacheSet {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param otherKey          其它集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setUnionForInstance(String instanceId, String key, String otherKey, TypeReference<List<E>> listTypeReference) {
-        return setUnionForInstance(instanceId, key, Collections.singletonList(otherKey), listTypeReference);
+    default <E> Set<E> setUnionForInstance(String instanceId, String key, String otherKey, Class<E> eClass) {
+        return setUnionForInstance(instanceId, key, Collections.singletonList(otherKey), eClass);
     }
 
     /**
@@ -1153,11 +1152,11 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param key               集合的键
      * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setUnion(String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
-        return setUnionForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, listTypeReference);
+    default <E> Set<E> setUnion(String key, Collection<String> otherKeys, Class<E> eClass) {
+        return setUnionForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, otherKeys, eClass);
     }
 
     /**
@@ -1167,14 +1166,14 @@ public interface CacheSet {
      * @param instanceId        实例ID
      * @param key               集合的键
      * @param otherKeys         其它集合的键的集合
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setUnionForInstance(String instanceId, String key, Collection<String> otherKeys, TypeReference<List<E>> listTypeReference) {
+    default <E> Set<E> setUnionForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         List<String> newKeys = new ArrayList<>();
         newKeys.add(key);
         newKeys.addAll(otherKeys);
-        return setUnionForInstance(instanceId, newKeys, listTypeReference);
+        return setUnionForInstance(instanceId, newKeys, eClass);
     }
 
     /**
@@ -1182,11 +1181,11 @@ public interface CacheSet {
      *
      * @param <E>               元素类型
      * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setUnion(Collection<String> keys, TypeReference<List<E>> listTypeReference) {
-        return setUnionForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, keys, listTypeReference);
+    default <E> Set<E> setUnion(Collection<String> keys, Class<E> eClass) {
+        return setUnionForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, keys, eClass);
     }
 
     /**
@@ -1195,10 +1194,10 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param instanceId        实例ID
      * @param keys              集合的键
-     * @param listTypeReference 元素的类型
+     * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    <E> Set<E> setUnionForInstance(String instanceId, Collection<String> keys, TypeReference<List<E>> listTypeReference);
+    <E> Set<E> setUnionForInstance(String instanceId, Collection<String> keys, Class<E> eClass);
 
     /**
      * 将键key和otherKey对应的集合进行并集计算，并将结果存储在键destKey中。
