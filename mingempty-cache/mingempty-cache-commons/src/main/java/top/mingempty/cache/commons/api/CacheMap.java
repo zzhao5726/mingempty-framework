@@ -1,7 +1,6 @@
 package top.mingempty.cache.commons.api;
 
 import cn.hutool.core.lang.Pair;
-import com.fasterxml.jackson.core.type.TypeReference;
 import top.mingempty.domain.base.IPage;
 import top.mingempty.domain.other.GlobalConstant;
 
@@ -354,11 +353,11 @@ public interface CacheMap {
      * @param <E>       值的类型
      * @param key       映射的键
      * @param field     要获取值的字段
-     * @param valueType 值的类型
+     * @param eClass 值的类型
      * @return 字段的值
      */
-    default <E> E mapGetField(String key, String field, Class<E> valueType) {
-        return mapGetFieldForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, field, valueType);
+    default <E> E mapGetField(String key, String field, Class<E> eClass) {
+        return mapGetFieldForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, field, eClass);
     }
 
     /**
@@ -368,10 +367,10 @@ public interface CacheMap {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param field      要获取值的字段
-     * @param valueType  值的类型
+     * @param eClass  值的类型
      * @return 字段的值
      */
-    <E> E mapGetFieldForInstance(String instanceId, String key, String field, Class<E> valueType);
+    <E> E mapGetFieldForInstance(String instanceId, String key, String field, Class<E> eClass);
 
     /**
      * 获取指定键的映射中指定字段的值，并将其转换为指定的类型。
@@ -379,11 +378,11 @@ public interface CacheMap {
      * @param <E>       值的类型
      * @param key       映射的键
      * @param fields    要获取值的字段数组
-     * @param valueType 值的类型
+     * @param eClass 值的类型
      * @return 字段的值列表
      */
-    default <E> List<E> mapMultiGet(String key, Collection<String> fields, Class<E> valueType) {
-        return mapMultiGetForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, fields, valueType);
+    default <E> List<E> mapMultiGet(String key, Collection<String> fields, Class<E> eClass) {
+        return mapMultiGetForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, fields, eClass);
     }
 
     /**
@@ -393,46 +392,22 @@ public interface CacheMap {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param fields     要获取值的字段数组
-     * @param valueType  值的类型
+     * @param eClass  值的类型
      * @return 字段的值列表
      */
-    <E> List<E> mapMultiGetForInstance(String instanceId, String key, Collection<String> fields, Class<E> valueType);
+    <E> List<E> mapMultiGetForInstance(String instanceId, String key, Collection<String> fields, Class<E> eClass);
 
-    /**
-     * 获取指定键的映射中指定字段的值，并将其转换为指定的类型。
-     *
-     * @param <E>               值的类型
-     * @param key               映射的键
-     * @param fields            要获取值的字段数组
-     * @param listTypeReference 值的类型
-     * @return 字段的值列表
-     */
-    default <E> List<E> mapMultiGet(String key, Collection<String> fields, TypeReference<List<E>> listTypeReference) {
-        return mapMultiGetForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, fields, listTypeReference);
-    }
-
-    /**
-     * 获取指定实例和键的映射中指定字段的值，并将其转换为指定的类型。
-     *
-     * @param <E>               值的类型
-     * @param instanceId        实例ID
-     * @param key               映射的键
-     * @param fields            要获取值的字段数组
-     * @param listTypeReference 值的类型
-     * @return 字段的值列表
-     */
-    <E> List<E> mapMultiGetForInstance(String instanceId, String key, Collection<String> fields, TypeReference<List<E>> listTypeReference);
 
     /**
      * 获取指定键的映射，返回映射中的所有键-值对。
      *
      * @param <E>       值的类型
      * @param key       映射的键
-     * @param valueType 映射中值的类型
+     * @param eClass 映射中值的类型
      * @return 映射中的所有键-值对
      */
-    default <E> Map<String, E> mapGet(String key, Class<E> valueType) {
-        return mapGetForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, valueType);
+    default <E> Map<String, E> mapGet(String key, Class<E> eClass) {
+        return mapGetForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, eClass);
     }
 
     /**
@@ -441,10 +416,10 @@ public interface CacheMap {
      * @param <E>        值的类型
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 映射中的所有键-值对
      */
-    <E> Map<String, E> mapGetForInstance(String instanceId, String key, Class<E> valueType);
+    <E> Map<String, E> mapGetForInstance(String instanceId, String key, Class<E> eClass);
 
     /**
      * 获取指定键的映射，分页返回映射中的键-值对。
@@ -452,11 +427,11 @@ public interface CacheMap {
      * @param <E>       值的类型
      * @param key       映射的键
      * @param iPage     分页参数
-     * @param valueType 映射中值的类型
+     * @param eClass 映射中值的类型
      * @return 映射中的所有键-值对
      */
-    default <E> Map<String, E> mapGetPage(String key, final IPage iPage, Class<E> valueType) {
-        return mapGetPageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage, valueType);
+    default <E> Map<String, E> mapGetPage(String key, final IPage iPage, Class<E> eClass) {
+        return mapGetPageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage, eClass);
     }
 
     /**
@@ -466,10 +441,10 @@ public interface CacheMap {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param iPage      分页参数
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 映射中的所有键-值对
      */
-    <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, final IPage iPage, Class<E> valueType);
+    <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass);
 
     /**
      * 获取指定键的映射大小。
@@ -623,11 +598,11 @@ public interface CacheMap {
      * 获取映射键内所有的值
      *
      * @param key               映射的键
-     * @param listTypeReference 值的类型
+     * @param eClass 值的类型
      * @return 映射键内所有的值
      */
-    default <E> List<E> mapValues(String key, TypeReference<List<E>> listTypeReference) {
-        return mapValuesForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, listTypeReference);
+    default <E> List<E> mapValues(String key, Class<E> eClass) {
+        return mapValuesForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, eClass);
     }
 
     /**
@@ -635,10 +610,10 @@ public interface CacheMap {
      *
      * @param instanceId        实例ID
      * @param key               映射的键
-     * @param listTypeReference 值的类型
+     * @param eClass 值的类型
      * @return 映射键内所有的值
      */
-    <E> List<E> mapValuesForInstance(String instanceId, String key, TypeReference<List<E>> listTypeReference);
+    <E> List<E> mapValuesForInstance(String instanceId, String key, Class<E> eClass);
 
     /**
      * 获取映射键内指定hash键值的长度
@@ -666,11 +641,11 @@ public interface CacheMap {
      *
      * @param <E>       值的类型
      * @param key       映射的键
-     * @param valueType 映射中值的类型
+     * @param eClass 映射中值的类型
      * @return 随机的数据
      */
-    default <E> Pair<String, E> mapRandomEntry(String key, Class<E> valueType) {
-        return mapRandomEntryForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, valueType);
+    default <E> Pair<String, E> mapRandomEntry(String key, Class<E> eClass) {
+        return mapRandomEntryForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, eClass);
     }
 
     /**
@@ -679,10 +654,10 @@ public interface CacheMap {
      * @param <E>        值的类型
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 随机的数据
      */
-    <E> Pair<String, E> mapRandomEntryForInstance(String instanceId, String key, Class<E> valueType);
+    <E> Pair<String, E> mapRandomEntryForInstance(String instanceId, String key, Class<E> eClass);
 
     /**
      * 随机获取映射键内指定数量值
@@ -690,11 +665,11 @@ public interface CacheMap {
      * @param <E>       值的类型
      * @param key       映射的键
      * @param count     随机取的数量
-     * @param valueType 映射中值的类型
+     * @param eClass 映射中值的类型
      * @return 随机的数据
      */
-    default <E> Map<String, E> mapRandomEntries(String key, long count, Class<E> valueType) {
-        return mapRandomEntriesForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, count, valueType);
+    default <E> Map<String, E> mapRandomEntries(String key, long count, Class<E> eClass) {
+        return mapRandomEntriesForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, count, eClass);
     }
 
     /**
@@ -704,10 +679,10 @@ public interface CacheMap {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param count      随机取的数量
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 随机的数据
      */
-    <E> Map<String, E> mapRandomEntriesForInstance(String instanceId, String key, long count, Class<E> valueType);
+    <E> Map<String, E> mapRandomEntriesForInstance(String instanceId, String key, long count, Class<E> eClass);
 
     /**
      * 随机获取映射键内指定数量值
@@ -715,11 +690,11 @@ public interface CacheMap {
      * @param <E>       值的类型
      * @param key       映射的键
      * @param pattern   元素格式
-     * @param valueType 映射中值的类型
+     * @param eClass 映射中值的类型
      * @return 随机的数据
      */
-    default <E> Map<String, E> mapScan(String key, String pattern, Class<E> valueType) {
-        return mapScanForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, pattern, valueType);
+    default <E> Map<String, E> mapScan(String key, String pattern, Class<E> eClass) {
+        return mapScanForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, pattern, eClass);
     }
 
     /**
@@ -729,10 +704,10 @@ public interface CacheMap {
      * @param instanceId 实例ID
      * @param key        映射的键
      * @param pattern    元素格式
-     * @param valueType  映射中值的类型
+     * @param eClass  映射中值的类型
      * @return 随机的数据
      */
-    <E> Map<String, E> mapScanForInstance(String instanceId, String key, String pattern, Class<E> valueType);
+    <E> Map<String, E> mapScanForInstance(String instanceId, String key, String pattern, Class<E> eClass);
 
     /**
      * 随机获取映射键内的hash键

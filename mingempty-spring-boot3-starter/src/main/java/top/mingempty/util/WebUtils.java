@@ -191,7 +191,7 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
     /**
      * 获取 URL 的特定于 Web 应用程序的片段。
      */
-    private static String buildRequestUrl(String servletPath, String requestURI, String contextPath, String pathInfo,
+    private static String buildRequestUrl(String servletPath, String requestUri, String contextPath, String pathInfo,
                                           String queryString) {
         StringBuilder url = new StringBuilder();
         if (servletPath != null) {
@@ -200,7 +200,7 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
                 url.append(pathInfo);
             }
         } else {
-            url.append(requestURI.substring(contextPath.length()));
+            url.append(requestUri.substring(contextPath.length()));
         }
         if (queryString != null) {
             url.append("?").append(queryString);
