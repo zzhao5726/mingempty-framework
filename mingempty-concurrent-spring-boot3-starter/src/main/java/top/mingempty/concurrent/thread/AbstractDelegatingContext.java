@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import top.mingempty.commons.trace.TraceContext;
 import top.mingempty.commons.trace.constants.TraceConstant;
 import top.mingempty.commons.trace.enums.SpanTypeEnum;
-import top.mingempty.commons.util.JacksonUtil;
+import top.mingempty.commons.util.JsonUtil;
 import top.mingempty.concurrent.model.enums.PriorityEnum;
 import top.mingempty.domain.function.ApplyFunction;
 import top.mingempty.trace.util.TraceAdapterUtil;
@@ -149,7 +149,7 @@ public abstract class AbstractDelegatingContext<V> implements Comparable<Abstrac
             this.params = Collections.emptyMap();
         }
         log.debug("线程池入参--------\npriority[{}]\nparams[{}]",
-                this.priority, JacksonUtil.toStr(params));
+                this.priority, JsonUtil.toStr(params));
     }
 
     @Override

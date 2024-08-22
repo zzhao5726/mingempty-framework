@@ -20,7 +20,7 @@ import top.mingempty.concurrent.pool.DelegatingThreadPoolExecutor;
 import top.mingempty.concurrent.pool.PoolRouterExecutorService;
 import top.mingempty.concurrent.pool.VirtualExecutorService;
 import top.mingempty.concurrent.thread.ThreadFactoryBuilder;
-import top.mingempty.config.MeConfiguration;
+import top.mingempty.config.MeSpringConfiguration;
 import top.mingempty.domain.other.GlobalConstant;
 import top.mingempty.util.SpringContextUtil;
 
@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Configuration
-@AutoConfigureAfter(value = {MeConfiguration.class})
+@AutoConfigureAfter(value = {MeSpringConfiguration.class})
 @EnableConfigurationProperties(ThreadPoolProperties.class)
 @ConditionalOnProperty(prefix = "me.concurrent", name = "enabled", havingValue = "true")
 public class ConcurrentConfig {

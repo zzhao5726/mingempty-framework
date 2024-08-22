@@ -4,7 +4,7 @@ import cn.hutool.core.util.ObjUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
-import top.mingempty.commons.util.JacksonUtil;
+import top.mingempty.commons.util.JsonUtil;
 
 /**
  * 重新序列化方式，如果为字符串，则直接进行返回
@@ -36,7 +36,7 @@ public class MeJackson2JsonRedisSerializer<T> extends Jackson2JsonRedisSerialize
 
         // 只要不是json类型的直接返回
         String str = new String(bytes);
-        if (JacksonUtil.isJson(redisObjectMapper, str)) {
+        if (JsonUtil.isJson(redisObjectMapper, str)) {
             // 只要是JSON，就进行序列化
             return super.deserialize(bytes);
         }

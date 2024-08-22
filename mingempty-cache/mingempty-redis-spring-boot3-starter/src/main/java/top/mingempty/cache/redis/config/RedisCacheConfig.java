@@ -1,6 +1,7 @@
 package top.mingempty.cache.redis.config;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -61,10 +63,11 @@ public class RedisCacheConfig {
      *
      * @return
      */
-    @Bean
+    @Bean(value = "redisObjectMapper")
+    @ConditionalOnMissingBean(name = {"redisObjectMapper"})
+    @ConditionalOnMissingClass(value = {"org.springframework.security.jackson2.CoreJackson2Module.class"})
     public ObjectMapper redisObjectMapper() {
-//        return JacksonUtil.build(false, JsonInclude.Include.NON_NULL, true);
-        return JacksonUtil.DEFAULT_OBJECT_MAPPER;
+        return JacksonUtil.build(false, JsonInclude.Include.NON_NULL, false);
     }
 
     /**
