@@ -79,8 +79,7 @@ public class MeProperties {
     /**
      * 项目编译时间</br>
      * <p>
-     * 建议在底层配置文件内增加配置项</br>
-     * {@code me.timestamp=${current.time}}, 然后通过maven插件配置时间</br>
+     * 建议在配置文件内增加配置项<CODE>me.timestamp=${current.time}</CODE>，然后项目编译时maven插件会自动配置时间该时间
      */
     @Schema(title = "项目编译时间")
     private String timestamp;
