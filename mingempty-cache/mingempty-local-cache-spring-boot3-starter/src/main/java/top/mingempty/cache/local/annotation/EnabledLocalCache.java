@@ -2,8 +2,9 @@ package top.mingempty.cache.local.annotation;
 
 
 import org.springframework.context.annotation.Import;
+import top.mingempty.cache.local.config.DefaultCacheManagerConfig;
+import top.mingempty.cache.local.config.DiasbleDefaultCacheConfig;
 import top.mingempty.cache.local.config.LocalCacheConfig;
-import top.mingempty.cache.local.config.LocalCacheDiasbleDefaultCacheConfig;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -21,7 +22,7 @@ import java.lang.annotation.Target;
 @Documented
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Import({LocalCacheDiasbleDefaultCacheConfig.class, LocalCacheConfig.class})
+@Import({DiasbleDefaultCacheConfig.class, LocalCacheConfig.class, DefaultCacheManagerConfig.class})
 public @interface EnabledLocalCache {
 
 }
