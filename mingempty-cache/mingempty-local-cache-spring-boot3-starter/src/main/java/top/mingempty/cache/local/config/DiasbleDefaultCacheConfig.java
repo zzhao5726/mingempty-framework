@@ -17,5 +17,5 @@ import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoCo
         CacheAutoConfiguration.class,
         RedisAutoConfiguration.class,
         RedisRepositoriesAutoConfiguration.class})
-public class LocalCacheDiasbleDefaultCacheConfig {
+public class DiasbleDefaultCacheConfig {
 }

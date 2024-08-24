@@ -29,7 +29,7 @@ public class RedisProperties {
     /**
      * 连接模式（默认单机）
      */
-    private RedisTypeEnum redisTypeEnum = RedisTypeEnum.Single;
+    private RedisTypeEnum type = RedisTypeEnum.Single;
 
     /**
      * 连接工厂使用的数据库索引。
