@@ -35,7 +35,7 @@ public class LocalCacheConfig {
 
     @Bean
     @ConditionalOnClass(name = {"com.github.benmanes.caffeine.cache.Caffeine"})
-    @ConditionalOnProperty(prefix = "me.cache", name = "enabled-caffeine", havingValue = "true")
+    @ConditionalOnProperty(prefix = "me.cache", name = "enabled-caffeine", havingValue = "true", matchIfMissing = true)
     public CaffeineCacheManagerFactory caffeineCacheManagerFactory(Map<String, CacheLoader<Object, Object>> cacheLoaderMap) {
         return new CaffeineCacheManagerFactory(localCacheProperties, cacheLoaderMap);
     }

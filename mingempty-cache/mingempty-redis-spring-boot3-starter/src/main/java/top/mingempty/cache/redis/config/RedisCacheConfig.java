@@ -65,7 +65,7 @@ public class RedisCacheConfig {
      */
     @Bean(value = "redisObjectMapper")
     @ConditionalOnMissingBean(name = {"redisObjectMapper"})
-    @ConditionalOnMissingClass(value = {"org.springframework.security.jackson2.CoreJackson2Module.class"})
+    @ConditionalOnMissingClass(value = {"org.springframework.security.jackson2.CoreJackson2Module"})
     public ObjectMapper redisObjectMapper() {
         return JacksonUtil.build(false, JsonInclude.Include.NON_NULL, false);
     }
@@ -183,7 +183,7 @@ public class RedisCacheConfig {
 
     @Bean
     @ConditionalOnBean(value = {RedissonClientFactory.class})
-    public RedissonClientWapper redissonConfigWapper(RedissonClientFactory redissonClientFactory) {
+    public RedissonClientWapper redissonClientWapper(RedissonClientFactory redissonClientFactory) {
         return redissonClientFactory.build();
     }
 
@@ -196,7 +196,7 @@ public class RedisCacheConfig {
 
     @Bean
     @ConditionalOnBean(value = {RedissonRxClientFactory.class})
-    public RedissonRxClientWapper redissonConfigWapper(RedissonRxClientFactory redissonRxClientFactory) {
+    public RedissonRxClientWapper redissonRxClientWapper(RedissonRxClientFactory redissonRxClientFactory) {
         return redissonRxClientFactory.build();
     }
 

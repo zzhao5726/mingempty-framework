@@ -61,7 +61,7 @@ public class RedissonConfigFactory implements IBuilder<RedissonConfigWapper> {
                 .name("redisson-netty-virtual-thread", 0)
                 .factory()));
 
-        switch (properties.getRedisTypeEnum()) {
+        switch (properties.getType()) {
             case RedisTypeEnum.Single -> configSingel(config, properties);
             case RedisTypeEnum.Cluster -> configCluster(config, properties);
             case RedisTypeEnum.MasterSlave -> configMasterSlave(config, properties);

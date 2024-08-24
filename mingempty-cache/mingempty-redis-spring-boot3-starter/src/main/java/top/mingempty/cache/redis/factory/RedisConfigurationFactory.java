@@ -50,7 +50,7 @@ public class RedisConfigurationFactory implements IBuilder<RedisConfigurationWap
 
 
     public RedisConfiguration redisConfiguration(RedisProperties properties) {
-        switch (properties.getRedisTypeEnum()) {
+        switch (properties.getType()) {
             case Single -> {
                 return standaloneConfig(properties);
             }
