@@ -123,7 +123,7 @@ public class RedisLettuceConnectionFactory implements MeRedisConnectionFactory {
 
 
     public ClientOptions.Builder initializeClientOptionsBuilder(RedisProperties properties) {
-        if (RedisTypeEnum.Cluster.equals(properties.getRedisTypeEnum())) {
+        if (RedisTypeEnum.Cluster.equals(properties.getType())) {
             ClusterClientOptions.Builder builder = ClusterClientOptions.builder();
             RedisProperties.Refresh refreshProperties = properties.getRefresh();
             ClusterTopologyRefreshOptions.Builder refreshBuilder = ClusterTopologyRefreshOptions.builder()
