@@ -125,7 +125,6 @@ public class TracePushBlockingQueue implements InitializingBean, DisposableBean 
         try {
             return MESSAGE_BLOCKING_QUEUE.takeFirst();
         } catch (InterruptedException e) {
-            log.warn("链路队列等待出队中断",e);
             return null;
         }
     }
