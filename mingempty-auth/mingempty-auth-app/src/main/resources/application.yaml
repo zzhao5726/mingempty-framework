@@ -1,0 +1,16 @@
+me:
+  name: auth
+  group: mingempty
+  version: 1.0.0
+  timestamp: ${current.time}
+  base-path: /auth
+
+  cache:
+    enabled-redis: true
+    redis:
+      password: redis@123
+      host: 10.168.231.220
+      port: 21024
+      redis-type: single
+
+    enabled-caffeine: true
