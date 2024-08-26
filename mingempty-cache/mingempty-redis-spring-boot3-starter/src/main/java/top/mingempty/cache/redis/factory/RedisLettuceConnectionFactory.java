@@ -18,8 +18,8 @@ import org.springframework.data.redis.connection.lettuce.LettucePoolingClientCon
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
 import top.mingempty.cache.redis.entity.RedisProperties;
 import top.mingempty.cache.redis.entity.enums.RedisTypeEnum;
-import top.mingempty.cache.redis.entity.wapper.RedisConfigurationWapper;
-import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWapper;
+import top.mingempty.cache.redis.entity.wapper.RedisConfigurationWrapper;
+import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWrapper;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.time.Duration;
@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RedisLettuceConnectionFactory implements MeRedisConnectionFactory {
 
     private final RedisCacheProperties redisCacheProperties;
-    private final RedisConfigurationWapper redisConfigurationWapper;
+    private final RedisConfigurationWrapper redisConfigurationWrapper;
 
     /**
      * 构建
@@ -44,18 +44,18 @@ public class RedisLettuceConnectionFactory implements MeRedisConnectionFactory {
      * @return 被构建的对象
      */
     @Override
-    public RedisConnectionFactoryWapper build() {
+    public RedisConnectionFactoryWrapper build() {
         Map<String, RedisConnectionFactory> map = new ConcurrentHashMap<>();
         map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, redisConnectionFactory(redisCacheProperties.getRedis(),
-                redisConfigurationWapper.getResolvedDefaultRouter()));
+                redisConfigurationWrapper.getResolvedDefaultRouter()));
         redisCacheProperties.getMore()
                 .entrySet()
                 .parallelStream()
                 .forEach(entry
                         -> map.put(entry.getKey(),
                         redisConnectionFactory(entry.getValue(),
-                                redisConfigurationWapper.getResolvedRouter(entry.getKey()))));
-        return new RedisConnectionFactoryWapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
+                                redisConfigurationWrapper.getResolvedRouter(entry.getKey()))));
+        return new RedisConnectionFactoryWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
 

@@ -29,9 +29,9 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
 import top.mingempty.cache.redis.api.RedisCacheApi;
 import top.mingempty.cache.redis.entity.wapper.RedisCacheManagerWrapper;
-import top.mingempty.cache.redis.entity.wapper.RedisTemplateWapper;
-import top.mingempty.cache.redis.entity.wapper.RedissonClientWapper;
-import top.mingempty.cache.redis.entity.wapper.RedissonRxClientWapper;
+import top.mingempty.cache.redis.entity.wapper.RedisTemplateWrapper;
+import top.mingempty.cache.redis.entity.wapper.RedissonClientWrapper;
+import top.mingempty.cache.redis.entity.wapper.RedissonRxClientWrapper;
 import top.mingempty.commons.util.CollectionUtil;
 import top.mingempty.commons.util.JsonUtil;
 import top.mingempty.domain.base.IPage;
@@ -60,9 +60,9 @@ public class RedisCacheApiImpl implements RedisCacheApi {
 
     private final ObjectMapper redisObjectMapper;
     private final RedisCacheManagerWrapper redisCacheManagerWrapper;
-    private final RedissonClientWapper redissonClientWapper;
-    private final RedissonRxClientWapper redissonRxClientWapper;
-    private final RedisTemplateWapper redisTemplateWapper;
+    private final RedissonClientWrapper redissonClientWrapper;
+    private final RedissonRxClientWrapper redissonRxClientWrapper;
+    private final RedisTemplateWrapper redisTemplateWrapper;
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**
@@ -76,33 +76,33 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     }
 
     /**
-     * 获取RedissonClientWapper
+     * 获取RedissonClientWrapper
      *
      * @return RedissonClient
      */
     @Override
     public RedissonClient redissonClient() {
-        return redissonClientWapper;
+        return redissonClientWrapper;
     }
 
     /**
-     * 获取RedissonRxClientWapper
+     * 获取RedissonRxClientWrapper
      *
      * @return RedissonRxClient
      */
     @Override
     public RedissonRxClient redissonRxClient() {
-        return redissonRxClientWapper;
+        return redissonRxClientWrapper;
     }
 
     /**
-     * 获取RedisTemplateWapper
+     * 获取RedisTemplateWrapper
      *
      * @return RedisOperations<String, Object>
      */
     @Override
     public RedisOperations<String, Object> redisOperations() {
-        return redisTemplateWapper;
+        return redisTemplateWrapper;
     }
 
     /**
@@ -124,7 +124,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      */
     @Override
     public Set<String> scanForInstance(String instanceId, ScanOptions options) {
-        try (Cursor<String> scanCursor = redisTemplateWapper.getResolvedRouter(instanceId).scan(options)) {
+        try (Cursor<String> scanCursor = redisTemplateWrapper.getResolvedRouter(instanceId).scan(options)) {
             return scanCursor.stream().collect(Collectors.toSet());
         } catch (Exception e) {
             log.error("Error while scan key", e);
@@ -143,7 +143,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Boolean renameForInstance(String instanceId, String oldKey, String newKey) {
         try {
-            redisTemplateWapper.getResolvedRouter(instanceId).rename(oldKey, newKey);
+            redisTemplateWrapper.getResolvedRouter(instanceId).rename(oldKey, newKey);
             return true;
         } catch (Exception e) {
             log.error("rename error", e);
@@ -161,7 +161,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Boolean existsForInstance(String instanceId, String key) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).hasKey(key);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).hasKey(key);
         } catch (Exception e) {
             log.error("exists error", e);
             return false;
@@ -179,7 +179,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long ttlForInstance(String instanceId, String key, TimeUnit unit) {
         try {
-            Long expire = redisTemplateWapper.getResolvedRouter(instanceId).getExpire(key, unit);
+            Long expire = redisTemplateWrapper.getResolvedRouter(instanceId).getExpire(key, unit);
             return expire == null ? -3 : expire;
         } catch (Exception e) {
             log.error("ttl error", e);
@@ -206,7 +206,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
                             //小于0时，清空过期时间
                             ? this.persistForInstance(instanceId, key) :
                             //大于0设置过期时间
-                            this.redisTemplateWapper.getResolvedRouter(instanceId).expire(key, expiry, unit));
+                            this.redisTemplateWrapper.getResolvedRouter(instanceId).expire(key, expiry, unit));
         } catch (Exception e) {
             log.error("update expires error", e);
             return false;
@@ -222,7 +222,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Boolean delForInstance(String instanceId, String key) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).delete(key);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).delete(key);
         } catch (Exception e) {
             log.error("evict error", e);
             return false;
@@ -238,7 +238,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long delForInstance(String instanceId, Collection<String> keys) {
         try {
-            Long delete = redisTemplateWapper.getResolvedRouter(instanceId).delete(keys);
+            Long delete = redisTemplateWrapper.getResolvedRouter(instanceId).delete(keys);
             return delete == null ? -4L : delete;
         } catch (Exception e) {
             log.error("evict error", e);
@@ -278,7 +278,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Boolean clearForInstance(String instanceId) {
         try {
-            redisTemplateWapper.getResolvedRouter(instanceId).execute((RedisCallback<Object>) connection
+            redisTemplateWrapper.getResolvedRouter(instanceId).execute((RedisCallback<Object>) connection
                     -> {
                 connection.serverCommands().flushAll();
                 return null;
@@ -312,7 +312,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Boolean unlinkForInstance(String instanceId, String key) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).unlink(key);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).unlink(key);
         } catch (Exception e) {
             log.error("Error while unlinking key", e);
             return false;
@@ -329,7 +329,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Boolean persistForInstance(String instanceId, String key) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).persist(key);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).persist(key);
         } catch (Exception e) {
             log.error("Error while persist key", e);
             return false;
@@ -345,7 +345,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      */
     @Override
     public String counterForInstance(String instanceId, String key) {
-        ValueOperations<String, Object> ops = redisTemplateWapper.getResolvedRouter(instanceId).opsForValue();
+        ValueOperations<String, Object> ops = redisTemplateWrapper.getResolvedRouter(instanceId).opsForValue();
         Object object = ops.get(key);
         return object != null ? JsonUtil.toStr(redisObjectMapper, object) : null;
     }
@@ -363,7 +363,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      */
     @Override
     public Long counterForInstance(String instanceId, String key, Long initial, Long dela, long expiry, TimeUnit unit) {
-        ValueOperations<String, Object> ops = redisTemplateWapper.getResolvedRouter(instanceId).opsForValue();
+        ValueOperations<String, Object> ops = redisTemplateWrapper.getResolvedRouter(instanceId).opsForValue();
         if (0 == initial) {
             if (!existsForInstance(instanceId, key)) {
                 ops.set(key, initial);
@@ -389,7 +389,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      */
     @Override
     public Double counterForInstance(String instanceId, String key, Double initial, Double dela, long expiry, TimeUnit unit) {
-        ValueOperations<String, Object> ops = redisTemplateWapper.getResolvedRouter(instanceId).opsForValue();
+        ValueOperations<String, Object> ops = redisTemplateWrapper.getResolvedRouter(instanceId).opsForValue();
         if (Double.compare(0, initial) == 0) {
             if (!existsForInstance(instanceId, key)) {
                 ops.set(key, initial);
@@ -415,7 +415,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Boolean mapSetForInstance(String instanceId, String key, Map<String, E> map, long expiry, TimeUnit unit) {
         try {
-            redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().putAll(key, map);
+            redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().putAll(key, map);
             updateExpiresForInstance(instanceId, key, expiry, unit);
             return true;
         } catch (Exception e) {
@@ -436,7 +436,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Boolean mapAddForInstance(String instanceId, String key, String field, E value) {
         try {
-            redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().put(key, field, value);
+            redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().put(key, field, value);
             return true;
         } catch (Exception e) {
             log.error("map add error", e);
@@ -460,9 +460,9 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Boolean mapAddForInstance(String instanceId, String key, String field, E value, long expiry, TimeUnit unit, boolean override) {
         try {
             if (override) {
-                redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().put(key, field, value);
+                redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().put(key, field, value);
             } else {
-                redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().putIfAbsent(key, field, value);
+                redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().putIfAbsent(key, field, value);
             }
             updateExpiresForInstance(instanceId, key, expiry, unit);
             return true;
@@ -486,7 +486,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             if (CollUtil.isEmpty(fields)) {
                 return 0L;
             }
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().delete(key, fields.toArray());
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().delete(key, fields.toArray());
         } catch (Exception e) {
             log.error("map del fields error", e);
             return -2L;
@@ -503,7 +503,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Boolean mapDelForInstance(String instanceId, String key) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).delete(key);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).delete(key);
         } catch (Exception e) {
             log.error("map del error", e);
             return Boolean.FALSE;
@@ -522,7 +522,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> E mapGetFieldForInstance(String instanceId, String key, String field, Class<E> eClass) {
         try {
-            Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().get(key, field);
+            Object object = redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().get(key, field);
             if (object == null) {
                 return null;
             }
@@ -548,7 +548,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             if (CollUtil.isEmpty(fields)) {
                 return List.of();
             }
-            List<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().multiGet(key, new ArrayList<>(fields));
+            List<Object> objects = redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().multiGet(key, new ArrayList<>(fields));
             return JsonUtil.toList(redisObjectMapper, objects, eClass);
         } catch (Exception e) {
             log.error("map multi get error", e);
@@ -567,7 +567,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Map<String, E> mapGetForInstance(String instanceId, String key, Class<E> eClass) {
         try {
-            Map<Object, Object> entries = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().entries(key);
+            Map<Object, Object> entries = redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().entries(key);
             return entries.entrySet()
                     .stream()
                     .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> JsonUtil.toObj(redisObjectMapper, e.getValue(), eClass)));
@@ -613,7 +613,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public int mapSizeForInstance(String instanceId, String key) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().size(key).intValue();
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().size(key).intValue();
         } catch (Exception e) {
             log.error("map size error", e);
             return 0;
@@ -631,7 +631,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Boolean mapContainsFieldForInstance(String instanceId, String key, String field) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().hasKey(key, field);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().hasKey(key, field);
         } catch (Exception e) {
             log.error("map contains field error", e);
             return false;
@@ -649,7 +649,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Boolean mapContainsValueForInstance(String instanceId, String key, E value) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().values(key).contains(value);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().values(key).contains(value);
         } catch (Exception e) {
             log.error("map contains value error", e);
             return false;
@@ -668,7 +668,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Double mapCounterForInstance(String instanceId, String key, String field, double dela) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().increment(key, field, dela);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().increment(key, field, dela);
         } catch (Exception e) {
             log.error("map increment error", e);
             return null;
@@ -687,7 +687,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long mapCounterForInstance(String instanceId, String key, String field, Long dela) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().increment(key, field, dela);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().increment(key, field, dela);
         } catch (Exception e) {
             log.error("map increment error", e);
             return null;
@@ -704,7 +704,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Set<String> mapKeysForInstance(String instanceId, String key) {
         try {
-            Set<Object> fields = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().keys(key);
+            Set<Object> fields = redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().keys(key);
             if (CollUtil.isEmpty(fields)) {
                 return Set.of();
             }
@@ -754,7 +754,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> List<E> mapValuesForInstance(String instanceId, String key, Class<E> eClass) {
         try {
-            List<Object> values = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().values(key);
+            List<Object> values = redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().values(key);
             return JsonUtil.toList(redisObjectMapper, values, eClass);
         } catch (Exception e) {
             log.error("map values error", e);
@@ -773,7 +773,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long mapLengthOfValueForInstance(String instanceId, String key, String field) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().lengthOfValue(key, field);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().lengthOfValue(key, field);
         } catch (Exception e) {
             log.error("map length of value error", e);
             return -1L;
@@ -792,7 +792,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Pair<String, E> mapRandomEntryForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             Map.Entry<Object, Object> entry =
-                    redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().randomEntry(key);
+                    redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().randomEntry(key);
             if (ObjUtil.isEmpty(entry)) {
                 return null;
             }
@@ -837,7 +837,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
                 }
                 return Map.of(pair.getKey(), pair.getValue());
             }
-            Map<Object, Object> objectMap = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().randomEntries(key, count);
+            Map<Object, Object> objectMap = redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().randomEntries(key, count);
             if (CollUtil.isEmpty(objectMap)) {
                 return Map.of();
             }
@@ -861,7 +861,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public String mapRandomKeyForInstance(String instanceId, String key) {
         try {
-            Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().randomKey(key);
+            Object object = redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().randomKey(key);
             return JsonUtil.toStr(redisObjectMapper, object);
         } catch (Exception e) {
             log.error("map random key error", e);
@@ -883,7 +883,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             if (count == 0) {
                 return List.of();
             }
-            List<Object> object = redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().randomKeys(key, count);
+            List<Object> object = redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().randomKeys(key, count);
             if (CollUtil.isEmpty(object)) {
                 return List.of();
             }
@@ -908,7 +908,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Map<String, E> mapScanForInstance(String instanceId, String key, ScanOptions options, Class<E> eClass) {
         try (Cursor<Map.Entry<Object, Object>> scanCursor =
-                     redisTemplateWapper.getResolvedRouter(instanceId).opsForHash().scan(key, options)) {
+                     redisTemplateWrapper.getResolvedRouter(instanceId).opsForHash().scan(key, options)) {
             return scanCursor.stream().parallel()
                     .collect(Collectors.toMap(entry -> JsonUtil.toStr(redisObjectMapper, entry.getKey()), entry -> JsonUtil.toObj(redisObjectMapper, entry.getValue(), eClass)));
 
@@ -931,7 +931,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Boolean queuePushForInstance(String instanceId, String key, E element, long expiry, TimeUnit unit) {
         try {
-            redisTemplateWapper.getResolvedRouter(instanceId).opsForList().rightPush(key, element);
+            redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().rightPush(key, element);
             updateExpiresForInstance(instanceId, key, expiry, unit);
             return true;
         } catch (Exception e) {
@@ -953,7 +953,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Boolean queuePushForInstance(String instanceId, String key, Collection<E> elements, long expiry, TimeUnit unit) {
         try {
-            redisTemplateWapper.getResolvedRouter(instanceId).opsForList().rightPushAll(key, elements);
+            redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().rightPushAll(key, elements);
             updateExpiresForInstance(instanceId, key, expiry, unit);
             return true;
         } catch (Exception e) {
@@ -975,7 +975,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Boolean queueLpushForInstance(String instanceId, String key, E element, long expiry, TimeUnit unit) {
         try {
-            redisTemplateWapper.getResolvedRouter(instanceId).opsForList().leftPush(key, element);
+            redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().leftPush(key, element);
             updateExpiresForInstance(instanceId, key, expiry, unit);
             return true;
         } catch (Exception e) {
@@ -997,7 +997,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Boolean queueLpushForInstance(String instanceId, String key, Collection<E> elements, long expiry, TimeUnit unit) {
         try {
-            redisTemplateWapper.getResolvedRouter(instanceId).opsForList().leftPushAll(key, elements);
+            redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().leftPushAll(key, elements);
             updateExpiresForInstance(instanceId, key, expiry, unit);
             return true;
         } catch (Exception e) {
@@ -1020,7 +1020,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Boolean queueSetForInstance(String instanceId, String key, int index, E element, long expiry, TimeUnit unit) {
         try {
-            redisTemplateWapper.getResolvedRouter(instanceId).opsForList().set(key, index, element);
+            redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().set(key, index, element);
             updateExpiresForInstance(instanceId, key, expiry, unit);
             return true;
         } catch (Exception e) {
@@ -1040,7 +1040,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> E queueLpopForInstance(String instanceId, String key, Class<E> eClass) {
         try {
-            Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForList().leftPop(key);
+            Object object = redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().leftPop(key);
             return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("queue lpop error", e);
@@ -1061,7 +1061,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> E queueLpopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> eClass) {
         try {
-            Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForList().leftPop(key, timeout, unit);
+            Object object = redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().leftPop(key, timeout, unit);
             return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("queue lpop error", e);
@@ -1080,7 +1080,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> E queueRPopForInstance(String instanceId, String key, Class<E> eClass) {
         try {
-            Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForList().rightPop(key);
+            Object object = redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().rightPop(key);
             return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("queue rpop error", e);
@@ -1101,7 +1101,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> E queueRPopForInstance(String instanceId, String key, long timeout, TimeUnit unit, Class<E> eClass) {
         try {
-            Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForList().rightPop(key, timeout, unit);
+            Object object = redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().rightPop(key, timeout, unit);
             return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("queue rpop error", e);
@@ -1121,7 +1121,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> List<E> queuePageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass) {
         try {
-            List<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForList()
+            List<Object> objects = redisTemplateWrapper.getResolvedRouter(instanceId).opsForList()
                     .range(key, iPage.getStartIndex(), iPage.getEndIndex());
 
             if (iPage.isSearchCount()) {
@@ -1147,7 +1147,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
         try {
             Object element = queueGetForInstance(instanceId, key, index);
             if (element != null) {
-                redisTemplateWapper.getResolvedRouter(instanceId).opsForList().remove(key, 1, element);
+                redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().remove(key, 1, element);
                 return true;
             }
             return false;
@@ -1168,7 +1168,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Long queueRemoveForInstance(String instanceId, String key, E element) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForList().remove(key, 0, element);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().remove(key, 0, element);
         } catch (Exception e) {
             log.error("queue remove all error", e);
             return -1L;
@@ -1186,7 +1186,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Object queueGetForInstance(String instanceId, String key, int index) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForList().index(key, index);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().index(key, index);
         } catch (Exception e) {
             log.error("queue get error", e);
             return null;
@@ -1224,7 +1224,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Long queueIndexOfForInstance(String instanceId, String key, E element) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForList().indexOf(key, element);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().indexOf(key, element);
         } catch (Exception e) {
             log.error("queue index of error", e);
             return -1L;
@@ -1241,7 +1241,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long queueSizeForInstance(String instanceId, String key) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForList().size(key);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().size(key);
         } catch (Exception e) {
             log.error("queue size error", e);
             return -1L;
@@ -1260,7 +1260,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Boolean queueTrimForInstance(String instanceId, String key, long start, long end) {
         try {
-            redisTemplateWapper.getResolvedRouter(instanceId).opsForList().trim(key, start, end);
+            redisTemplateWrapper.getResolvedRouter(instanceId).opsForList().trim(key, start, end);
             return true;
         } catch (Exception e) {
             log.error("queue trim error", e);
@@ -1284,7 +1284,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             if (CollUtil.isEmpty(elements)) {
                 return Boolean.TRUE;
             }
-            redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().add(key, elements.toArray());
+            redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().add(key, elements.toArray());
             updateExpiresForInstance(instanceId, key, expiry, unit);
             return true;
         } catch (Exception e) {
@@ -1307,7 +1307,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             if (CollUtil.isEmpty(elements)) {
                 return Boolean.TRUE;
             }
-            redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().remove(key, elements.toArray());
+            redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().remove(key, elements.toArray());
             return true;
         } catch (Exception e) {
             log.error("set remove error", e);
@@ -1326,7 +1326,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Boolean setContainsForInstance(String instanceId, String key, E element) {
         try {
-            Boolean isMember = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().isMember(key, element);
+            Boolean isMember = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().isMember(key, element);
             return isMember != null && isMember;
         } catch (Exception e) {
             log.error("set contains error", e);
@@ -1344,7 +1344,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public int setSizeForInstance(String instanceId, String key) {
         try {
-            Long size = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().size(key);
+            Long size = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().size(key);
             return size != null ? size.intValue() : 0;
         } catch (Exception e) {
             log.error("set size error", e);
@@ -1364,7 +1364,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Boolean setMoveForInstance(String instanceId, String key, E value, String destKey) {
         try {
-            Boolean aBoolean = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().move(key, value, destKey);
+            Boolean aBoolean = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().move(key, value, destKey);
             return aBoolean != null ? aBoolean : Boolean.FALSE;
         } catch (Exception e) {
             log.error("set move error", e);
@@ -1383,7 +1383,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> E setPopForInstance(String instanceId, String key, Class<E> eClass) {
         try {
-            Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().pop(key);
+            Object object = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().pop(key);
             return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("set pop error", e);
@@ -1402,7 +1402,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> E setRandomMemberForInstance(String instanceId, String key, Class<E> eClass) {
         try {
-            Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().randomMember(key);
+            Object object = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().randomMember(key);
             return JsonUtil.toObj(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("set random member error", e);
@@ -1425,7 +1425,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             if (count <= 0) {
                 return List.of();
             }
-            List<Object> object = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().randomMembers(key, count);
+            List<Object> object = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().randomMembers(key, count);
             return JsonUtil.toList(redisObjectMapper, object, eClass);
         } catch (Exception e) {
             log.error("set random members error", e);
@@ -1449,7 +1449,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
                 return Set.of();
             }
             Set<Object> objects
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().distinctRandomMembers(key, count);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().distinctRandomMembers(key, count);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
@@ -1471,7 +1471,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Set<E> setGetPageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass) {
         try {
-            Set<Object> members = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().members(key);
+            Set<Object> members = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().members(key);
             List<Object> objectList = CollectionUtil.batchSubList(members, iPage);
             List<E> list = JsonUtil.toList(redisObjectMapper, objectList, eClass);
             if (CollUtil.isEmpty(list)) {
@@ -1498,7 +1498,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             return Set.of();
         }
         try {
-            Set<Object> difference = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().difference(keys);
+            Set<Object> difference = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().difference(keys);
             List<E> list = JsonUtil.toList(redisObjectMapper, difference, eClass);
             if (CollUtil.isEmpty(list)) {
                 return Set.of();
@@ -1526,7 +1526,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             return -1L;
         }
         try {
-            Long differenceAndStore = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().differenceAndStore(keys, destKey);
+            Long differenceAndStore = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().differenceAndStore(keys, destKey);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
             return differenceAndStore;
         } catch (Exception e) {
@@ -1549,7 +1549,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             return Set.of();
         }
         try {
-            Set<Object> intersect = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().intersect(keys);
+            Set<Object> intersect = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().intersect(keys);
             List<E> list = JsonUtil.toList(redisObjectMapper, intersect, eClass);
             if (CollUtil.isEmpty(list)) {
                 return Set.of();
@@ -1577,7 +1577,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             return -1L;
         }
         try {
-            Long intersectAndStore = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet()
+            Long intersectAndStore = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet()
                     .intersectAndStore(keys, destKey);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
             return intersectAndStore;
@@ -1601,7 +1601,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             return Set.of();
         }
         try {
-            Set<Object> union = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().union(keys);
+            Set<Object> union = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().union(keys);
             List<E> list = JsonUtil.toList(redisObjectMapper, union, eClass);
             if (CollUtil.isEmpty(list)) {
                 return Set.of();
@@ -1629,7 +1629,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             return -1L;
         }
         try {
-            Long unionAndStore = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet()
+            Long unionAndStore = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet()
                     .unionAndStore(keys, destKey);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
             return unionAndStore;
@@ -1650,7 +1650,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      */
     @Override
     public <E> Set<E> setScanForInstance(String instanceId, String key, ScanOptions options, Class<E> eClass) {
-        try (Cursor<Object> scanCursor = redisTemplateWapper.getResolvedRouter(instanceId).opsForSet().scan(key, options)) {
+        try (Cursor<Object> scanCursor = redisTemplateWrapper.getResolvedRouter(instanceId).opsForSet().scan(key, options)) {
             return new HashSet<>(JsonUtil.toList(redisObjectMapper, scanCursor.stream().parallel()
                     .collect(Collectors.toSet()), eClass));
         } catch (Exception e) {
@@ -1818,7 +1818,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Object getObjForInstance(String instanceId, String key) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).boundValueOps(key).get();
+            return redisTemplateWrapper.getResolvedRouter(instanceId).boundValueOps(key).get();
         } catch (Exception e) {
             log.error("set get error", e);
         }
@@ -1838,7 +1838,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
             if (CollUtil.isEmpty(keys)) {
                 return List.of();
             }
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForValue().multiGet(keys);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForValue().multiGet(keys);
         } catch (Exception e) {
             log.error("multi get obj error", e);
         }
@@ -1861,16 +1861,16 @@ public class RedisCacheApiImpl implements RedisCacheApi {
         try {
             if (override) {
                 if (expiry > 0) {
-                    redisTemplateWapper.getResolvedRouter(instanceId).opsForValue().set(key, value, expiry, unit);
+                    redisTemplateWrapper.getResolvedRouter(instanceId).opsForValue().set(key, value, expiry, unit);
                 } else {
-                    redisTemplateWapper.getResolvedRouter(instanceId).opsForValue().set(key, value);
+                    redisTemplateWrapper.getResolvedRouter(instanceId).opsForValue().set(key, value);
                 }
             } else {
                 if (expiry > 0) {
-                    redisTemplateWapper.getResolvedRouter(instanceId).opsForValue()
+                    redisTemplateWrapper.getResolvedRouter(instanceId).opsForValue()
                             .setIfAbsent(key, value, expiry, unit);
                 } else {
-                    redisTemplateWapper.getResolvedRouter(instanceId).opsForValue()
+                    redisTemplateWrapper.getResolvedRouter(instanceId).opsForValue()
                             .setIfAbsent(key, value);
                 }
             }
@@ -1892,7 +1892,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Boolean appendForInstance(String instanceId, String key, String value) {
         try {
-            redisTemplateWapper.getResolvedRouter(instanceId).opsForValue().append(key, value);
+            redisTemplateWrapper.getResolvedRouter(instanceId).opsForValue().append(key, value);
             return true;
         } catch (Exception e) {
             log.error("append error", e);
@@ -1916,9 +1916,9 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Boolean zsetAddForInstance(String instanceId, String key, double score, E value, long expiry, TimeUnit unit, boolean override) {
         try {
             if (override) {
-                redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().add(key, value, score);
+                redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().add(key, value, score);
             } else {
-                redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().addIfAbsent(key, value, score);
+                redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().addIfAbsent(key, value, score);
             }
             updateExpiresForInstance(instanceId, key, expiry, unit);
             return true;
@@ -1951,9 +1951,9 @@ public class RedisCacheApiImpl implements RedisCacheApi {
                             entry.getValue()))
                     .collect(Collectors.toSet());
             if (override) {
-                redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().add(key, typedTuples);
+                redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().add(key, typedTuples);
             } else {
-                redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().addIfAbsent(key, typedTuples);
+                redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().addIfAbsent(key, typedTuples);
             }
             updateExpiresForInstance(instanceId, key, expiry, unit);
             return true;
@@ -1975,7 +1975,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Double zsetIncrementScoreForInstance(String instanceId, String key, E value, double delta) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().incrementScore(key, value, delta);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().incrementScore(key, value, delta);
         } catch (Exception e) {
             log.error("zset increment score errod", e);
             return 0.0;
@@ -1992,7 +1992,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long zsetCardForInstance(String instanceId, String key) {
         try {
-            Long size = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().zCard(key);
+            Long size = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().zCard(key);
             return size != null ? size : 0L;
         } catch (Exception e) {
             log.error("zset card error", e);
@@ -2012,7 +2012,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long zsetCountForInstance(String instanceId, String key, double min, double max) {
         try {
-            Long count = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().count(key, min, max);
+            Long count = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().count(key, min, max);
             return count != null ? count : 0L;
         } catch (Exception e) {
             log.error("zset count error", e);
@@ -2031,7 +2031,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> double zsetScoreForInstance(String instanceId, String key, E value) {
         try {
-            Double score = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().score(key, value);
+            Double score = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().score(key, value);
             return score != null ? score : 0;
         } catch (Exception e) {
             log.error("zset score error", e);
@@ -2050,7 +2050,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Long zsetRemoveForInstance(String instanceId, String key, List<E> value) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().remove(key, value);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().remove(key, value);
         } catch (Exception e) {
             log.error("zset remove error", e);
             return -1L;
@@ -2069,7 +2069,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long zsetRemoveRangeForInstance(String instanceId, String key, long start, long end) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().removeRange(key, start, end);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().removeRange(key, start, end);
         } catch (Exception e) {
             log.error("zset remove range error", e);
             return -1L;
@@ -2087,7 +2087,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      */
     @Override
     public <E> Map<E, Double> zsetScanForInstance(String instanceId, String key, ScanOptions options, Class<E> eClass) {
-        try (Cursor<ZSetOperations.TypedTuple<Object>> tupleCursor = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().scan(key, options)) {
+        try (Cursor<ZSetOperations.TypedTuple<Object>> tupleCursor = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().scan(key, options)) {
             return tupleCursor.stream().parallel().collect(Collectors.toMap(tuple -> JsonUtil.toObj(tuple.getValue(), eClass), ZSetOperations.TypedTuple::getScore, (v1, v2) -> v1));
         } catch (Exception e) {
             log.error("zset scan error", e);
@@ -2106,7 +2106,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long zsetRemoveRangeByLexForInstance(String instanceId, String key, Range<String> range) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().removeRangeByLex(key, range);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().removeRangeByLex(key, range);
         } catch (Exception e) {
             log.error("zset remove range by lex error", e);
             return -1L;
@@ -2125,7 +2125,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long zsetRemoveRangeByScoreForInstance(String instanceId, String key, double min, double max) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().removeRangeByScore(key, min, max);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().removeRangeByScore(key, min, max);
         } catch (Exception e) {
             log.error("zset remove range by score error", e);
             return -1L;
@@ -2145,7 +2145,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Set<E> zsetDifferenceForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
-            Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().difference(key, otherKeys);
+            Set<Object> objects = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().difference(key, otherKeys);
             if (ObjUtil.isEmpty(objects)) {
                 return Set.of();
             }
@@ -2170,7 +2170,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long zsetDifferenceAndStoreForInstance(String instanceId, String key, Collection<String> otherKeys, String destKey, long expiry, TimeUnit unit) {
         try {
-            Long differenceAndStore = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().differenceAndStore(key, otherKeys, destKey);
+            Long differenceAndStore = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().differenceAndStore(key, otherKeys, destKey);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
             return differenceAndStore != null ? differenceAndStore : -1L;
         } catch (Exception e) {
@@ -2193,7 +2193,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Map<E, Double> zsetDifferenceWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().differenceWithScores(key, otherKeys);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().differenceWithScores(key, otherKeys);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset difference with store error", e);
@@ -2214,7 +2214,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Set<E> zsetIntersectForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
-            Set<Object> intersect = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().intersect(key, otherKeys);
+            Set<Object> intersect = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().intersect(key, otherKeys);
             if (CollUtil.isEmpty(intersect)) {
                 return Set.of();
             }
@@ -2239,7 +2239,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Map<E, Double> zsetIntersectWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().intersectWithScores(key, otherKeys);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().intersectWithScores(key, otherKeys);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset intersect with store error", e);
@@ -2262,7 +2262,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Map<E, Double> zsetIntersectWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate, Weights weights) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().intersectWithScores(key, otherKeys, aggregate, weights);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().intersectWithScores(key, otherKeys, aggregate, weights);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset intersect with store error", e);
@@ -2284,7 +2284,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long zsetIntersectAndStoreForInstance(String instanceId, String key, Collection<String> otherKeys, String destKey, long expiry, TimeUnit unit) {
         try {
-            Long intersectAndStore = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().intersectAndStore(key, otherKeys, destKey);
+            Long intersectAndStore = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().intersectAndStore(key, otherKeys, destKey);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
             return intersectAndStore != null ? intersectAndStore : -1L;
         } catch (Exception e) {
@@ -2310,7 +2310,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public Long zsetIntersectAndStoreForInstance(String instanceId, String key, Collection<String> otherKeys, String destKey, Aggregate aggregate, Weights weights, long expiry, TimeUnit unit) {
         try {
             Long intersectAndStore =
-                    redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().intersectAndStore(key, otherKeys, destKey, aggregate, weights);
+                    redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().intersectAndStore(key, otherKeys, destKey, aggregate, weights);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
             return intersectAndStore != null ? intersectAndStore : -1L;
         } catch (Exception e) {
@@ -2332,7 +2332,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Set<E> zsetUnionForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
             Set<Object> intersect
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().union(key, otherKeys);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().union(key, otherKeys);
             if (CollUtil.isEmpty(intersect)) {
                 return Set.of();
             }
@@ -2356,7 +2356,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Map<E, Double> zsetUnionWithScoresForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().unionWithScores(key, otherKeys);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().unionWithScores(key, otherKeys);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset union with store error", e);
@@ -2379,7 +2379,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Map<E, Double> zsetUnionWithStoreForInstance(String instanceId, String key, Collection<String> otherKeys, Class<E> eClass, Aggregate aggregate, Weights weights) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().unionWithScores(key, otherKeys, aggregate, weights);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().unionWithScores(key, otherKeys, aggregate, weights);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset union with store error", e);
@@ -2401,7 +2401,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long zsetUnionAndStoreForInstance(String instanceId, String key, Collection<String> otherKeys, String destKey, long expiry, TimeUnit unit) {
         try {
-            Long intersectAndStore = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().unionAndStore(key, otherKeys, destKey);
+            Long intersectAndStore = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().unionAndStore(key, otherKeys, destKey);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
             return intersectAndStore != null ? intersectAndStore : -1L;
         } catch (Exception e) {
@@ -2427,7 +2427,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public Long zsetUnionAndStoreForInstance(String instanceId, String key, Collection<String> otherKeys, String destKey, Aggregate aggregate, Weights weights, long expiry, TimeUnit unit) {
         try {
             Long intersectAndStore =
-                    redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().unionAndStore(key, otherKeys, destKey, aggregate, weights);
+                    redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().unionAndStore(key, otherKeys, destKey, aggregate, weights);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
 
             return intersectAndStore != null ? intersectAndStore : -1L;
@@ -2448,7 +2448,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> E zsetRandomMembersForInstance(String instanceId, String key, Class<E> eClass) {
         try {
-            Object object = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().randomMember(key);
+            Object object = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().randomMember(key);
             return JsonUtil.toObj(object, eClass);
         } catch (Exception e) {
             log.error("zset random member error", e);
@@ -2472,7 +2472,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
                 return Set.of();
             }
             Set<Object> objects
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().distinctRandomMembers(key, count);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().distinctRandomMembers(key, count);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
@@ -2499,7 +2499,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
                 return Map.of();
             }
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().distinctRandomMembersWithScore(key, count);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().distinctRandomMembersWithScore(key, count);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset  distinct random members with score error", e);
@@ -2519,7 +2519,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Pair<E, Double> zsetPopMaxForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             ZSetOperations.TypedTuple<Object> typedTuple
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMax(key);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().popMax(key);
             if (ObjUtil.isEmpty(typedTuple)) {
                 return null;
             }
@@ -2544,7 +2544,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Pair<E, Double> zsetPopMaxForInstance(String instanceId, String key, long expiry, TimeUnit unit, Class<E> eClass) {
         try {
             ZSetOperations.TypedTuple<Object> typedTuple
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMax(key, expiry, unit);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().popMax(key, expiry, unit);
             if (ObjUtil.isEmpty(typedTuple)) {
                 return null;
             }
@@ -2572,7 +2572,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
                 return Map.of();
             }
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMax(key, count);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().popMax(key, count);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset  pop max count error", e);
@@ -2592,7 +2592,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Pair<E, Double> zsetPopMinForInstance(String instanceId, String key, Class<E> eClass) {
         try {
             ZSetOperations.TypedTuple<Object> typedTuple
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMin(key);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().popMin(key);
             if (ObjUtil.isEmpty(typedTuple)) {
                 return null;
             }
@@ -2617,7 +2617,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Pair<E, Double> zsetPopMinForInstance(String instanceId, String key, long expiry, TimeUnit unit, Class<E> eClass) {
         try {
             ZSetOperations.TypedTuple<Object> typedTuple
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMin(key, expiry, unit);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().popMin(key, expiry, unit);
             if (ObjUtil.isEmpty(typedTuple)) {
                 return null;
             }
@@ -2645,7 +2645,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
                 return Map.of();
             }
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().popMin(key, count);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().popMin(key, count);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset  pop min count error", e);
@@ -2665,7 +2665,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Long zsetRankForInstance(String instanceId, String key, E value) {
 
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rank(key, value);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().rank(key, value);
         } catch (Exception e) {
             log.error("zset rank error", e);
             return -1L;
@@ -2686,7 +2686,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Set<E> zsetRangeForInstance(String instanceId, String key, long min, long max, Class<E> eClass) {
         try {
-            Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().range(key, min, max);
+            Set<Object> objects = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().range(key, min, max);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
@@ -2711,7 +2711,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Set<E> zsetRangeByLexForInstance(String instanceId, String key, Range<String> range, Limit limit, Class<E> eClass) {
         try {
-            Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeByLex(key, range, limit);
+            Set<Object> objects = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().rangeByLex(key, range, limit);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
@@ -2736,7 +2736,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Set<E> zsetRangeByScoreForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         try {
-            Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeByScore(key, min, max);
+            Set<Object> objects = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().rangeByScore(key, min, max);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
@@ -2763,7 +2763,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Set<E> zsetRangeByScoreForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         try {
-            Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeByScore(key, min, max, offset, count);
+            Set<Object> objects = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().rangeByScore(key, min, max, offset, count);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
@@ -2789,7 +2789,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Map<E, Double> zsetRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeByScoreWithScores(key, min, max);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().rangeByScoreWithScores(key, min, max);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset range by score with scores error", e);
@@ -2815,7 +2815,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Map<E, Double> zsetRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeByScoreWithScores(key, min, max, offset, count);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().rangeByScoreWithScores(key, min, max, offset, count);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset range by score with scores error", e);
@@ -2838,7 +2838,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Map<E, Double> zsetRangeWithScoresForInstance(String instanceId, String key, long start, long end, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeWithScores(key, start, end);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().rangeWithScores(key, start, end);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset range with scores error", e);
@@ -2861,7 +2861,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long zsetRangeAndStoreByLexForInstance(String instanceId, String key, Range<String> range, Limit limit, String destKey, long expiry, TimeUnit unit) {
         try {
-            Long rangeAndStoreByLex = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeAndStoreByLex(key, destKey, range, limit);
+            Long rangeAndStoreByLex = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().rangeAndStoreByLex(key, destKey, range, limit);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
             return rangeAndStoreByLex != null ? rangeAndStoreByLex : -1L;
         } catch (Exception e) {
@@ -2885,7 +2885,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long zsetRangeAndStoreByScoreForInstance(String instanceId, String key, Range<Number> range, Limit limit, String destKey, long expiry, TimeUnit unit) {
         try {
-            Long rangeAndStoreByLex = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().rangeAndStoreByScore(key, destKey, range, limit);
+            Long rangeAndStoreByLex = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().rangeAndStoreByScore(key, destKey, range, limit);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
             return rangeAndStoreByLex != null ? rangeAndStoreByLex : -1L;
         } catch (Exception e) {
@@ -2908,7 +2908,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Set<E> zsetReverseRangeByLexForInstance(String instanceId, String key, Range<String> range, Limit limit, Class<E> eClass) {
         try {
-            Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByLex(key, range, limit);
+            Set<Object> objects = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByLex(key, range, limit);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
@@ -2934,7 +2934,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Set<E> zsetReverseRangeForInstance(String instanceId, String key, long min, long max, Class<E> eClass) {
         try {
             Set<Object> objects
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRange(key, min, max);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().reverseRange(key, min, max);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
@@ -2959,7 +2959,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Set<E> zsetReverseRangeByScoreForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         try {
-            Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScore(key, min, max);
+            Set<Object> objects = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScore(key, min, max);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
@@ -2986,7 +2986,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public <E> Set<E> zsetReverseRangeByScoreForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         try {
-            Set<Object> objects = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScore(key, min, max, offset, count);
+            Set<Object> objects = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScore(key, min, max, offset, count);
             if (CollUtil.isEmpty(objects)) {
                 return Set.of();
             }
@@ -3012,7 +3012,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Map<E, Double> zsetReverseRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScoreWithScores(key, min, max);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScoreWithScores(key, min, max);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset reverse range by score with scores error", e);
@@ -3037,7 +3037,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Map<E, Double> zsetReverseRangeByScoreWithScoresForInstance(String instanceId, String key, double min, double max, long offset, long count, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScoreWithScores(key, min, max, offset, count);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeByScoreWithScores(key, min, max, offset, count);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset reverse range by score with scores error", e);
@@ -3060,7 +3060,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public <E> Map<E, Double> zsetReverseRangeWithScoresForInstance(String instanceId, String key, long start, long end, Class<E> eClass) {
         try {
             Set<ZSetOperations.TypedTuple<Object>> typedTuples
-                    = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeWithScores(key, start, end);
+                    = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeWithScores(key, start, end);
             return zsetWithScores(typedTuples, eClass);
         } catch (Exception e) {
             log.error("zset reverse range with scores error", e);
@@ -3084,7 +3084,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     public Long zsetReverseRangeAndStoreByLexForInstance(String instanceId, String
             key, Range<String> range, Limit limit, String destKey, long expiry, TimeUnit unit) {
         try {
-            Long rangeAndStoreByLex = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeAndStoreByLex(key, destKey, range, limit);
+            Long rangeAndStoreByLex = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeAndStoreByLex(key, destKey, range, limit);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
             return rangeAndStoreByLex != null ? rangeAndStoreByLex : -1L;
         } catch (Exception e) {
@@ -3108,7 +3108,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long zsetReverseRangeAndStoreByScoreForInstance(String instanceId, String key, Range<Number> range, Limit limit, String destKey, long expiry, TimeUnit unit) {
         try {
-            Long rangeAndStoreByLex = redisTemplateWapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeAndStoreByScore(key, destKey, range, limit);
+            Long rangeAndStoreByLex = redisTemplateWrapper.getResolvedRouter(instanceId).opsForZSet().reverseRangeAndStoreByScore(key, destKey, range, limit);
             updateExpiresForInstance(instanceId, destKey, expiry, unit);
             return rangeAndStoreByLex != null ? rangeAndStoreByLex : -1L;
         } catch (Exception e) {
@@ -3129,7 +3129,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long geoAddForInstance(String instanceId, String key, Point point, Object member) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().add(key, point, member);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().add(key, point, member);
         } catch (Exception e) {
             log.error("geo add error", e);
             return 0L;
@@ -3147,7 +3147,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long geoAddForInstance(String instanceId, String key, RedisGeoCommands.GeoLocation<Object> location) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().add(key, location);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().add(key, location);
         } catch (Exception e) {
             log.error("geo add error", e);
             return 0L;
@@ -3165,7 +3165,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long geoAddForInstance(String instanceId, String key, Map<Object, Point> memberCoordinateMap) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().add(key, memberCoordinateMap);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().add(key, memberCoordinateMap);
         } catch (Exception e) {
             log.error("geo add error", e);
             return 0L;
@@ -3183,7 +3183,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long geoAddForInstance(String instanceId, String key, Iterable<RedisGeoCommands.GeoLocation<Object>> geoLocations) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().add(key, geoLocations);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().add(key, geoLocations);
         } catch (Exception e) {
             log.error("geo add error", e);
             return 0L;
@@ -3202,7 +3202,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Distance geoDistForInstance(String instanceId, String key, Object member1, Object member2) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().distance(key, member1, member2);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().distance(key, member1, member2);
         } catch (Exception e) {
             log.error("geo dist error", e);
             return null;
@@ -3222,7 +3222,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Distance geoDistForInstance(String instanceId, String key, Object member1, Object member2, Metric metric) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo()
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo()
                     .distance(key, member1, member2, metric);
         } catch (Exception e) {
             log.error("geo dist error", e);
@@ -3241,7 +3241,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public List<String> geoHashForInstance(String instanceId, String key, Object... members) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().hash(key, members);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().hash(key, members);
         } catch (Exception e) {
             log.error("geo hash error", e);
             return List.of();
@@ -3259,7 +3259,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public List<Point> geoPosForInstance(String instanceId, String key, Object... members) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().position(key, members);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().position(key, members);
         } catch (Exception e) {
             log.error("geo pos error", e);
             return List.of();
@@ -3277,7 +3277,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<Object>> geoRadiusForInstance(String instanceId, String key, Circle within) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().radius(key, within);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().radius(key, within);
         } catch (Exception e) {
             log.error("geo radius error", e);
             return null;
@@ -3296,7 +3296,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<Object>> geoRadiusForInstance(String instanceId, String key, Circle within, RedisGeoCommands.GeoRadiusCommandArgs args) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().radius(key, within, args);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().radius(key, within, args);
         } catch (Exception e) {
             log.error("geo radius error", e);
             return null;
@@ -3315,7 +3315,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<Object>> geoRadiusByMemberForInstance(String instanceId, String key, Object member, double radius) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo()
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo()
                     .radius(key, member, new Distance(radius));
         } catch (Exception e) {
             log.error("geo radius error", e);
@@ -3335,7 +3335,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<Object>> geoRadiusByMemberForInstance(String instanceId, String key, Object member, Distance distance) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().radius(key, member, distance);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().radius(key, member, distance);
         } catch (Exception e) {
             log.error("geo radius error", e);
             return null;
@@ -3355,7 +3355,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<Object>> geoRadiusByMemberForInstance(String instanceId, String key, Object member, Distance distance, RedisGeoCommands.GeoRadiusCommandArgs args) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().radius(key, member, distance, args);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().radius(key, member, distance, args);
         } catch (Exception e) {
             log.error("geo radius error", e);
             return null;
@@ -3373,7 +3373,7 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Long geoRemoveForInstance(String instanceId, String key, Object... members) {
         try {
-            return redisTemplateWapper.getResolvedRouter(instanceId).opsForGeo().remove(key, members);
+            return redisTemplateWrapper.getResolvedRouter(instanceId).opsForGeo().remove(key, members);
         } catch (Exception e) {
             log.error("geo remove error", e);
             return 0L;
