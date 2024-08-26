@@ -91,7 +91,7 @@ public class CaffeineFactory {
         }
 
         // 设置是否启用缓存的统计功能
-        if (caffeineProperties.getRecordStats()) {
+        if (caffeineProperties.isRecordStats()) {
             caffeine.recordStats();
         }
         caffeine.build();

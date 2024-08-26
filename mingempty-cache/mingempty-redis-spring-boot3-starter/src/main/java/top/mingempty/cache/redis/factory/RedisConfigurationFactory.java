@@ -10,11 +10,11 @@ import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.RedisStaticMasterReplicaConfiguration;
 import org.springframework.util.Assert;
+import top.mingempty.builder.WrapperBuilder;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
 import top.mingempty.cache.redis.entity.RedisProperties;
 import top.mingempty.cache.redis.entity.wapper.RedisConfigurationWrapper;
 import top.mingempty.cache.redis.excetion.RedisCacheException;
-import top.mingempty.domain.function.IBuilder;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.util.ArrayList;
@@ -28,7 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zzhao
  */
 @AllArgsConstructor
-public class RedisConfigurationFactory implements IBuilder<RedisConfigurationWrapper> {
+public class RedisConfigurationFactory
+        implements WrapperBuilder<RedisConfigurationWrapper, RedisConfiguration, RedisProperties> {
 
     private final RedisCacheProperties redisCacheProperties;
 
@@ -40,16 +41,23 @@ public class RedisConfigurationFactory implements IBuilder<RedisConfigurationWra
     @Override
     public RedisConfigurationWrapper build() {
         Map<String, RedisConfiguration> map = new ConcurrentHashMap<>();
-        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, redisConfiguration(redisCacheProperties.getRedis()));
+        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, buildToSub(GlobalConstant.DEFAULT_INSTANCE_NAME, redisCacheProperties.getRedis()));
         redisCacheProperties.getMore()
                 .entrySet()
                 .parallelStream()
-                .forEach(entry -> map.put(entry.getKey(), redisConfiguration(entry.getValue())));
+                .forEach(entry -> map.put(entry.getKey(), buildToSub(entry.getKey(), entry.getValue())));
         return new RedisConfigurationWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
-
-    public RedisConfiguration redisConfiguration(RedisProperties properties) {
+    /**
+     * 构建
+     *
+     * @param instanceName
+     * @param properties
+     * @return 被构建的对象
+     */
+    @Override
+    public RedisConfiguration buildToSub(String instanceName, RedisProperties properties) {
         switch (properties.getType()) {
             case Single -> {
                 return standaloneConfig(properties);

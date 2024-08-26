@@ -3,6 +3,7 @@ package top.mingempty.cache.redis.factory;
 import lombok.AllArgsConstructor;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.config.Config;
+import top.mingempty.builder.WrapperBuilder;
 import top.mingempty.cache.redis.entity.RedisCacheConstant;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
 import top.mingempty.cache.redis.entity.RedisProperties;
@@ -10,7 +11,6 @@ import top.mingempty.cache.redis.entity.enums.RedisTypeEnum;
 import top.mingempty.cache.redis.entity.wapper.RedissonConfigWrapper;
 import top.mingempty.cache.redis.excetion.RedisCacheException;
 import top.mingempty.cache.redis.mapstruct.RedissonConfigMapstruct;
-import top.mingempty.domain.function.IBuilder;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.util.HashSet;
@@ -24,7 +24,8 @@ import java.util.concurrent.Executors;
  * @author zzhao
  */
 @AllArgsConstructor
-public class RedissonConfigFactory implements IBuilder<RedissonConfigWrapper> {
+public class RedissonConfigFactory
+        implements WrapperBuilder<RedissonConfigWrapper, Config, RedisProperties> {
 
     private final static RedisProperties.RedissonConfig REDISSON_CONFIG = new RedisProperties.RedissonConfig();
 
@@ -38,17 +39,24 @@ public class RedissonConfigFactory implements IBuilder<RedissonConfigWrapper> {
     @Override
     public RedissonConfigWrapper build() {
         Map<String, Config> map = new ConcurrentHashMap<>();
-        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, config(redisCacheProperties.getRedis()));
+        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, buildToSub(GlobalConstant.DEFAULT_INSTANCE_NAME, redisCacheProperties.getRedis()));
         redisCacheProperties.getMore()
                 .entrySet()
                 .parallelStream()
                 .forEach(entry
-                        -> map.put(entry.getKey(), config(entry.getValue())));
+                        -> map.put(entry.getKey(), buildToSub(entry.getKey(), entry.getValue())));
         return new RedissonConfigWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
-
-    public static Config config(RedisProperties properties) {
+    /**
+     * 构建
+     *
+     * @param instanceName
+     * @param properties
+     * @return 被构建的对象
+     */
+    @Override
+    public Config buildToSub(String instanceName, RedisProperties properties) {
         final Config config = RedissonConfigMapstruct.INSTANCE.toConfig(properties.getRedisson() == null
                 ? REDISSON_CONFIG : properties.getRedisson());
         config.setCodec(new StringCodec());

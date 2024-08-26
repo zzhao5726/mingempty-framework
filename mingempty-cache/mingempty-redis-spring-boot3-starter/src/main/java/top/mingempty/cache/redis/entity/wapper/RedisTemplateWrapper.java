@@ -2,7 +2,6 @@ package top.mingempty.cache.redis.entity.wapper;
 
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.BoundGeoOperations;
 import org.springframework.data.redis.core.BoundHashOperations;
@@ -20,7 +19,6 @@ import org.springframework.data.redis.core.HyperLogLogOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.SetOperations;
@@ -32,7 +30,6 @@ import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.data.redis.core.types.RedisClientInfo;
 import org.springframework.data.redis.hash.HashMapper;
 import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.lang.Nullable;
 import top.mingempty.cache.redis.aspect.RedisCacheAspect;
 import top.mingempty.domain.other.AbstractRouter;
 
@@ -52,14 +49,14 @@ import java.util.concurrent.TimeUnit;
  * @author zzhao
  * @date 2023/3/11 21:28
  */
-public class RedisTemplateWrapper extends AbstractRouter<RedisTemplate<String, Object>>
+public class RedisTemplateWrapper extends AbstractRouter<RedisOperations<String, Object>>
         implements RedisOperations<String, Object> {
 
-    public RedisTemplateWrapper(String defaultTargetName, Map<String, RedisTemplate<String, Object>> targetRouter) {
+    public RedisTemplateWrapper(String defaultTargetName, Map<String, RedisOperations<String, Object>> targetRouter) {
         super(defaultTargetName, targetRouter);
     }
 
-    public RedisTemplateWrapper(String defaultTargetName, Map<String, RedisTemplate<String, Object>> targetRouter, boolean lenientFallback) {
+    public RedisTemplateWrapper(String defaultTargetName, Map<String, RedisOperations<String, Object>> targetRouter, boolean lenientFallback) {
         super(defaultTargetName, targetRouter, lenientFallback);
     }
 
@@ -931,35 +928,6 @@ public class RedisTemplateWrapper extends AbstractRouter<RedisTemplate<String, O
     @Override
     public void restore(String key, byte[] value, long timeToLive, TimeUnit unit) {
         this.determineTargetRouter().restore(key, value, timeToLive, unit);
-    }
-
-    /**
-     * Returns the connectionFactory.
-     *
-     * @return Returns the connectionFactory. Can be {@literal null}
-     */
-    @Nullable
-    public RedisConnectionFactory getConnectionFactory() {
-        return this.determineTargetRouter().getConnectionFactory();
-    }
-
-    /**
-     * Returns the required {@link RedisConnectionFactory} or throws {@link IllegalStateException} if the connection
-     * factory is not set.
-     *
-     * @return the associated {@link RedisConnectionFactory}.
-     * @throws IllegalStateException if the connection factory is not set.
-     * @since 2.0
-     */
-    public RedisConnectionFactory getRequiredConnectionFactory() {
-
-        RedisConnectionFactory connectionFactory = getConnectionFactory();
-
-        if (connectionFactory == null) {
-            throw new IllegalStateException("RedisConnectionFactory is required");
-        }
-
-        return connectionFactory;
     }
 
     /************************RedisTemplate方法封装----------end*********************************************/

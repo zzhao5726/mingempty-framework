@@ -8,7 +8,6 @@ import io.lettuce.core.TimeoutOptions;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import io.lettuce.core.resource.ClientResources;
-import lombok.AllArgsConstructor;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.data.redis.connection.RedisConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -19,12 +18,8 @@ import top.mingempty.cache.redis.entity.RedisCacheProperties;
 import top.mingempty.cache.redis.entity.RedisProperties;
 import top.mingempty.cache.redis.entity.enums.RedisTypeEnum;
 import top.mingempty.cache.redis.entity.wapper.RedisConfigurationWrapper;
-import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWrapper;
-import top.mingempty.domain.other.GlobalConstant;
 
 import java.time.Duration;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -32,34 +27,22 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author zzhao
  */
-@AllArgsConstructor
-public class RedisLettuceConnectionFactory implements MeRedisConnectionFactory {
+public class RedisLettuceConnectionFactory extends MeRedisConnectionFactory {
 
-    private final RedisCacheProperties redisCacheProperties;
-    private final RedisConfigurationWrapper redisConfigurationWrapper;
+
+    public RedisLettuceConnectionFactory(RedisCacheProperties redisCacheProperties, RedisConfigurationWrapper redisConfigurationWrapper) {
+        super(redisCacheProperties, redisConfigurationWrapper);
+    }
 
     /**
      * 构建
      *
+     * @param properties
      * @return 被构建的对象
      */
     @Override
-    public RedisConnectionFactoryWrapper build() {
-        Map<String, RedisConnectionFactory> map = new ConcurrentHashMap<>();
-        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, redisConnectionFactory(redisCacheProperties.getRedis(),
-                redisConfigurationWrapper.getResolvedDefaultRouter()));
-        redisCacheProperties.getMore()
-                .entrySet()
-                .parallelStream()
-                .forEach(entry
-                        -> map.put(entry.getKey(),
-                        redisConnectionFactory(entry.getValue(),
-                                redisConfigurationWrapper.getResolvedRouter(entry.getKey()))));
-        return new RedisConnectionFactoryWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
-    }
-
-
-    public RedisConnectionFactory redisConnectionFactory(RedisProperties properties, RedisConfiguration redisConfiguration) {
+    public RedisConnectionFactory buildToSub(String instanceName, RedisProperties properties) {
+        RedisConfiguration redisConfiguration = super.redisConfigurationWrapper.getResolvedRouter(instanceName);
         LettuceClientConfiguration clientConfig
                 = lettuceClientConfiguration(properties,
                 clientResources());
@@ -150,7 +133,7 @@ public class RedisLettuceConnectionFactory implements MeRedisConnectionFactory {
     static class PoolBuilderFactory {
         static LettuceClientConfiguration.LettuceClientConfigurationBuilder createBuilder(RedisProperties.Pool pool) {
             if (pool == null) {
-                return  LettucePoolingClientConfiguration.builder();
+                return LettucePoolingClientConfiguration.builder();
             }
             return LettucePoolingClientConfiguration.builder().poolConfig(getPoolConfig(pool));
         }

@@ -7,6 +7,7 @@ import lombok.Data;
 import org.redisson.config.Protocol;
 import org.redisson.config.TransportMode;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import top.mingempty.builder.BuilderWrapperParent;
 import top.mingempty.cache.redis.entity.enums.RedisTypeEnum;
 import top.mingempty.cache.redis.excetion.RedisUrlSyntaxException;
 
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
  * @author zzhao
  */
 @Data
-public class RedisProperties {
+public class RedisProperties implements BuilderWrapperParent {
     /**
      * 连接模式（默认单机）
      */
@@ -131,7 +132,7 @@ public class RedisProperties {
     /**
      * 是否启用 事务 支持。
      */
-    private boolean enableTransactionSupport;
+    private boolean enableTransactionSupport = false;
 
     /**
      *
@@ -151,6 +152,12 @@ public class RedisProperties {
      */
     @NestedConfigurationProperty
     private RedissonConfig redisson;
+
+
+    /**
+     * 是否注册到spring
+     */
+    private boolean registerToSpring;
 
 
     public String getAddress() {
@@ -218,6 +225,16 @@ public class RedisProperties {
         } catch (URISyntaxException ex) {
             throw new RedisUrlSyntaxException(url, ex);
         }
+    }
+
+    /**
+     * 是否注册到spring
+     *
+     * @return
+     */
+    @Override
+    public boolean registerToSpring() {
+        return this.registerToSpring;
     }
 
     /**

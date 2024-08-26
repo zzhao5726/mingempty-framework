@@ -1,14 +1,12 @@
 package top.mingempty.cache.redis.factory;
 
 import lombok.AllArgsConstructor;
-import org.redisson.Redisson;
-import org.redisson.api.RedissonClient;
 import org.redisson.api.RedissonRxClient;
-import org.redisson.config.Config;
+import top.mingempty.builder.WrapperBuilder;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
+import top.mingempty.cache.redis.entity.RedisProperties;
 import top.mingempty.cache.redis.entity.wapper.RedissonClientWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedissonRxClientWrapper;
-import top.mingempty.domain.function.IBuilder;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.util.Map;
@@ -20,7 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zzhao
  */
 @AllArgsConstructor
-public class RedissonRxClientFactory implements IBuilder<RedissonRxClientWrapper> {
+public class RedissonRxClientFactory
+        implements WrapperBuilder<RedissonRxClientWrapper, RedissonRxClient, RedisProperties> {
 
     private final RedisCacheProperties redisCacheProperties;
     private final RedissonClientWrapper redissonClientWrapper;
@@ -33,23 +32,25 @@ public class RedissonRxClientFactory implements IBuilder<RedissonRxClientWrapper
     @Override
     public RedissonRxClientWrapper build() {
         Map<String, RedissonRxClient> map = new ConcurrentHashMap<>();
-        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, redissonRx(redissonClientWrapper.getResolvedDefaultRouter()));
+        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, buildToSub(GlobalConstant.DEFAULT_INSTANCE_NAME, redisCacheProperties.getRedis()));
         redisCacheProperties.getMore()
                 .entrySet()
                 .parallelStream()
                 .forEach(entry
                         -> map.put(entry.getKey(),
-                        redissonRx(redissonClientWrapper.getResolvedRouter(entry.getKey()))));
+                        buildToSub(entry.getKey(), entry.getValue())));
         return new RedissonRxClientWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
-
-    public RedissonRxClient redissonRx(Config config) {
-        return Redisson.create(config).rxJava();
+    /**
+     * 构建
+     *
+     * @param instanceName
+     * @param properties
+     * @return 被构建的对象
+     */
+    @Override
+    public RedissonRxClient buildToSub(String instanceName, RedisProperties properties) {
+        return redissonClientWrapper.getResolvedRouter(instanceName).rxJava();
     }
-
-    public RedissonRxClient redissonRx(RedissonClient redissonClient) {
-        return redissonClient.rxJava();
-    }
-
 }

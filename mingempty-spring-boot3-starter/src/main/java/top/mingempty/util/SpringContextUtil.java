@@ -15,6 +15,7 @@ import top.mingempty.commons.util.StringUtil;
 
 import java.beans.Introspector;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -165,7 +166,8 @@ public class SpringContextUtil implements BeanFactoryPostProcessor, ApplicationC
      * @return 加上前缀的bean名称
      */
     public static <T> String gainDefaultBeanName(String prefix, Class<T> beanClass) {
-        return prefix.concat(gainDefaultBeanName(beanClass));
+        String beanName = gainDefaultBeanName(beanClass);
+        return prefix.concat(beanName.substring(0, 1).toUpperCase(Locale.ROOT)).concat(beanName.substring(1));
     }
 
 

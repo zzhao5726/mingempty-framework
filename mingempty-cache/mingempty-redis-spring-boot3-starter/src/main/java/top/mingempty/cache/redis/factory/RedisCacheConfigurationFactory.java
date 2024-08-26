@@ -7,10 +7,10 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.ObjectUtils;
+import top.mingempty.builder.WrapperBuilder;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
 import top.mingempty.cache.redis.entity.RedisProperties;
 import top.mingempty.cache.redis.entity.wapper.RedisCacheConfigurationWrapper;
-import top.mingempty.domain.function.IBuilder;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.time.Duration;
@@ -24,7 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zzhao
  */
 @AllArgsConstructor
-public class RedisCacheConfigurationFactory implements IBuilder<RedisCacheConfigurationWrapper> {
+public class RedisCacheConfigurationFactory
+        implements WrapperBuilder<RedisCacheConfigurationWrapper, RedisCacheConfiguration, RedisProperties> {
 
     private final RedisCacheProperties redisCacheProperties;
     private final Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer;
@@ -37,22 +38,23 @@ public class RedisCacheConfigurationFactory implements IBuilder<RedisCacheConfig
     @Override
     public RedisCacheConfigurationWrapper build() {
         Map<String, RedisCacheConfiguration> map = new ConcurrentHashMap<>();
-        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, redisCacheConfiguration(redisCacheProperties.getRedis()));
+        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, buildToSub(GlobalConstant.DEFAULT_INSTANCE_NAME, redisCacheProperties.getRedis()));
         redisCacheProperties.getMore()
                 .entrySet()
                 .parallelStream()
-                .forEach(entry -> map.put(entry.getKey(), redisCacheConfiguration(entry.getValue())));
+                .forEach(entry -> map.put(entry.getKey(), buildToSub(entry.getKey(), entry.getValue())));
         return new RedisCacheConfigurationWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
-
     /**
-     * RedisCacheConfiguration
+     * 构建
      *
+     * @param instanceName
      * @param properties
-     * @return
+     * @return 被构建的对象
      */
-    public RedisCacheConfiguration redisCacheConfiguration(RedisProperties properties) {
+    @Override
+    public RedisCacheConfiguration buildToSub(String instanceName, RedisProperties properties) {
         if (ObjectUtils.isEmpty(properties.getSeconds())) {
             properties.setSeconds(0);
         }
