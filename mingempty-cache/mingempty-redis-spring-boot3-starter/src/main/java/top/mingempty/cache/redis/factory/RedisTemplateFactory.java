@@ -2,14 +2,15 @@ package top.mingempty.cache.redis.factory;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import top.mingempty.builder.WrapperBuilder;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
 import top.mingempty.cache.redis.entity.RedisProperties;
 import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedisTemplateWrapper;
-import top.mingempty.domain.function.IBuilder;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.util.Map;
@@ -21,7 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zzhao
  */
 @AllArgsConstructor
-public class RedisTemplateFactory implements IBuilder<RedisTemplateWrapper> {
+public class RedisTemplateFactory
+    implements WrapperBuilder<RedisTemplateWrapper, RedisOperations<String, Object>, RedisProperties> {
 
     private final RedisCacheProperties redisCacheProperties;
     private final RedisConnectionFactoryWrapper redisConnectionFactoryWrapper;
@@ -35,25 +37,35 @@ public class RedisTemplateFactory implements IBuilder<RedisTemplateWrapper> {
      */
     @Override
     public RedisTemplateWrapper build() {
-        Map<String, RedisTemplate<String, Object>> map = new ConcurrentHashMap<>();
-        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, redisTemplate(redisCacheProperties.getRedis(),
-                redisConnectionFactoryWrapper.getResolvedDefaultRouter()));
+        Map<String, RedisOperations<String, Object>> map = new ConcurrentHashMap<>();
+        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, buildToSub(GlobalConstant.DEFAULT_INSTANCE_NAME,redisCacheProperties.getRedis()));
         redisCacheProperties.getMore()
                 .entrySet()
                 .parallelStream()
                 .forEach(entry
                         -> map.put(entry.getKey(),
-                        redisTemplate(entry.getValue(),
-                                redisConnectionFactoryWrapper.getResolvedRouter(entry.getKey()))));
+                        buildToSub(entry.getKey(), entry.getValue())));
         return new RedisTemplateWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
+    /**
+     * 构建
+     *
+     * @param instanceName
+     * @param properties
+     * @return 被构建的对象
+     */
+    @Override
+    public RedisOperations<String, Object> buildToSub(String instanceName, RedisProperties properties) {
+        RedisConnectionFactory connectionFactory = redisConnectionFactoryWrapper.getResolvedRouter(instanceName);
+        return redisTemplate(properties.isEnableTransactionSupport(),connectionFactory);
+    }
 
-    public RedisTemplate<String, Object> redisTemplate(RedisProperties redisProperties,
+    public RedisTemplate<String, Object> redisTemplate(boolean enableTransactionSupport,
                                                        RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         // 开启redis数据库事务的支持
-        redisTemplate.setEnableTransactionSupport(redisProperties.isEnableTransactionSupport());
+        redisTemplate.setEnableTransactionSupport(enableTransactionSupport);
         redisTemplate.setConnectionFactory(connectionFactory);
 
         //设置默认序列化方式
