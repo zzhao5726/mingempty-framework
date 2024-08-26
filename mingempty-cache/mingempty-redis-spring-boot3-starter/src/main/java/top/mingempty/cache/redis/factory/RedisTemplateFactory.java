@@ -7,8 +7,8 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
 import top.mingempty.cache.redis.entity.RedisProperties;
-import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWapper;
-import top.mingempty.cache.redis.entity.wapper.RedisTemplateWapper;
+import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWrapper;
+import top.mingempty.cache.redis.entity.wapper.RedisTemplateWrapper;
 import top.mingempty.domain.function.IBuilder;
 import top.mingempty.domain.other.GlobalConstant;
 
@@ -21,10 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zzhao
  */
 @AllArgsConstructor
-public class RedisTemplateFactory implements IBuilder<RedisTemplateWapper> {
+public class RedisTemplateFactory implements IBuilder<RedisTemplateWrapper> {
 
     private final RedisCacheProperties redisCacheProperties;
-    private final RedisConnectionFactoryWapper redisConnectionFactoryWapper;
+    private final RedisConnectionFactoryWrapper redisConnectionFactoryWrapper;
     private final Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer;
     private final StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
 
@@ -34,18 +34,18 @@ public class RedisTemplateFactory implements IBuilder<RedisTemplateWapper> {
      * @return 被构建的对象
      */
     @Override
-    public RedisTemplateWapper build() {
+    public RedisTemplateWrapper build() {
         Map<String, RedisTemplate<String, Object>> map = new ConcurrentHashMap<>();
         map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, redisTemplate(redisCacheProperties.getRedis(),
-                redisConnectionFactoryWapper.getResolvedDefaultRouter()));
+                redisConnectionFactoryWrapper.getResolvedDefaultRouter()));
         redisCacheProperties.getMore()
                 .entrySet()
                 .parallelStream()
                 .forEach(entry
                         -> map.put(entry.getKey(),
                         redisTemplate(entry.getValue(),
-                                redisConnectionFactoryWapper.getResolvedRouter(entry.getKey()))));
-        return new RedisTemplateWapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
+                                redisConnectionFactoryWrapper.getResolvedRouter(entry.getKey()))));
+        return new RedisTemplateWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
 
