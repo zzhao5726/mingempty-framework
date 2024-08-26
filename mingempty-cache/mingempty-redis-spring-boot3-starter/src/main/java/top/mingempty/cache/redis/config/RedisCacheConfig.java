@@ -94,8 +94,8 @@ public class RedisCacheConfig {
 
     @Bean
     @ConditionalOnClass(name = {"redis.clients.jedis.Jedis"})
-    public MeRedisConnectionFactory redisJedisConnectionFactory() {
-        return new RedisJedisConnectionFactory(redisCacheProperties);
+    public MeRedisConnectionFactory redisJedisConnectionFactory(RedisConfigurationWrapper redisConfigurationWrapper) {
+        return new RedisJedisConnectionFactory(redisCacheProperties, redisConfigurationWrapper);
     }
 
 
@@ -129,7 +129,8 @@ public class RedisCacheConfig {
     @ConditionalOnBean(value = {RedisConnectionFactoryWrapper.class, RedisTemplateFactory.class})
     public RedisTemplate<String, Object> redisTemplate(RedisTemplateFactory redisTemplateFactory,
                                                        RedisConnectionFactoryWrapper redisConnectionFactoryWrapper) {
-        return redisTemplateFactory.redisTemplate(redisCacheProperties.getRedis(), redisConnectionFactoryWrapper);
+        return redisTemplateFactory
+                .redisTemplate(redisCacheProperties.getRedis().isEnableTransactionSupport(), redisConnectionFactoryWrapper);
     }
 
     /*=================redis👆  CacheManager👇================================*/
