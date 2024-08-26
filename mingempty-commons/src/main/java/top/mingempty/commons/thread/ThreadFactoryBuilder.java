@@ -1,10 +1,8 @@
-package top.mingempty.concurrent.thread;
+package top.mingempty.commons.thread;
 
 
 import top.mingempty.domain.function.IBuilder;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -17,10 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author zzhao
  */
-public class ThreadFactoryBuilder implements IBuilder<ThreadFactory>, Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class ThreadFactoryBuilder implements IBuilder<ThreadFactory> {
 
     /**
      * 用于线程创建的线程工厂类
