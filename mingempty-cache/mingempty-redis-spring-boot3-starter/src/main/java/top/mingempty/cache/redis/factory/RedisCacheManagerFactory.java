@@ -5,11 +5,12 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import top.mingempty.builder.WrapperBuilder;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
+import top.mingempty.cache.redis.entity.RedisProperties;
 import top.mingempty.cache.redis.entity.wapper.RedisCacheConfigurationWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedisCacheManagerWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWrapper;
-import top.mingempty.domain.function.IBuilder;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.util.HashMap;
@@ -22,7 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zzhao
  */
 @AllArgsConstructor
-public class RedisCacheManagerFactory implements IBuilder<RedisCacheManagerWrapper> {
+public class RedisCacheManagerFactory
+        implements WrapperBuilder<RedisCacheManagerWrapper, RedisCacheManager, RedisProperties> {
 
     private final RedisCacheProperties redisCacheProperties;
     private final RedisConnectionFactoryWrapper redisConnectionFactoryWrapper;
@@ -37,26 +39,30 @@ public class RedisCacheManagerFactory implements IBuilder<RedisCacheManagerWrapp
     @Override
     public RedisCacheManagerWrapper build() {
         Map<String, RedisCacheManager> map = new ConcurrentHashMap<>();
-        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, redisCacheManager(
-                redisConnectionFactoryWrapper.getResolvedDefaultRouter(),
-                redisCacheConfigurationWrapper.getResolvedDefaultRouter()));
+        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, buildToSub(
+                GlobalConstant.DEFAULT_INSTANCE_NAME, redisCacheProperties.getRedis()));
         redisCacheProperties.getMore()
                 .entrySet()
                 .parallelStream()
                 .forEach(entry
                         -> map.put(entry.getKey(),
-                        redisCacheManager(redisConnectionFactoryWrapper.getResolvedRouter(entry.getKey()),
-                                redisCacheConfigurationWrapper.getResolvedRouter(entry.getKey()))));
+                        buildToSub(entry.getKey(), entry.getValue())));
         return new RedisCacheManagerWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
-
-    public static RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory,
-                                                      RedisCacheConfiguration redisCacheConfiguration) {
+    /**
+     * 构建
+     *
+     * @param instanceName
+     * @param properties
+     * @return 被构建的对象
+     */
+    @Override
+    public RedisCacheManager buildToSub(String instanceName, RedisProperties properties) {
+        RedisConnectionFactory redisConnectionFactory = redisConnectionFactoryWrapper.getResolvedRouter(instanceName);
+        RedisCacheConfiguration redisCacheConfiguration = redisCacheConfigurationWrapper.getResolvedRouter(instanceName);
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
-        RedisCacheManager redisCacheManager
-                = new RedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory),
+        return new RedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory),
                 redisCacheConfiguration, redisCacheConfigurationMap);
-        return redisCacheManager;
     }
 }

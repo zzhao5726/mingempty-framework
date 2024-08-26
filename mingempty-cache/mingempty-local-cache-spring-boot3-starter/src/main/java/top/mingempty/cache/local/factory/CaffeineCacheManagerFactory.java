@@ -3,10 +3,10 @@ package top.mingempty.cache.local.factory;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
+import top.mingempty.builder.WrapperBuilder;
 import top.mingempty.cache.local.entity.CaffeineProperties;
 import top.mingempty.cache.local.entity.LocalCacheProperties;
 import top.mingempty.cache.local.entity.wrapper.CaffeineCacheManagerWrapper;
-import top.mingempty.domain.function.IBuilder;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author zzhao
  */
 @AllArgsConstructor
-public class CaffeineCacheManagerFactory implements IBuilder<CaffeineCacheManagerWrapper> {
+public class CaffeineCacheManagerFactory implements WrapperBuilder<CaffeineCacheManagerWrapper, CaffeineCacheManager, CaffeineProperties> {
     private final LocalCacheProperties localCacheProperties;
     private final Map<String, CacheLoader<Object, Object>> cacheLoaderMap;
 
@@ -33,22 +33,28 @@ public class CaffeineCacheManagerFactory implements IBuilder<CaffeineCacheManage
     @Override
     public CaffeineCacheManagerWrapper build() {
         Map<String, CaffeineCacheManager> map = new ConcurrentHashMap<>();
-        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, caffeineCacheManager(localCacheProperties.getCaffeine()));
+        map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, build(GlobalConstant.DEFAULT_INSTANCE_NAME, localCacheProperties.getCaffeine()));
         localCacheProperties.getMoreCaffeine()
                 .entrySet()
                 .parallelStream()
                 .forEach(entry
                         -> map.put(entry.getKey(),
-                        caffeineCacheManager(entry.getValue())));
+                        build(entry.getKey(), entry.getValue())));
         return new CaffeineCacheManagerWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
-
-    private CaffeineCacheManager caffeineCacheManager(CaffeineProperties caffeineProperties) {
+    /**
+     * 构建
+     *
+     * @param caffeineProperties
+     * @return 被构建的对象
+     */
+    @Override
+    public CaffeineCacheManager buildToSub(String instanceName,CaffeineProperties caffeineProperties) {
         List<String> alias = Optional.ofNullable(caffeineProperties.getAlias())
                 .orElse(new CopyOnWriteArrayList<>());
 
-        if (caffeineProperties.getEnableLocalApi()
+        if (caffeineProperties.isEnableLocalApi()
                 && !alias.contains("API")) {
             alias.add("API");
         }

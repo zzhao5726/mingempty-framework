@@ -1,6 +1,7 @@
 package top.mingempty.cache.local.entity;
 
 import lombok.Data;
+import top.mingempty.builder.BuilderWrapperParent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @author zzhao
  */
 @Data
-public class CaffeineProperties {
+public class CaffeineProperties implements BuilderWrapperParent {
 
     /**
      * 将缓存管理器构建的通用缓存类型设置为异步.
@@ -82,12 +83,17 @@ public class CaffeineProperties {
     /**
      * 是否启用缓存的统计功能
      */
-    private Boolean recordStats = Boolean.FALSE;
+    private boolean recordStats = false;
 
     /**
      * 是否启用API功能
      */
-    private Boolean enableLocalApi = Boolean.FALSE;
+    private boolean enableLocalApi = false;
+
+    /**
+     * 是否注册到spring
+     */
+    private boolean registerToSpring = false;
 
     /**
      * 缓存别名集合
@@ -95,4 +101,14 @@ public class CaffeineProperties {
     private List<String> alias = new ArrayList<>() {{
         add("SYS");
     }};
+
+    /**
+     * 是否注册到spring
+     *
+     * @return
+     */
+    @Override
+    public boolean registerToSpring() {
+        return false;
+    }
 }
