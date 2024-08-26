@@ -6,9 +6,9 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
-import top.mingempty.cache.redis.entity.wapper.RedisCacheConfigurationWapper;
+import top.mingempty.cache.redis.entity.wapper.RedisCacheConfigurationWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedisCacheManagerWrapper;
-import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWapper;
+import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWrapper;
 import top.mingempty.domain.function.IBuilder;
 import top.mingempty.domain.other.GlobalConstant;
 
@@ -25,8 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RedisCacheManagerFactory implements IBuilder<RedisCacheManagerWrapper> {
 
     private final RedisCacheProperties redisCacheProperties;
-    private final RedisConnectionFactoryWapper redisConnectionFactoryWapper;
-    private final RedisCacheConfigurationWapper redisCacheConfigurationWapper;
+    private final RedisConnectionFactoryWrapper redisConnectionFactoryWrapper;
+    private final RedisCacheConfigurationWrapper redisCacheConfigurationWrapper;
 
 
     /**
@@ -38,15 +38,15 @@ public class RedisCacheManagerFactory implements IBuilder<RedisCacheManagerWrapp
     public RedisCacheManagerWrapper build() {
         Map<String, RedisCacheManager> map = new ConcurrentHashMap<>();
         map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, redisCacheManager(
-                redisConnectionFactoryWapper.getResolvedDefaultRouter(),
-                redisCacheConfigurationWapper.getResolvedDefaultRouter()));
+                redisConnectionFactoryWrapper.getResolvedDefaultRouter(),
+                redisCacheConfigurationWrapper.getResolvedDefaultRouter()));
         redisCacheProperties.getMore()
                 .entrySet()
                 .parallelStream()
                 .forEach(entry
                         -> map.put(entry.getKey(),
-                        redisCacheManager(redisConnectionFactoryWapper.getResolvedRouter(entry.getKey()),
-                                redisCacheConfigurationWapper.getResolvedRouter(entry.getKey()))));
+                        redisCacheManager(redisConnectionFactoryWrapper.getResolvedRouter(entry.getKey()),
+                                redisCacheConfigurationWrapper.getResolvedRouter(entry.getKey()))));
         return new RedisCacheManagerWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 

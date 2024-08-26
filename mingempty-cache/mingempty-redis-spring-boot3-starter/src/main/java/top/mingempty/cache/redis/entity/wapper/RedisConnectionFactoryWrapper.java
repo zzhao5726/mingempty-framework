@@ -16,12 +16,12 @@ import java.util.Map;
  * @author zzhao
  * @date 2023/3/12 11:02
  */
-public class RedisConnectionFactoryWapper extends AbstractRouter<RedisConnectionFactory> implements RedisConnectionFactory {
-    public RedisConnectionFactoryWapper(String defaultTargetName, Map<String, RedisConnectionFactory> targetRouter) {
+public class RedisConnectionFactoryWrapper extends AbstractRouter<RedisConnectionFactory> implements RedisConnectionFactory {
+    public RedisConnectionFactoryWrapper(String defaultTargetName, Map<String, RedisConnectionFactory> targetRouter) {
         super(defaultTargetName, targetRouter);
     }
 
-    public RedisConnectionFactoryWapper(String defaultTargetName, Map<String, RedisConnectionFactory> targetRouter, boolean lenientFallback) {
+    public RedisConnectionFactoryWrapper(String defaultTargetName, Map<String, RedisConnectionFactory> targetRouter, boolean lenientFallback) {
         super(defaultTargetName, targetRouter, lenientFallback);
     }
 

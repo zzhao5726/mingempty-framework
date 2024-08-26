@@ -11,14 +11,14 @@ import java.util.Map;
  * @author zzhao
  * @date 2023/3/12 11:12
  */
-public class RedissonConfigWapper extends AbstractRouter<Config> {
+public class RedissonConfigWrapper extends AbstractRouter<Config> {
 
 
-    public RedissonConfigWapper(String defaultTargetName, Map<String, Config> targetRouter) {
+    public RedissonConfigWrapper(String defaultTargetName, Map<String, Config> targetRouter) {
         super(defaultTargetName, targetRouter);
     }
 
-    public RedissonConfigWapper(String defaultTargetName, Map<String, Config> targetRouter, boolean lenientFallback) {
+    public RedissonConfigWrapper(String defaultTargetName, Map<String, Config> targetRouter, boolean lenientFallback) {
         super(defaultTargetName, targetRouter, lenientFallback);
     }
 
