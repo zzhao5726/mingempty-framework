@@ -81,12 +81,12 @@ import java.util.Map;
  * @author zzhao
  * @date 2023/3/12 10:56
  */
-public class RedissonRxClientWapper extends AbstractRouter<RedissonRxClient> implements RedissonRxClient {
-    public RedissonRxClientWapper(String defaultTargetName, Map<String, RedissonRxClient> targetRouter) {
+public class RedissonRxClientWrapper extends AbstractRouter<RedissonRxClient> implements RedissonRxClient {
+    public RedissonRxClientWrapper(String defaultTargetName, Map<String, RedissonRxClient> targetRouter) {
         super(defaultTargetName, targetRouter);
     }
 
-    public RedissonRxClientWapper(String defaultTargetName, Map<String, RedissonRxClient> targetRouter, boolean lenientFallback) {
+    public RedissonRxClientWrapper(String defaultTargetName, Map<String, RedissonRxClient> targetRouter, boolean lenientFallback) {
         super(defaultTargetName, targetRouter, lenientFallback);
     }
 
