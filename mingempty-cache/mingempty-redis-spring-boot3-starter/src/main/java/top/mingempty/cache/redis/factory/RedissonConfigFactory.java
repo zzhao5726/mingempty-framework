@@ -7,7 +7,7 @@ import top.mingempty.cache.redis.entity.RedisCacheConstant;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
 import top.mingempty.cache.redis.entity.RedisProperties;
 import top.mingempty.cache.redis.entity.enums.RedisTypeEnum;
-import top.mingempty.cache.redis.entity.wapper.RedissonConfigWapper;
+import top.mingempty.cache.redis.entity.wapper.RedissonConfigWrapper;
 import top.mingempty.cache.redis.excetion.RedisCacheException;
 import top.mingempty.cache.redis.mapstruct.RedissonConfigMapstruct;
 import top.mingempty.domain.function.IBuilder;
@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
  * @author zzhao
  */
 @AllArgsConstructor
-public class RedissonConfigFactory implements IBuilder<RedissonConfigWapper> {
+public class RedissonConfigFactory implements IBuilder<RedissonConfigWrapper> {
 
     private final static RedisProperties.RedissonConfig REDISSON_CONFIG = new RedisProperties.RedissonConfig();
 
@@ -36,7 +36,7 @@ public class RedissonConfigFactory implements IBuilder<RedissonConfigWapper> {
      * @return 被构建的对象
      */
     @Override
-    public RedissonConfigWapper build() {
+    public RedissonConfigWrapper build() {
         Map<String, Config> map = new ConcurrentHashMap<>();
         map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, config(redisCacheProperties.getRedis()));
         redisCacheProperties.getMore()
@@ -44,7 +44,7 @@ public class RedissonConfigFactory implements IBuilder<RedissonConfigWapper> {
                 .parallelStream()
                 .forEach(entry
                         -> map.put(entry.getKey(), config(entry.getValue())));
-        return new RedissonConfigWapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
+        return new RedissonConfigWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
 

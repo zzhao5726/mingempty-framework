@@ -52,14 +52,14 @@ import java.util.concurrent.TimeUnit;
  * @author zzhao
  * @date 2023/3/11 21:28
  */
-public class RedisTemplateWapper extends AbstractRouter<RedisTemplate<String, Object>>
+public class RedisTemplateWrapper extends AbstractRouter<RedisTemplate<String, Object>>
         implements RedisOperations<String, Object> {
 
-    public RedisTemplateWapper(String defaultTargetName, Map<String, RedisTemplate<String, Object>> targetRouter) {
+    public RedisTemplateWrapper(String defaultTargetName, Map<String, RedisTemplate<String, Object>> targetRouter) {
         super(defaultTargetName, targetRouter);
     }
 
-    public RedisTemplateWapper(String defaultTargetName, Map<String, RedisTemplate<String, Object>> targetRouter, boolean lenientFallback) {
+    public RedisTemplateWrapper(String defaultTargetName, Map<String, RedisTemplate<String, Object>> targetRouter, boolean lenientFallback) {
         super(defaultTargetName, targetRouter, lenientFallback);
     }
 

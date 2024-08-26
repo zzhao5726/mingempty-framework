@@ -14,13 +14,13 @@ import java.util.function.Supplier;
  * @author zzhao
  * @date 2023/3/12 11:05
  */
-public class RedisConfigurationWapper extends AbstractRouter<RedisConfiguration> implements RedisConfiguration {
+public class RedisConfigurationWrapper extends AbstractRouter<RedisConfiguration> implements RedisConfiguration {
 
-    public RedisConfigurationWapper(String defaultTargetName, Map<String, RedisConfiguration> targetRouter) {
+    public RedisConfigurationWrapper(String defaultTargetName, Map<String, RedisConfiguration> targetRouter) {
         super(defaultTargetName, targetRouter);
     }
 
-    public RedisConfigurationWapper(String defaultTargetName, Map<String, RedisConfiguration> targetRouter, boolean lenientFallback) {
+    public RedisConfigurationWrapper(String defaultTargetName, Map<String, RedisConfiguration> targetRouter, boolean lenientFallback) {
         super(defaultTargetName, targetRouter, lenientFallback);
     }
 

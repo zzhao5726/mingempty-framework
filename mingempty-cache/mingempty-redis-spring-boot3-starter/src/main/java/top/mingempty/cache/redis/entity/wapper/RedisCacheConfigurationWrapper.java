@@ -12,14 +12,14 @@ import java.util.Map;
  * @author zzhao
  * @date 2023/3/12 11:12
  */
-public class RedisCacheConfigurationWapper extends AbstractRouter<RedisCacheConfiguration> {
+public class RedisCacheConfigurationWrapper extends AbstractRouter<RedisCacheConfiguration> {
 
 
-    public RedisCacheConfigurationWapper(String defaultTargetName, Map<String, RedisCacheConfiguration> targetRouter) {
+    public RedisCacheConfigurationWrapper(String defaultTargetName, Map<String, RedisCacheConfiguration> targetRouter) {
         super(defaultTargetName, targetRouter);
     }
 
-    public RedisCacheConfigurationWapper(String defaultTargetName, Map<String, RedisCacheConfiguration> targetRouter, boolean lenientFallback) {
+    public RedisCacheConfigurationWrapper(String defaultTargetName, Map<String, RedisCacheConfiguration> targetRouter, boolean lenientFallback) {
         super(defaultTargetName, targetRouter, lenientFallback);
     }
 

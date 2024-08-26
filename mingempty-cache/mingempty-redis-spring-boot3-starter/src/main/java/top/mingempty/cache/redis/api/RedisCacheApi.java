@@ -26,7 +26,7 @@ public interface RedisCacheApi extends RedisCacheMap, RedisCacheSet, RedisCacheZ
     CacheManager cacheManager();
 
     /**
-     * 获取RedissonClientWapper
+     * 获取RedissonClientWrapper
      *
      * @return RedissonClient
      */
@@ -45,14 +45,14 @@ public interface RedisCacheApi extends RedisCacheMap, RedisCacheSet, RedisCacheZ
     }
 
     /**
-     * 获取RedissonRxClientWapper
+     * 获取RedissonRxClientWrapper
      *
      * @return RedissonRxClient
      */
     RedissonRxClient redissonRxClient();
 
     /**
-     * 获取RedisTemplateWapper
+     * 获取RedisTemplateWrapper
      *
      * @return RedisOperations
      */

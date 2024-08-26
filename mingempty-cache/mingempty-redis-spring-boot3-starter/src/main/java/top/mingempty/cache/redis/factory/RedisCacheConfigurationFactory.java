@@ -9,7 +9,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.ObjectUtils;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
 import top.mingempty.cache.redis.entity.RedisProperties;
-import top.mingempty.cache.redis.entity.wapper.RedisCacheConfigurationWapper;
+import top.mingempty.cache.redis.entity.wapper.RedisCacheConfigurationWrapper;
 import top.mingempty.domain.function.IBuilder;
 import top.mingempty.domain.other.GlobalConstant;
 
@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zzhao
  */
 @AllArgsConstructor
-public class RedisCacheConfigurationFactory implements IBuilder<RedisCacheConfigurationWapper> {
+public class RedisCacheConfigurationFactory implements IBuilder<RedisCacheConfigurationWrapper> {
 
     private final RedisCacheProperties redisCacheProperties;
     private final Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer;
@@ -35,14 +35,14 @@ public class RedisCacheConfigurationFactory implements IBuilder<RedisCacheConfig
      * @return 被构建的对象
      */
     @Override
-    public RedisCacheConfigurationWapper build() {
+    public RedisCacheConfigurationWrapper build() {
         Map<String, RedisCacheConfiguration> map = new ConcurrentHashMap<>();
         map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, redisCacheConfiguration(redisCacheProperties.getRedis()));
         redisCacheProperties.getMore()
                 .entrySet()
                 .parallelStream()
                 .forEach(entry -> map.put(entry.getKey(), redisCacheConfiguration(entry.getValue())));
-        return new RedisCacheConfigurationWapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
+        return new RedisCacheConfigurationWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
 

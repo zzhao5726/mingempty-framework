@@ -98,12 +98,12 @@ import java.util.concurrent.TimeUnit;
  * @author zzhao
  * @date 2023/3/12 10:56
  */
-public class RedissonClientWapper extends AbstractRouter<RedissonClient> implements RedissonClient {
-    public RedissonClientWapper(String defaultTargetName, Map<String, RedissonClient> targetRouter) {
+public class RedissonClientWrapper extends AbstractRouter<RedissonClient> implements RedissonClient {
+    public RedissonClientWrapper(String defaultTargetName, Map<String, RedissonClient> targetRouter) {
         super(defaultTargetName, targetRouter);
     }
 
-    public RedissonClientWapper(String defaultTargetName, Map<String, RedissonClient> targetRouter, boolean lenientFallback) {
+    public RedissonClientWrapper(String defaultTargetName, Map<String, RedissonClient> targetRouter, boolean lenientFallback) {
         super(defaultTargetName, targetRouter, lenientFallback);
     }
 

@@ -20,14 +20,14 @@ import top.mingempty.cache.redis.api.RedisCacheApi;
 import top.mingempty.cache.redis.api.impl.RedisCacheApiImpl;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
 import top.mingempty.cache.redis.entity.serializer.MeJackson2JsonRedisSerializer;
-import top.mingempty.cache.redis.entity.wapper.RedisCacheConfigurationWapper;
+import top.mingempty.cache.redis.entity.wapper.RedisCacheConfigurationWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedisCacheManagerWrapper;
-import top.mingempty.cache.redis.entity.wapper.RedisConfigurationWapper;
-import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWapper;
-import top.mingempty.cache.redis.entity.wapper.RedisTemplateWapper;
-import top.mingempty.cache.redis.entity.wapper.RedissonClientWapper;
-import top.mingempty.cache.redis.entity.wapper.RedissonConfigWapper;
-import top.mingempty.cache.redis.entity.wapper.RedissonRxClientWapper;
+import top.mingempty.cache.redis.entity.wapper.RedisConfigurationWrapper;
+import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWrapper;
+import top.mingempty.cache.redis.entity.wapper.RedisTemplateWrapper;
+import top.mingempty.cache.redis.entity.wapper.RedissonClientWrapper;
+import top.mingempty.cache.redis.entity.wapper.RedissonConfigWrapper;
+import top.mingempty.cache.redis.entity.wapper.RedissonRxClientWrapper;
 import top.mingempty.cache.redis.factory.MeRedisConnectionFactory;
 import top.mingempty.cache.redis.factory.RedisCacheConfigurationFactory;
 import top.mingempty.cache.redis.factory.RedisCacheManagerFactory;
@@ -88,7 +88,7 @@ public class RedisCacheConfig {
 
     @Bean
     @ConditionalOnBean(value = {RedisConfigurationFactory.class})
-    public RedisConfigurationWapper redisConfigurationWapper(RedisConfigurationFactory redisConfigurationFactory) {
+    public RedisConfigurationWrapper redisConfigurationWrapper(RedisConfigurationFactory redisConfigurationFactory) {
         return redisConfigurationFactory.build();
     }
 
@@ -101,35 +101,35 @@ public class RedisCacheConfig {
 
     @Bean
     @ConditionalOnMissingBean(value = {MeRedisConnectionFactory.class})
-    public MeRedisConnectionFactory redisLettuceConnectionFactory(RedisConfigurationWapper redisConfigurationWapper) {
-        return new RedisLettuceConnectionFactory(redisCacheProperties, redisConfigurationWapper);
+    public MeRedisConnectionFactory redisLettuceConnectionFactory(RedisConfigurationWrapper redisConfigurationWrapper) {
+        return new RedisLettuceConnectionFactory(redisCacheProperties, redisConfigurationWrapper);
     }
 
     @Bean
     @ConditionalOnBean(value = {MeRedisConnectionFactory.class})
-    public RedisConnectionFactoryWapper redisConnectionFactoryWapper(MeRedisConnectionFactory meRedisConnectionFactory) {
+    public RedisConnectionFactoryWrapper redisConnectionFactoryWrapper(MeRedisConnectionFactory meRedisConnectionFactory) {
         return meRedisConnectionFactory.build();
     }
 
     @Bean
-    @ConditionalOnBean(value = {RedisConnectionFactoryWapper.class, Jackson2JsonRedisSerializer.class})
-    public RedisTemplateFactory redisTemplateFactory(RedisConnectionFactoryWapper redisConnectionFactoryWapper,
+    @ConditionalOnBean(value = {RedisConnectionFactoryWrapper.class, Jackson2JsonRedisSerializer.class})
+    public RedisTemplateFactory redisTemplateFactory(RedisConnectionFactoryWrapper redisConnectionFactoryWrapper,
                                                      Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer) {
         return new RedisTemplateFactory(redisCacheProperties,
-                redisConnectionFactoryWapper, jackson2JsonRedisSerializer);
+                redisConnectionFactoryWrapper, jackson2JsonRedisSerializer);
     }
 
     @Bean
     @ConditionalOnBean(value = {RedisTemplateFactory.class})
-    public RedisTemplateWapper redisTemplateWapper(RedisTemplateFactory redisTemplateFactory) {
+    public RedisTemplateWrapper redisTemplateWrapper(RedisTemplateFactory redisTemplateFactory) {
         return redisTemplateFactory.build();
     }
 
     @Bean
-    @ConditionalOnBean(value = {RedisConnectionFactoryWapper.class, RedisTemplateFactory.class})
+    @ConditionalOnBean(value = {RedisConnectionFactoryWrapper.class, RedisTemplateFactory.class})
     public RedisTemplate<String, Object> redisTemplate(RedisTemplateFactory redisTemplateFactory,
-                                                       RedisConnectionFactoryWapper redisConnectionFactoryWapper) {
-        return redisTemplateFactory.redisTemplate(redisCacheProperties.getRedis(), redisConnectionFactoryWapper);
+                                                       RedisConnectionFactoryWrapper redisConnectionFactoryWrapper) {
+        return redisTemplateFactory.redisTemplate(redisCacheProperties.getRedis(), redisConnectionFactoryWrapper);
     }
 
     /*=================redis👆  CacheManager👇================================*/
@@ -143,16 +143,16 @@ public class RedisCacheConfig {
 
     @Bean
     @ConditionalOnBean(value = {RedisCacheConfigurationFactory.class})
-    public RedisCacheConfigurationWapper redisCacheConfigurationWapper(RedisCacheConfigurationFactory redisCacheConfigurationFactory) {
+    public RedisCacheConfigurationWrapper redisCacheConfigurationWrapper(RedisCacheConfigurationFactory redisCacheConfigurationFactory) {
         return redisCacheConfigurationFactory.build();
     }
 
 
     @Bean
-    @ConditionalOnBean(value = {RedisCacheConfigurationWapper.class, MeRedisConnectionFactory.class})
-    public RedisCacheManagerFactory redisCacheManagerFactory(RedisConnectionFactoryWapper redisConnectionFactoryWapper,
-                                                             RedisCacheConfigurationWapper redisCacheConfigurationWapper) {
-        return new RedisCacheManagerFactory(redisCacheProperties, redisConnectionFactoryWapper, redisCacheConfigurationWapper);
+    @ConditionalOnBean(value = {RedisCacheConfigurationWrapper.class, MeRedisConnectionFactory.class})
+    public RedisCacheManagerFactory redisCacheManagerFactory(RedisConnectionFactoryWrapper redisConnectionFactoryWrapper,
+                                                             RedisCacheConfigurationWrapper redisCacheConfigurationWrapper) {
+        return new RedisCacheManagerFactory(redisCacheProperties, redisConnectionFactoryWrapper, redisCacheConfigurationWrapper);
     }
 
     @Bean
@@ -171,32 +171,32 @@ public class RedisCacheConfig {
 
     @Bean
     @ConditionalOnBean(value = {RedissonConfigFactory.class})
-    public RedissonConfigWapper redissonConfigWapper(RedissonConfigFactory redissonConfigFactory) {
+    public RedissonConfigWrapper redissonConfigWrapper(RedissonConfigFactory redissonConfigFactory) {
         return redissonConfigFactory.build();
     }
 
     @Bean
-    @ConditionalOnBean(value = {RedissonConfigWapper.class})
-    public RedissonClientFactory redissonClientFactory(RedissonConfigWapper redissonConfigWapper) {
-        return new RedissonClientFactory(redisCacheProperties, redissonConfigWapper);
+    @ConditionalOnBean(value = {RedissonConfigWrapper.class})
+    public RedissonClientFactory redissonClientFactory(RedissonConfigWrapper redissonConfigWrapper) {
+        return new RedissonClientFactory(redisCacheProperties, redissonConfigWrapper);
     }
 
     @Bean
     @ConditionalOnBean(value = {RedissonClientFactory.class})
-    public RedissonClientWapper redissonClientWapper(RedissonClientFactory redissonClientFactory) {
+    public RedissonClientWrapper redissonClientWrapper(RedissonClientFactory redissonClientFactory) {
         return redissonClientFactory.build();
     }
 
     @Bean
-    @ConditionalOnBean(value = {RedissonClientWapper.class})
+    @ConditionalOnBean(value = {RedissonClientWrapper.class})
     @ConditionalOnProperty(prefix = "me.cache", name = "enabled-redisson-rx", havingValue = "true")
-    public RedissonRxClientFactory redissonRxClientFactory(RedissonClientWapper redissonConfigWapper) {
-        return new RedissonRxClientFactory(redisCacheProperties, redissonConfigWapper);
+    public RedissonRxClientFactory redissonRxClientFactory(RedissonClientWrapper redissonConfigWrapper) {
+        return new RedissonRxClientFactory(redisCacheProperties, redissonConfigWrapper);
     }
 
     @Bean
     @ConditionalOnBean(value = {RedissonRxClientFactory.class})
-    public RedissonRxClientWapper redissonRxClientWapper(RedissonRxClientFactory redissonRxClientFactory) {
+    public RedissonRxClientWrapper redissonRxClientWrapper(RedissonRxClientFactory redissonRxClientFactory) {
         return redissonRxClientFactory.build();
     }
 
@@ -205,12 +205,12 @@ public class RedisCacheConfig {
     @Bean
     public RedisCacheApi redisCacheApi(ObjectMapper redisObjectMapper,
                                        @Autowired(required = false) RedisCacheManagerWrapper redisCacheManagerWrapper,
-                                       @Autowired(required = false) RedissonClientWapper redissonClientWapper,
-                                       @Autowired(required = false) RedissonRxClientWapper redissonRxClientWapper,
-                                       RedisTemplateWapper redisTemplateWapper,
+                                       @Autowired(required = false) RedissonClientWrapper redissonClientWrapper,
+                                       @Autowired(required = false) RedissonRxClientWrapper redissonRxClientWrapper,
+                                       RedisTemplateWrapper redisTemplateWrapper,
                                        RedisTemplate<String, Object> redisTemplate) {
         return new RedisCacheApiImpl(redisObjectMapper, redisCacheManagerWrapper,
-                redissonClientWapper, redissonRxClientWapper, redisTemplateWapper, redisTemplate);
+                redissonClientWrapper, redissonRxClientWrapper, redisTemplateWrapper, redisTemplate);
     }
 
 

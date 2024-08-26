@@ -12,7 +12,7 @@ import org.springframework.data.redis.connection.RedisStaticMasterReplicaConfigu
 import org.springframework.util.Assert;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
 import top.mingempty.cache.redis.entity.RedisProperties;
-import top.mingempty.cache.redis.entity.wapper.RedisConfigurationWapper;
+import top.mingempty.cache.redis.entity.wapper.RedisConfigurationWrapper;
 import top.mingempty.cache.redis.excetion.RedisCacheException;
 import top.mingempty.domain.function.IBuilder;
 import top.mingempty.domain.other.GlobalConstant;
@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zzhao
  */
 @AllArgsConstructor
-public class RedisConfigurationFactory implements IBuilder<RedisConfigurationWapper> {
+public class RedisConfigurationFactory implements IBuilder<RedisConfigurationWrapper> {
 
     private final RedisCacheProperties redisCacheProperties;
 
@@ -38,14 +38,14 @@ public class RedisConfigurationFactory implements IBuilder<RedisConfigurationWap
      * @return 被构建的对象
      */
     @Override
-    public RedisConfigurationWapper build() {
+    public RedisConfigurationWrapper build() {
         Map<String, RedisConfiguration> map = new ConcurrentHashMap<>();
         map.put(GlobalConstant.DEFAULT_INSTANCE_NAME, redisConfiguration(redisCacheProperties.getRedis()));
         redisCacheProperties.getMore()
                 .entrySet()
                 .parallelStream()
                 .forEach(entry -> map.put(entry.getKey(), redisConfiguration(entry.getValue())));
-        return new RedisConfigurationWapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
+        return new RedisConfigurationWrapper(GlobalConstant.DEFAULT_INSTANCE_NAME, map);
     }
 
 

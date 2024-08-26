@@ -2,7 +2,7 @@ package top.mingempty.cache.redis.factory;
 
 import lombok.AllArgsConstructor;
 import top.mingempty.cache.redis.entity.RedisCacheProperties;
-import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWapper;
+import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWrapper;
 
 /**
  * RedisConnectionFactory JEDIS 工厂
@@ -20,7 +20,7 @@ public class RedisJedisConnectionFactory implements MeRedisConnectionFactory {
      * @return 被构建的对象
      */
     @Override
-    public RedisConnectionFactoryWapper build() {
+    public RedisConnectionFactoryWrapper build() {
         return null;
     }
 }
