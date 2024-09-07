@@ -26,6 +26,7 @@
         <module>../mingempty-gateway</module>
         <module>../mingempty-jdbc-spring-boot3-starter</module>
         <module>../mingempty-cache</module>
+        <module>../mingempty-zookeeper-spring-boot3-starter</module>
     </modules>
 
     <properties>
@@ -72,6 +73,7 @@
         <c3p0.version>0.10.1</c3p0.version>
         <druid.version>1.2.23</druid.version>
         <redisson-spring-boot-starter.version>3.33.0</redisson-spring-boot-starter.version>
+        <curator.version>5.7.0</curator.version>
 
     </properties>
 
@@ -283,6 +285,14 @@
                 <version>${redisson-spring-boot-starter.version}</version>
             </dependency>
 
+            <!-- curator-recipes -->
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+
+
 
             <!--👆👆👆👆👆👆👆👆👆👆👆👆👆👆第三方项目的依赖start 👆👆👆👆👆👆👆👆👆👆👆👆👆👆-->
 
@@ -362,6 +372,13 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-event-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对zookeeper的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-zookeeper-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
