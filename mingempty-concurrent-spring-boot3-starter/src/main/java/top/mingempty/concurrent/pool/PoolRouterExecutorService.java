@@ -33,8 +33,9 @@ import java.util.stream.Collectors;
  * @date 2023/8/2 11:42
  */
 @Slf4j
-public class PoolRouterExecutorService extends AbstractRouter<ExecutorService> implements DisposableBean,
-        ExecutorService {
+public class PoolRouterExecutorService
+        extends AbstractRouter<ExecutorService>
+        implements ExecutorService, DisposableBean {
 
     /**
      * 非线程池关闭时，等待任务执行时间（默认为一分钟）
@@ -60,6 +61,20 @@ public class PoolRouterExecutorService extends AbstractRouter<ExecutorService> i
         this.awaitTerminationTimeUnit = ObjectUtils.isEmpty(threadPoolProperties.getAwaitTerminationTimeUnit())
                 ? TimeUnit.MINUTES : threadPoolProperties.getAwaitTerminationTimeUnit();
     }
+
+    /**
+     * 检索查找路由方式
+     */
+    @Override
+    protected String determineCurrentLookupKey() {
+        try {
+            return ExecutorServiceThreadLocal.gain();
+        } finally {
+            ExecutorServiceThreadLocal.remove();
+        }
+    }
+
+    /************************ExecutorService方法封装----------start*********************************************/
 
     /**
      * Initiates an orderly shutdown in which previously submitted
@@ -362,6 +377,10 @@ public class PoolRouterExecutorService extends AbstractRouter<ExecutorService> i
         this.determineTargetRouter().execute(command);
     }
 
+    /************************ExecutorService方法封装----------end*********************************************/
+
+    /************************DisposableBean方法封装----------start*********************************************/
+
     @Override
     public void destroy() throws Exception {
         try {
@@ -380,6 +399,7 @@ public class PoolRouterExecutorService extends AbstractRouter<ExecutorService> i
         }
     }
 
+    /************************DisposableBean方法封装----------end*********************************************/
 
     /**
      * 将线程池批量执行结果封装起来
@@ -425,17 +445,5 @@ public class PoolRouterExecutorService extends AbstractRouter<ExecutorService> i
             }
         }
         return concurrentResultMap;
-    }
-
-    /**
-     * 检索查找路由方式
-     */
-    @Override
-    protected String determineCurrentLookupKey() {
-        try {
-            return ExecutorServiceThreadLocal.gain();
-        } finally {
-            ExecutorServiceThreadLocal.remove();
-        }
     }
 }
