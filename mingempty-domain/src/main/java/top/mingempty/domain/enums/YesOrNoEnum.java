@@ -23,7 +23,6 @@ public enum YesOrNoEnum {
 
     @Schema(title = "是", description = "是")
     NO("N", "是"),
-
     ;
 
 

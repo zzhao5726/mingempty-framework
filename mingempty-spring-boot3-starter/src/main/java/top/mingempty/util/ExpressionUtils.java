@@ -12,13 +12,65 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.lang.Nullable;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Spring Expression 工具类
  *
+ *
+ * <p>
+ * 使用示例如下
+ * <p>
+ * 商品实体
+ * <p>
+ * {@snippet :
+ * import lombok.Builder;
+ * import lombok.Data;
+ * import java.util.List;
+ *
  * @author zzhao
+ * @Data
+ * @Builder public class OrderDO {
+ * //订单编号
+ * private Integer id;
+ * //产品列表
+ * private List<PorductDO> products;
+ * // ... 省略 setter/getter 方法
+ * }
+ *}
+ * <p>
+ * 订单实体
+ * <p>
+ * {@snippet :
+ * import lombok.Builder;
+ * import lombok.Data;
+ * @Data
+ * @Builder public class PorductDO {
+ * //  商品编号
+ * private Integer id;
+ * // 价格
+ * private Integer price;
+ * // ... 省略 setter/getter 方法
+ * }
+ *}
+ * <p>
+ * 示例方法
+ * <p>
+ * {@snippet :
+ * public static void main(String[] args) {
+ * List<PorductDO> porductDOList = new ArrayList<>();
+ * PorductDO build = PorductDO.builder().id(213532).build();
+ * porductDOList.add(build);
+ * OrderDO orderDO = OrderDO.builder().id(1111).products(porductDOList).build();
+ * Object expressionValue = ExpressionUtils.gainExpressionValue(new String[]{"orderDO"}, new Object[]{orderDO}, "{#orderDO.id}", "{#orderDO.products}");
+ * System.out.println(expressionValue);
+ *
+ * Object[] objects = ExpressionUtils.gainExpressionValue(orderDO, "#root.id", "#root.products[0].id");
+ * System.out.println(objects);
+ * }
+ *}
  */
 public class ExpressionUtils {
 
@@ -34,15 +86,6 @@ public class ExpressionUtils {
 
     private static final Map<String, SpelExpression> EXPRESSION_CACHE = new ConcurrentHashMap<>(2);
 
-    /**
-     * 获取Expression对象
-     *
-     * @param expressionString Spring EL 表达式字符串 例如 #{param.id}
-     * @return SpelExpression
-     */
-    public static SpelExpression getExpressionValue(@Nullable String expressionString) {
-        return EXPRESSION_CACHE.get(expressionString);
-    }
 
     /**
      * 获取Expression对象
@@ -50,31 +93,11 @@ public class ExpressionUtils {
      * @param expressionString Spring EL 表达式字符串 例如 #{param.id}
      * @return Expression
      */
-    public static Expression getExpression(@Nullable String expressionString) {
+    public static Expression gainExpression(@Nullable String expressionString) {
         if (StrUtil.isBlank(expressionString)) {
             return null;
         }
         return EXPRESSION_CACHE.computeIfAbsent(expressionString, SPEL_EXPRESSION_PARSER::parseRaw);
-    }
-
-    /**
-     * 根据方法获取参数值
-     *
-     * @param method           对象方法
-     * @param args             请求参数
-     * @param expressionString el表达式
-     * @param <T>              泛型 这里的泛型要慎用,大多数情况下要使用Object接收避免出现转换异常
-     * @return
-     */
-    @Nullable
-    public static <T> T getExpressionValue(@Nullable Method method,
-                                           @Nullable Object[] args,
-                                           @Nullable String expressionString) {
-        Object[] expressionValue = getExpressionValue(method, args, new String[]{expressionString});
-        if (ArrayUtil.isEmpty(expressionValue)) {
-            return null;
-        }
-        return (T) expressionValue[0];
     }
 
     /**
@@ -85,13 +108,13 @@ public class ExpressionUtils {
      * @param expressionStrings EL表达式数组
      * @return 结果集
      */
-    public static Object[] getExpressionValue(@Nullable Method method,
-                                              @Nullable Object[] args,
-                                              @Nullable String... expressionStrings) {
+    public static Object[] gainExpressionValue(@Nullable Method method,
+                                               @Nullable Object[] args,
+                                               @Nullable String... expressionStrings) {
         if (method == null) {
             return null;
         }
-        return getExpressionValue(DEFAULT_PARAMETER_NAME_DISCOVERER.getParameterNames(method), args, expressionStrings);
+        return gainExpressionValue(DEFAULT_PARAMETER_NAME_DISCOVERER.getParameterNames(method), args, expressionStrings);
     }
 
     /**
@@ -102,15 +125,14 @@ public class ExpressionUtils {
      * @param expressionStrings EL表达式数组
      * @return 结果集
      */
-    public static Object[] getExpressionValue(@Nullable String[] parameterNames,
-                                              @Nullable Object[] args,
-                                              @Nullable String... expressionStrings) {
+    public static Object[] gainExpressionValue(@Nullable String[] parameterNames,
+                                               @Nullable Object[] args,
+                                               @Nullable String... expressionStrings) {
         if (ArrayUtil.isEmpty(parameterNames)
                 || ArrayUtil.isEmpty(args)
                 || ArrayUtil.isEmpty(expressionStrings)) {
             return null;
         }
-
         EvaluationContext context = new StandardEvaluationContext();
         // 给上下文赋值变量
         for (int i = 0; i < parameterNames.length; i++) {
@@ -118,32 +140,14 @@ public class ExpressionUtils {
         }
         Object[] values = new Object[expressionStrings.length];
         for (int i = 0; i < expressionStrings.length; i++) {
-            Expression expression = getExpression(expressionStrings[i]);
-            if (expression == null) {
-                values[i] = null;
-                continue;
+            Object value = gainExpressionValue(context, expressionStrings[i]);
+            if (value instanceof Collection collation) {
+                values[i] = collation.stream().findFirst().orElse(null);
+            } else {
+                values[i] = value;
             }
-            values[i] = expression.getValue(context);
         }
         return values;
-    }
-
-
-    /**
-     * 计算EL表达式的值
-     *
-     * @param root             根对象
-     * @param expressionString Spring EL表达式
-     * @param <T>              泛型 这里的泛型要慎用,大多数情况下要使用Object接收避免出现转换异常
-     * @return 结果
-     */
-    @Nullable
-    public static <T> T getExpressionValue(@Nullable Object root, @Nullable String expressionString) {
-        Object[] expressionValue = getExpressionValue(root, new String[]{expressionString});
-        if (ArrayUtil.isEmpty(expressionValue)) {
-            return null;
-        }
-        return (T) expressionValue[0];
     }
 
     /**
@@ -153,7 +157,7 @@ public class ExpressionUtils {
      * @param expressionStrings Spring EL表达式
      * @return 结果集
      */
-    public static Object[] getExpressionValue(@Nullable Object root, @Nullable String... expressionStrings) {
+    public static Object[] gainExpressionValue(@Nullable Object root, @Nullable String... expressionStrings) {
         if (root == null) {
             return null;
         }
@@ -163,60 +167,25 @@ public class ExpressionUtils {
         //noinspection ConstantConditions
         Object[] values = new Object[expressionStrings.length];
         for (int i = 0; i < expressionStrings.length; i++) {
-            values[i] = getExpressionValue(root, expressionStrings[i]);
+            EvaluationContext context = new StandardEvaluationContext(root);
+            values[i] = gainExpressionValue(context, expressionStrings[i]);
         }
-        //noinspection unchecked
         return values;
     }
 
-
     /**
-     * 表达式条件求值
-     * 如果为值为null则返回false,
-     * 如果为布尔类型直接返回,
-     * 如果为数字类型则判断是否大于0
+     * 获取值
      *
-     * @param root             根对象
-     * @param expressionString Spring EL表达式
-     * @return 值
+     * @param expressionString
+     * @param context
+     * @return
      */
-    @Nullable
-    public static boolean getConditionValue(@Nullable Object root, @Nullable String expressionString) {
-        Object value = getExpressionValue(root, expressionString);
-        if (value == null) {
-            return false;
+    public static Object gainExpressionValue(EvaluationContext context, String expressionString) {
+        Expression expression = gainExpression(expressionString);
+        if (expression == null) {
+            return null;
         }
-        if (value instanceof Boolean) {
-            return (boolean) value;
-        }
-        if (value instanceof Number) {
-            return ((Number) value).longValue() > 0;
-        }
-        return true;
-    }
-
-    /**
-     * 表达式条件求值
-     *
-     * @param root              根对象
-     * @param expressionStrings Spring EL表达式数组
-     * @return 值
-     */
-    @Nullable
-    public static boolean getConditionValue(@Nullable Object root, @Nullable String... expressionStrings) {
-        if (root == null) {
-            return false;
-        }
-        if (ArrayUtil.isEmpty(expressionStrings)) {
-            return false;
-        }
-        for (String expressionString : expressionStrings) {
-            expressionString = EnvironmentUtil.resolvePlaceholders(expressionString);
-            if (!getConditionValue(root, expressionString)) {
-                return false;
-            }
-        }
-        return true;
+        return expression.getValue(context);
     }
 
 

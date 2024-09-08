@@ -18,6 +18,7 @@ import java.util.List;
  * @author zzhao
  */
 @ConditionalOnClass(value = {CoreJackson2Module.class})
+@ConditionalOnProperty(prefix = "me.cache", name = "enabled-security", havingValue = "true")
 public class RedisObjectMapperConfig {
 
     /**
@@ -27,7 +28,6 @@ public class RedisObjectMapperConfig {
      */
     @Bean(value = "redisObjectMapper")
     @ConditionalOnMissingBean(name = {"redisObjectMapper"})
-    @ConditionalOnProperty(prefix = "me.cache", name = "enabled-security", havingValue = "true", matchIfMissing = true)
     public ObjectMapper redisObjectMapperWithSecurity() {
         return JacksonUtil.build(false, JsonInclude.Include.NON_NULL,
                 List.of(new CoreJackson2Module()),

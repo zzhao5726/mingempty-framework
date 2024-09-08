@@ -384,7 +384,7 @@ public class PoolRouterExecutorService
     @Override
     public void destroy() throws Exception {
         try {
-            log.info("bontal thread pool shutdown now。。。。。。");
+            log.debug("thread pool shutdown now。。。。。。");
             //关闭线程池，已提交的任务继续执行，不再接收新的任务
             this.shutdown();
             //等待所有的任务都结束（实时判断是否全完成），若所有任务都已完成，则返回true，若超时未完成，则返回false

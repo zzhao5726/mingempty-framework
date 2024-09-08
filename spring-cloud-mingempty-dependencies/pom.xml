@@ -27,6 +27,7 @@
         <module>../mingempty-jdbc-spring-boot3-starter</module>
         <module>../mingempty-cache</module>
         <module>../mingempty-zookeeper-spring-boot3-starter</module>
+        <module>../mingempty-distributed-lock-spring-boot3-starter</module>
     </modules>
 
     <properties>
@@ -393,6 +394,13 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-concurrent-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对分布式锁的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-distributed-lock-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
