@@ -82,100 +82,31 @@ public class EnvironmentUtil implements EnvironmentAware {
      * 返回给定的属性键是否可用于解析，
      * <p>
      * 例如，如果给定键的值不是{@code null}。
-     *
-     * @param key
-     * @return
      */
     public static Boolean containsProperty(String key) {
         return gainEnvironment().containsProperty(key);
     }
 
+
     /**
-     * 返回与给定键相关联的属性值(绝不是{@code null})。
-     *
-     * @param key
-     * @return
+     * 返回与给定键相关联的属性值。
+     * 无法解析时，则抛出一个IllegalStateException。
      */
-    public static String getRequiredProperty(String key) {
+    public static String getRequiredProperty(String key) throws IllegalStateException {
         return gainEnvironment().getRequiredProperty(key);
     }
 
     /**
-     * 返回与给定键相关联的属性值，转换为给定的targetType(绝不是{@code null})。
-     *
-     * @param key
-     * @param targetType
-     * @param <T>
-     * @return
+     * 返回与给定键相关联的属性值，转换为给定的targetType。
+     * 无法解析时，则抛出一个IllegalStateException。
      */
-    public static <T> T getRequiredProperty(String key, Class<T> targetType) {
+    public static <T> T getRequiredProperty(String key, Class<T> targetType) throws IllegalStateException {
         return gainEnvironment().getRequiredProperty(key, targetType);
-    }
-
-    /**
-     * 解决${… }占位符，用{@link #getProperty}解析的相应属性值替换它们。 没有默认值的不可解析占位符将被忽略，并被原样传递。
-     *
-     * @param text
-     * @return
-     */
-    public static String resolvePlaceholders(String text) {
-        return gainEnvironment().resolvePlaceholders(text);
-    }
-
-    /**
-     * 解决${… }占位符，用{@link #getProperty}解析的相应属性值替换它们。 没有默认值的不可解析占位符将导致抛出一个IllegalArgumentException。
-     *
-     * @param text
-     * @return
-     */
-    public static String resolveRequiredPlaceholders(String text) {
-        return gainEnvironment().resolveRequiredPlaceholders(text);
-    }
-
-
-    /**
-     * 判断配置文件类型
-     *
-     * @param profiles
-     * @return
-     */
-    public static Boolean acceptsProfiles(Profiles profiles) {
-        return gainEnvironment().acceptsProfiles(profiles);
-    }
-
-    /**
-     * 判断配置文件类型
-     *
-     * @param profiles
-     * @return
-     */
-    public static Boolean acceptsProfiles(String... profiles) {
-        return gainEnvironment().acceptsProfiles(Profiles.of(profiles));
-    }
-
-    /**
-     * 获取激活的配置文件
-     *
-     * @return
-     */
-    public static Set<String> getActiveProfiles() {
-        return Arrays.stream(gainEnvironment().getActiveProfiles()).collect(Collectors.toSet());
-    }
-
-    /**
-     * 获取激活的配置文件
-     *
-     * @return
-     */
-    public static Set<String> getDefaultProfiles() {
-        return Arrays.stream(gainEnvironment().getDefaultProfiles()).collect(Collectors.toSet());
     }
 
 
     /**
      * 返回与给定键关联的属性值，如果键不能解析，则返回{@code null}。
-     *
-     * @return
      */
     public static String getProperty(String key) {
         return gainEnvironment().getProperty(key);
@@ -183,8 +114,6 @@ public class EnvironmentUtil implements EnvironmentAware {
 
     /**
      * 返回与给定键关联的属性值，如果键不能解析，则返回{@code null}。
-     *
-     * @return
      */
     public static <T> T getProperty(String key, Class<T> targetType) {
         return gainEnvironment().getProperty(key, targetType);
@@ -192,8 +121,6 @@ public class EnvironmentUtil implements EnvironmentAware {
 
     /**
      * 返回与给定键关联的属性值，如果键不能解析，则返回{@code defaultValue}。
-     *
-     * @return
      */
     public static String getProperty(String key, String defaultValue) {
         return gainEnvironment().getProperty(key, defaultValue);
@@ -201,30 +128,89 @@ public class EnvironmentUtil implements EnvironmentAware {
 
     /**
      * 返回与给定键关联的属性值，如果键不能解析，则返回{@code defaultValue}。
-     *
-     * @return
      */
     public static <T> T getProperty(String key, Class<T> targetType, T defaultValue) {
         return gainEnvironment().getProperty(key, targetType, defaultValue);
     }
 
+    /**
+     * 解决${… }占位符，用{@link #getProperty}解析的相应属性值替换它们。
+     * 没有默认值或者不可解析的，则原样返回。
+     */
+    public static String resolvePlaceholders(String text) {
+        return gainEnvironment().resolvePlaceholders(text);
+    }
 
     /**
-     * 系统设置别名
+     * 解决${… }占位符，用{@link #getProperty}解析的相应属性值替换它们。
+     * 没有默认值或者不可解析的，则抛出一个IllegalArgumentException。
+     */
+    public static String resolveRequiredPlaceholders(String text) throws IllegalArgumentException {
+        return gainEnvironment().resolveRequiredPlaceholders(text);
+    }
+
+
+    /**
+     * 判断配置文件类型
+     */
+    public static Boolean acceptsProfiles(Profiles profiles) {
+        return gainEnvironment().acceptsProfiles(profiles);
+    }
+
+    /**
+     * 判断配置文件类型
+     */
+    public static Boolean acceptsProfiles(String... profiles) {
+        return gainEnvironment().acceptsProfiles(Profiles.of(profiles));
+    }
+
+    /**
+     * 获取激活的配置文件
+     */
+    public static Set<String> getActiveProfiles() {
+        return Arrays.stream(gainEnvironment().getActiveProfiles()).collect(Collectors.toSet());
+    }
+
+    /**
+     * 返回在未显式设置活动配置文件时默认处于活动状态的配置文件集
+     */
+    public static Set<String> getDefaultProfiles() {
+        return Arrays.stream(gainEnvironment().getDefaultProfiles()).collect(Collectors.toSet());
+    }
+
+
+    /**
+     * 系统设置名称
+     */
+    public static String getApplicationName() {
+        return getProperty("spring.application.name", getProperty("me.name", ""));
+    }
+
+
+    /**
+     * 系统设置分组
+     */
+    public static String getApplicationGroup() {
+        return getProperty("spring.application.group", getProperty("me.group", ""));
+    }
+
+
+    /**
+     * 系统设置版本
      *
      * @return
      */
-    public static String getApplicationName() {
-        return getProperty("spring.application.name", "");
+    public static String getApplicationVersion() {
+        return getProperty("spring.application.version", getProperty("me.version", ""));
     }
 
     /**
      * 系统前缀
-     *
-     * @return
      */
     public static String getContextPath() {
-        return getProperty("server.servlet.context-path", "");
+        return getProperty("spring.webflux.base-path",
+                getProperty("server.servlet.context-path",
+                        getProperty("me.base-path", "")));
     }
 
     public static Environment gainEnvironment() {
