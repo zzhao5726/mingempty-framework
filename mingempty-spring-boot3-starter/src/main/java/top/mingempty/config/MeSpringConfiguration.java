@@ -28,7 +28,6 @@ public class MeSpringConfiguration implements Ordered {
 
     @Bean
     @Primary
-    @ConditionalOnMissingBean(name = {"objectMapper", "jacksonObjectMapper"})
     public static ObjectMapper objectMapper() {
         return JsonUtil.DEFAULT_OBJECT_MAPPER;
     }
