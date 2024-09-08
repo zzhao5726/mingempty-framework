@@ -23,14 +23,72 @@ public interface RedisCacheApi extends RedisCacheMap, RedisCacheSet, RedisCacheZ
      *
      * @return CacheManager
      */
-    CacheManager cacheManager();
+    default CacheManager cacheManager() {
+        return cacheManagerForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME);
+    }
+
+    /**
+     * 获取CacheManagerWrapper
+     *
+     * @return CacheManager
+     */
+    CacheManager cacheManagerForInstance(String instanceId);
 
     /**
      * 获取RedissonClientWrapper
      *
      * @return RedissonClient
      */
-    RedissonClient redissonClient();
+    default RedissonClient redissonClient() {
+        return redissonClientForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME);
+    }
+
+    /**
+     * 获取RedissonClientWrapper
+     *
+     * @return RedissonClient
+     */
+    RedissonClient redissonClientForInstance(String instanceId);
+
+    /**
+     * 获取RedissonRxClientWrapper
+     *
+     * @return RedissonRxClient
+     */
+    default RedissonRxClient redissonRxClient() {
+        return redissonRxClientForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME);
+    }
+
+    /**
+     * 获取RedissonRxClientWrapper
+     *
+     * @return RedissonRxClient
+     */
+    RedissonRxClient redissonRxClientForInstance(String instanceId);
+
+    /**
+     * 获取RedisTemplateWrapper
+     *
+     * @return RedisOperations
+     */
+    default RedisOperations<String, Object> redisOperations() {
+        return redisOperationsForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME);
+    }
+
+    /**
+     * 获取RedisTemplateWrapper
+     *
+     * @return RedisOperations
+     */
+    RedisOperations<String, Object> redisOperationsForInstance(String instanceId);
+
+    /**
+     * 获取RedisTemplate
+     *
+     * @return RedisTemplate
+     */
+    RedisTemplate<String, Object> redisTemplate();
+
 
     /**
      * 在指定实例中根据前缀删除所有相关的缓存数据，使用扫描操作。
@@ -43,28 +101,6 @@ public interface RedisCacheApi extends RedisCacheMap, RedisCacheSet, RedisCacheZ
     default Boolean delByPrefixUseScanForInstance(String instanceId, String prefix) {
         return delByNamespaceForInstance(instanceId, prefix);
     }
-
-    /**
-     * 获取RedissonRxClientWrapper
-     *
-     * @return RedissonRxClient
-     */
-    RedissonRxClient redissonRxClient();
-
-    /**
-     * 获取RedisTemplateWrapper
-     *
-     * @return RedisOperations
-     */
-    RedisOperations<String, Object> redisOperations();
-
-    /**
-     * 获取RedisTemplate
-     *
-     * @return RedisTemplate
-     */
-    RedisTemplate<String, Object> redisTemplate();
-
     /**
      * 扫描指定格式的键
      *

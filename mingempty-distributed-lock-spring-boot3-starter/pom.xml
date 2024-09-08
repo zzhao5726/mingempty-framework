@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>top.mingempty</groupId>
+        <artifactId>spring-cloud-mingempty-dependencies</artifactId>
+        <version>${dependencies.version}</version>
+        <relativePath>../spring-cloud-mingempty-dependencies/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>mingempty-distributed-lock-spring-boot3-starter</artifactId>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <project.encoding>UTF-8</project.encoding>
+        <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${project.encoding}</project.reporting.outputEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-redis-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-zookeeper-spring-boot3-starter</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+</project>
