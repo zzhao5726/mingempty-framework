@@ -3,3 +3,8 @@ org.springframework.boot.env.EnvironmentPostProcessor=\
 top.mingempty.postprocessor.EnAndDeCryptionEnvironmentPostProcessor,\
 top.mingempty.postprocessor.ApplicationEnvironmentPostProcessor,\
 top.mingempty.postprocessor.ErrorFormatEnvironmentPostProcessor
+
+
+
+org.springframework.boot.SpringApplicationRunListener=\
+top.mingempty.boot.MeCloudListener
