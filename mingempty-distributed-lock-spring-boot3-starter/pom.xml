@@ -23,11 +23,17 @@
     </properties>
 
     <dependencies>
+
+        <!--第三方依赖👆  项目自身依赖👇-->
+
+        <!--redis封装starter-->
         <dependency>
             <groupId>top.mingempty</groupId>
             <artifactId>mingempty-redis-spring-boot3-starter</artifactId>
+            <optional>true</optional>
         </dependency>
 
+        <!--对zookeeper的封装-->
         <dependency>
             <groupId>top.mingempty</groupId>
             <artifactId>mingempty-zookeeper-spring-boot3-starter</artifactId>

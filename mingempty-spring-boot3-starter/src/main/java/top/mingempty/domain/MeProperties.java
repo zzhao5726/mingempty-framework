@@ -15,10 +15,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class MeProperties {
 
     /**
-     * 是否开启基础工具配置类
+     * 是否写进程ID到当前目录
      */
-    @Schema(title = "是否开启基础工具配置类")
-    private boolean enabled = true;
+    @Schema(title = "是否写进程ID到当前目录")
+    private boolean writePid = false;
 
     /**
      * 系统名称</br>
