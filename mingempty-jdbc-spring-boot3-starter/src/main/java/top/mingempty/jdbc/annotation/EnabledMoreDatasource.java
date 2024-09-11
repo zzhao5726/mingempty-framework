@@ -14,7 +14,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 对缓存的装配
+ * 对数据源的装配
  *
  * @author zzhao
  */

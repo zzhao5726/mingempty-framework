@@ -1,0 +1,8 @@
+me:
+  sequence:
+    snowflake-id-worker-instances:
+      default: Redis
+      demo: Zookeeper
+
+    cache-sequences:
+      - seq-name: demo

@@ -28,6 +28,7 @@ import org.apache.curator.framework.schema.SchemaSet;
 import org.apache.curator.framework.state.ConnectionStateErrorPolicy;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.utils.EnsurePath;
+import org.apache.curator.utils.ZookeeperCompatibility;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.server.quorum.flexible.QuorumVerifier;
 import org.springframework.beans.factory.DisposableBean;
@@ -218,6 +219,7 @@ public class CuratorFrameworkWrapper
      * @deprecated use {@link #transaction()} instead
      */
     @Override
+    @Deprecated
     public CuratorTransaction inTransaction() {
         return determineTargetRouter().inTransaction();
     }
@@ -342,6 +344,7 @@ public class CuratorFrameworkWrapper
      * @deprecated Since 2.9.0 - use {@link #usingNamespace} passing <code>null</code>
      */
     @Override
+    @Deprecated
     public CuratorFramework nonNamespaceView() {
         return determineTargetRouter().nonNamespaceView();
     }
@@ -376,6 +379,16 @@ public class CuratorFrameworkWrapper
     @Override
     public CuratorZookeeperClient getZookeeperClient() {
         return determineTargetRouter().getZookeeperClient();
+    }
+
+    /**
+     * Return zookeeper server compatibility
+     *
+     * @return compatibility
+     */
+    @Override
+    public ZookeeperCompatibility getZookeeperCompatibility() {
+        return determineTargetRouter().getZookeeperCompatibility();
     }
 
     /**
@@ -473,6 +486,19 @@ public class CuratorFrameworkWrapper
     @Override
     public SchemaSet getSchemaSet() {
         return determineTargetRouter().getSchemaSet();
+    }
+
+    /**
+     * Calls {@link #notifyAll()} on the given object after first synchronizing on it. This is
+     * done from the {@link #runSafe(Runnable)} thread.
+     *
+     * @param monitorHolder object to sync on and notify
+     * @return a CompletableFuture that can be used to monitor when the call is complete
+     * @since 4.1.0
+     */
+    @Override
+    public CompletableFuture<Void> postSafeNotify(Object monitorHolder) {
+        return determineTargetRouter().postSafeNotify(monitorHolder);
     }
 
     /**

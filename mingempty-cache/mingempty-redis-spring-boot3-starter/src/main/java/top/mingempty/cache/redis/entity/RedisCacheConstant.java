@@ -7,6 +7,11 @@ package top.mingempty.cache.redis.entity;
  */
 public interface RedisCacheConstant {
 
+    /**
+     * Redis分隔符
+     */
+    String REDIS_SEPARATOR = ":";
+
     String REDIS_PROTOCOL_PREFIX = "redis://";
 
     String REDISS_PROTOCOL_PREFIX = "rediss://";

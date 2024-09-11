@@ -13,6 +13,7 @@ import org.apache.curator.framework.api.BackgroundPathableQuietlyable;
 import org.apache.curator.framework.api.BackgroundVersionable;
 import org.apache.curator.framework.api.ChildrenDeletable;
 import org.apache.curator.framework.api.CreateBuilder;
+import org.apache.curator.framework.api.CreateBuilderMain;
 import org.apache.curator.framework.api.DeleteBuilder;
 import org.apache.curator.framework.api.DeleteBuilderMain;
 import org.apache.curator.framework.api.ExistsBuilder;
@@ -155,30 +156,29 @@ public class ZookeeperApiImpl implements ZookeeperApi {
                                                                     CreateMode createMode, long ttl,
                                                                     ZookeeperBackground background) {
         CreateBuilder createBuilder = gainCreateBuilderForInstance(instanceName);
-        ACLBackgroundPathAndBytesable<String> aclBackgroundPathAndBytesable = createBuilder;
+        CreateBuilderMain createBuilderMain = createBuilder;
+        if (CreateMode.PERSISTENT_WITH_TTL.equals(createMode)
+                || CreateMode.PERSISTENT_SEQUENTIAL_WITH_TTL.equals(createMode)) {
+            createBuilderMain = createBuilder.withTtl(ttl);
+        }
+        ACLBackgroundPathAndBytesable<String> aclBackgroundPathAndBytesable = createBuilderMain;
         if (creatingParents != null) {
             ProtectACLCreateModeStatPathAndBytesable<String> pathAndBytesable
                     = YesOrNoEnum.YES.equals(creatingParents)
-                    ? createBuilder.creatingParentsIfNeeded() : createBuilder.creatingParentContainersIfNeeded();
+                    ? createBuilderMain.creatingParentsIfNeeded()
+                    : createBuilderMain.creatingParentContainersIfNeeded();
             if (CreateMode.EPHEMERAL_SEQUENTIAL.equals(createMode)) {
                 aclBackgroundPathAndBytesable = pathAndBytesable.withProtection().withMode(createMode);
-            } else if (CreateMode.PERSISTENT_WITH_TTL.equals(createMode)
-                    || CreateMode.PERSISTENT_SEQUENTIAL_WITH_TTL.equals(createMode)) {
-                aclBackgroundPathAndBytesable = createBuilder.withTtl(ttl).withMode(createMode);
             } else if (createMode != null) {
                 aclBackgroundPathAndBytesable = pathAndBytesable.withMode(createMode);
             }
         } else {
             if (CreateMode.EPHEMERAL_SEQUENTIAL.equals(createMode)) {
-                aclBackgroundPathAndBytesable = createBuilder.withProtection().withMode(createMode);
-            } else if (CreateMode.PERSISTENT_WITH_TTL.equals(createMode)
-                    || CreateMode.PERSISTENT_SEQUENTIAL_WITH_TTL.equals(createMode)) {
-                aclBackgroundPathAndBytesable = createBuilder.withTtl(ttl).withMode(createMode);
+                aclBackgroundPathAndBytesable = createBuilderMain.withProtection().withMode(createMode);
             } else if (createMode != null) {
-                aclBackgroundPathAndBytesable = createBuilder.withMode(createMode);
+                aclBackgroundPathAndBytesable = createBuilderMain.withMode(createMode);
             }
         }
-
         BackgroundPathAndBytesable<String> backgroundPathAndBytesable
                 = CollUtil.isEmpty(aclList)
                 ? aclBackgroundPathAndBytesable : aclBackgroundPathAndBytesable.withACL(aclList);

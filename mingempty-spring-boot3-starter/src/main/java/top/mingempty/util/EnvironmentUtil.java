@@ -92,7 +92,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * 返回与给定键相关联的属性值。
      * 无法解析时，则抛出一个IllegalStateException。
      */
-    public static String getRequiredProperty(String key) throws IllegalStateException {
+    public static String gainRequiredProperty(String key) throws IllegalStateException {
         return gainEnvironment().getRequiredProperty(key);
     }
 
@@ -100,7 +100,7 @@ public class EnvironmentUtil implements EnvironmentAware {
      * 返回与给定键相关联的属性值，转换为给定的targetType。
      * 无法解析时，则抛出一个IllegalStateException。
      */
-    public static <T> T getRequiredProperty(String key, Class<T> targetType) throws IllegalStateException {
+    public static <T> T gainRequiredProperty(String key, Class<T> targetType) throws IllegalStateException {
         return gainEnvironment().getRequiredProperty(key, targetType);
     }
 
@@ -108,28 +108,28 @@ public class EnvironmentUtil implements EnvironmentAware {
     /**
      * 返回与给定键关联的属性值，如果键不能解析，则返回{@code null}。
      */
-    public static String getProperty(String key) {
+    public static String gainProperty(String key) {
         return gainEnvironment().getProperty(key);
     }
 
     /**
      * 返回与给定键关联的属性值，如果键不能解析，则返回{@code null}。
      */
-    public static <T> T getProperty(String key, Class<T> targetType) {
+    public static <T> T gainProperty(String key, Class<T> targetType) {
         return gainEnvironment().getProperty(key, targetType);
     }
 
     /**
      * 返回与给定键关联的属性值，如果键不能解析，则返回{@code defaultValue}。
      */
-    public static String getProperty(String key, String defaultValue) {
+    public static String gainProperty(String key, String defaultValue) {
         return gainEnvironment().getProperty(key, defaultValue);
     }
 
     /**
      * 返回与给定键关联的属性值，如果键不能解析，则返回{@code defaultValue}。
      */
-    public static <T> T getProperty(String key, Class<T> targetType, T defaultValue) {
+    public static <T> T gainProperty(String key, Class<T> targetType, T defaultValue) {
         return gainEnvironment().getProperty(key, targetType, defaultValue);
     }
 
@@ -167,14 +167,14 @@ public class EnvironmentUtil implements EnvironmentAware {
     /**
      * 获取激活的配置文件
      */
-    public static Set<String> getActiveProfiles() {
+    public static Set<String> gainActiveProfiles() {
         return Arrays.stream(gainEnvironment().getActiveProfiles()).collect(Collectors.toSet());
     }
 
     /**
      * 返回在未显式设置活动配置文件时默认处于活动状态的配置文件集
      */
-    public static Set<String> getDefaultProfiles() {
+    public static Set<String> gainDefaultProfiles() {
         return Arrays.stream(gainEnvironment().getDefaultProfiles()).collect(Collectors.toSet());
     }
 
@@ -182,16 +182,16 @@ public class EnvironmentUtil implements EnvironmentAware {
     /**
      * 系统设置名称
      */
-    public static String getApplicationName() {
-        return getProperty("spring.application.name", getProperty("me.name", ""));
+    public static String gainApplicationName() {
+        return gainProperty("spring.application.name", gainProperty("me.name", ""));
     }
 
 
     /**
      * 系统设置分组
      */
-    public static String getApplicationGroup() {
-        return getProperty("spring.application.group", getProperty("me.group", ""));
+    public static String gainApplicationGroup() {
+        return gainProperty("spring.application.group", gainProperty("me.group", ""));
     }
 
 
@@ -200,17 +200,24 @@ public class EnvironmentUtil implements EnvironmentAware {
      *
      * @return
      */
-    public static String getApplicationVersion() {
-        return getProperty("spring.application.version", getProperty("me.version", ""));
+    public static String gainApplicationVersion() {
+        return gainProperty("spring.application.version", gainProperty("me.version", ""));
     }
 
     /**
      * 系统前缀
      */
-    public static String getContextPath() {
-        return getProperty("spring.webflux.base-path",
-                getProperty("server.servlet.context-path",
-                        getProperty("me.base-path", "")));
+    public static String gainContextPath() {
+        return gainProperty("spring.webflux.base-path",
+                gainProperty("server.servlet.context-path",
+                        gainProperty("me.base-path", "")));
+    }
+
+    /**
+     * 系统端口
+     */
+    public static String gainServerPort() {
+        return gainProperty("server.port", "8080");
     }
 
     public static Environment gainEnvironment() {

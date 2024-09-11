@@ -28,6 +28,8 @@
         <module>../mingempty-cache</module>
         <module>../mingempty-zookeeper-spring-boot3-starter</module>
         <module>../mingempty-distributed-lock-spring-boot3-starter</module>
+        <module>../mingempty-sequence-spring-boot3-starter</module>
+
     </modules>
 
     <properties>
@@ -74,6 +76,7 @@
         <c3p0.version>0.10.1</c3p0.version>
         <druid.version>1.2.23</druid.version>
         <redisson-spring-boot-starter.version>3.33.0</redisson-spring-boot-starter.version>
+        <zookeeper.version>3.9.2</zookeeper.version>
         <curator.version>5.7.0</curator.version>
 
     </properties>
@@ -144,7 +147,6 @@
                 <artifactId>mybatis</artifactId>
                 <version>${mybatis.version}</version>
             </dependency>
-
 
             <!--mybatis-generator-->
             <dependency>
@@ -286,6 +288,19 @@
                 <version>${redisson-spring-boot-starter.version}</version>
             </dependency>
 
+            <!-- zookeeper -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>slf4j-api</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
             <!-- curator-recipes -->
             <dependency>
                 <groupId>org.apache.curator</groupId>
@@ -293,6 +308,25 @@
                 <version>${curator.version}</version>
             </dependency>
 
+            <!-- curator-framework -->
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-framework</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+
+            <!-- curator-client -->
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-client</artifactId>
+                <version>${curator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>slf4j-api</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 
 
             <!--👆👆👆👆👆👆👆👆👆👆👆👆👆👆第三方项目的依赖start 👆👆👆👆👆👆👆👆👆👆👆👆👆👆-->
@@ -401,6 +435,13 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-distributed-lock-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对序号生成的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-sequence-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 

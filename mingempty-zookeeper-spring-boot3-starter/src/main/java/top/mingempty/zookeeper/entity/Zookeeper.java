@@ -85,7 +85,7 @@ public class Zookeeper implements BuilderWrapperParent {
     /**
      * 表示是否可以只读。
      * <p>
-     * 如果为 true，则允许 ZooKeeper 客户端在网络分区的情况下进入只读模式
+     * 如果为 true，则允许 zookeeper 客户端在网络分区的情况下进入只读模式
      */
     private boolean canBeReadOnly = false;
 

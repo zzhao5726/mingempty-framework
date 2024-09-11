@@ -49,7 +49,7 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
         this.unit = unit == null ? TimeUnit.MINUTES : unit;
         this.VIRTUAL_EXECUTOR_SERVICE = Executors.newThreadPerTaskExecutor(Thread
                 .ofVirtual()
-                .name(virtualName == null ? "me-Virtual-Thread" : virtualName, 0)
+                .name(virtualName == null ? "me-Virtual-Thread-" : virtualName, 0)
                 .factory());
     }
 

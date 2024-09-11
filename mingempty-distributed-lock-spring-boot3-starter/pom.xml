@@ -25,6 +25,10 @@
     <dependencies>
 
         <!--第三方依赖👆  项目自身依赖👇-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-spring-boot3-starter</artifactId>
+        </dependency>
 
         <!--redis封装starter-->
         <dependency>

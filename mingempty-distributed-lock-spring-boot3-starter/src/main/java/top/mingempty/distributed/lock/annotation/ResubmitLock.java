@@ -87,9 +87,9 @@ public @interface ResubmitLock {
      * <p>
      * 毫秒级别
      * <p>
-     * {@code  realize}值为{@link RealizeEnum#ZooKeeper}时,该参数不生效
+     * {@code  realize}值为{@link RealizeEnum#Zookeeper}时,该参数不生效
      */
-    @Schema(title = "防重复提交校验的时间间隔", description = "毫秒级别。{@code  realize}值为{@link RealizeEnum#ZooKeeper}时,该参数不生效")
+    @Schema(title = "防重复提交校验的时间间隔", description = "毫秒级别。{@code  realize}值为{@link RealizeEnum#zookeeper}时,该参数不生效")
     int leaseTime() default -1;
 
 

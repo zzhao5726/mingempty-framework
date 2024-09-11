@@ -11,11 +11,11 @@ import top.mingempty.commons.util.JsonUtil;
 import top.mingempty.commons.util.ReflectionUtil;
 import top.mingempty.distributed.lock.annotation.ResubmitLock;
 import top.mingempty.distributed.lock.api.DistributedLock;
+import top.mingempty.distributed.lock.enums.RealizeEnum;
 import top.mingempty.distributed.lock.enums.TierEnum;
 import top.mingempty.distributed.lock.exception.ResubmitLockException;
 import top.mingempty.distributed.lock.exception.ResubmitUnLockException;
 import top.mingempty.distributed.lock.factory.LockFactory;
-import top.mingempty.distributed.lock.other.DistributedLockConstant;
 import top.mingempty.domain.base.IRsp;
 import top.mingempty.domain.enums.YesOrNoEnum;
 import top.mingempty.util.AspectUtil;
@@ -102,16 +102,14 @@ public class ResubmitLockAspect {
 
     static DistributedLock gainDistributedLock(ProceedingJoinPoint joinPoint,
                                                Class aClass, Method method, ResubmitLock resubmitLock, Object[] args) {
+        String key = gainKey(resubmitLock.realize(), aClass, method, resubmitLock, args);
         return switch (resubmitLock.realize()) {
-            case Redis -> redisDistributedLock(aClass, method, resubmitLock, args);
-            case ZooKeeper -> zookeeperDistributedLock(aClass, method, resubmitLock, args);
+            case Redis -> redisDistributedLock(key, resubmitLock);
+            case Zookeeper -> zookeeperDistributedLock(key, resubmitLock);
         };
     }
 
-    private static DistributedLock zookeeperDistributedLock(Class aClass, Method method,
-                                                            ResubmitLock resubmitLock, Object[] args) {
-        String key = gainKey(DistributedLockConstant.ZOOKEEPER_RESUBMIT_LOCK_KEY_PREFIX,
-                DistributedLockConstant.ZOOKEEPER_SEPARATOR, aClass, method, resubmitLock, args);
+    private static DistributedLock zookeeperDistributedLock(String key, ResubmitLock resubmitLock) {
         return switch (resubmitLock.readWrite()) {
             case Read -> LockFactory.zookeeperLock(resubmitLock.instanceName()).readWriteLock(key).readLock().lock();
             case Write -> LockFactory.zookeeperLock(resubmitLock.instanceName()).readWriteLock(key).writeLock().lock();
@@ -119,10 +117,7 @@ public class ResubmitLockAspect {
         };
     }
 
-    private static DistributedLock redisDistributedLock(Class aClass, Method method,
-                                                        ResubmitLock resubmitLock, Object[] args) {
-        String key = gainKey(DistributedLockConstant.REDIS_RESUBMIT_LOCK_KEY_PREFIX,
-                DistributedLockConstant.REDIS_SEPARATOR, aClass, method, resubmitLock, args);
+    private static DistributedLock redisDistributedLock(String key, ResubmitLock resubmitLock) {
         return switch (resubmitLock.readWrite()) {
             case Read -> LockFactory.redisLock(resubmitLock.instanceName()).readWriteLock(key).readLock().lock();
             case Write -> LockFactory.redisLock(resubmitLock.instanceName()).readWriteLock(key).writeLock().lock();
@@ -131,25 +126,25 @@ public class ResubmitLockAspect {
     }
 
 
-    private static String gainKey(String keyPrefix, String separator,
+    private static String gainKey(RealizeEnum realize,
                                   Class aClass, Method method, ResubmitLock resubmitLock, Object[] args) {
-        String key = keyPrefix;
+        String key = realize.getKeyPrefix();
         if (TierEnum.Interface.equals(resubmitLock.tier())) {
             //说明是接口层级，使用当前类+方法名作为防重锁前缀
             String className = aClass.getName();
             String methodName = method.getName();
-            key = key.concat(className.replaceAll("\\.", separator)).concat(separator).concat(methodName);
+            key = key.concat(className.replaceAll("\\.", realize.getSeparator())).concat(realize.getSeparator()).concat(methodName);
         } else {
             String keyPrefixByBuss = resubmitLock.keyPrefix();
-            if (keyPrefixByBuss.startsWith(separator)) {
+            if (keyPrefixByBuss.startsWith(realize.getSeparator())) {
                 keyPrefixByBuss = keyPrefixByBuss.substring(1);
             }
-            if (keyPrefixByBuss.endsWith(separator)) {
+            if (keyPrefixByBuss.endsWith(realize.getSeparator())) {
                 keyPrefixByBuss = keyPrefixByBuss.substring(0, keyPrefixByBuss.length() - 1);
             }
             key = key.concat(keyPrefixByBuss);
         }
-        key = key.concat(separator);
+        key = key.concat(realize.getSeparator());
 
         if (resubmitLock.keys() != null
                 && resubmitLock.keys().length > 0) {
@@ -157,7 +152,7 @@ public class ResubmitLockAspect {
             if (log.isDebugEnabled()) {
                 log.debug("分布式锁key前缀的业务取值为:{}", JsonUtil.toStr(expressionValue));
             }
-            key = key.concat(Arrays.stream(expressionValue).map(JsonUtil::toStr).collect(Collectors.joining(separator)));
+            key = key.concat(Arrays.stream(expressionValue).map(JsonUtil::toStr).collect(Collectors.joining(realize.getSeparator())));
         }
         if (log.isDebugEnabled()) {
             log.debug("分布式锁key为:[{}]", key);
