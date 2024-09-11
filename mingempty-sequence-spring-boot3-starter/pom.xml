@@ -10,7 +10,7 @@
         <relativePath>../spring-cloud-mingempty-dependencies/pom.xml</relativePath>
     </parent>
 
-    <artifactId>mingempty-zookeeper-spring-boot3-starter</artifactId>
+    <artifactId>mingempty-sequence-spring-boot3-starter</artifactId>
 
     <properties>
         <java.version>21</java.version>
@@ -24,28 +24,11 @@
 
     <dependencies>
 
-        <!-- zookeeper -->
+        <!-- 自动提示配置 -->
         <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-        </dependency>
-
-        <!-- curator-recipes -->
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
-        </dependency>
-
-        <!-- curator-framework -->
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-framework</artifactId>
-        </dependency>
-
-        <!-- curator-client -->
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-client</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!--第三方依赖👆  项目自身依赖👇-->
@@ -56,6 +39,25 @@
             <artifactId>mingempty-spring-boot3-starter</artifactId>
         </dependency>
 
-    </dependencies>
+        <!--redis封装starter-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-redis-spring-boot3-starter</artifactId>
+            <optional>true</optional>
+        </dependency>
 
+        <!--对zookeeper的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-zookeeper-spring-boot3-starter</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--对jdbc的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-jdbc-spring-boot3-starter</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 </project>

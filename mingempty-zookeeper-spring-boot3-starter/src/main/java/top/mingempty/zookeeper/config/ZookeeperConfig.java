@@ -38,7 +38,7 @@ public class ZookeeperConfig {
     }
 
     @Bean
-    public CuratorFrameworkWrapper CuratorFrameworkWrapper(MeCuratorFrameworkFactory meCuratorFrameworkFactory) {
+    public CuratorFrameworkWrapper curatorFrameworkWrapper(MeCuratorFrameworkFactory meCuratorFrameworkFactory) {
         return meCuratorFrameworkFactory.build();
     }
 
