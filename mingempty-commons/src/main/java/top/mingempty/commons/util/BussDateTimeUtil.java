@@ -4,6 +4,7 @@ import cn.hutool.core.comparator.CompareUtil;
 import cn.hutool.core.date.DatePattern;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -926,6 +927,275 @@ public class BussDateTimeUtil {
                     .with(TemporalAdjusters.lastDayOfMonth());
         } catch (Exception e) {
             log.warn("获取指定时间LocalDateTime[{}]所在月份的最后一天异常，异常原因为：", localDateTime, e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取当前年的第一天
+     */
+    public static String getDayStrWithYearFirst() {
+        return DateTimeUtil.formatLocalDate(getDayWithYearFirst(LocalDate.now()), DatePattern.PURE_DATE_PATTERN);
+    }
+
+    /**
+     * 获取当前年的第一天
+     */
+    public static LocalDate getDayWithYearFirst() {
+        return getDayWithYearFirst(LocalDate.now());
+    }
+
+    /**
+     * 获取指定时间所在年的第一天
+     *
+     * @param date 指定时间
+     */
+    public static LocalDate getDayWithYearFirst(Date date) {
+        if (date == null) {
+            return null;
+        }
+        try {
+            return getDayWithYearFirst(Objects.requireNonNull(DateTimeUtil.dateToLocalDate(date)));
+        } catch (Exception e) {
+            log.warn("获取指定时间Date[{}]所在年的第一天异常，异常原因为：", date, e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取指定时间所在年的第一天
+     *
+     * @param localDate 指定时间
+     */
+    public static LocalDate getDayWithYearFirst(LocalDate localDate) {
+        if (localDate == null) {
+            return null;
+        }
+        try {
+            return localDate.with(TemporalAdjusters.firstDayOfYear());
+        } catch (Exception e) {
+            log.warn("获取指定时间LocalDate[{}]所在年的第一天异常，异常原因为：", localDate, e);
+            return null;
+        }
+
+    }
+
+    /**
+     * 获取指定时间所在年的第一天
+     *
+     * @param localDateTime 指定时间
+     */
+    public static LocalDate getDayWithYearFirst(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
+        try {
+            return Objects.requireNonNull(DateTimeUtil.localDateTimeToLocalDate(localDateTime))
+                    .with(TemporalAdjusters.firstDayOfYear());
+        } catch (Exception e) {
+            log.warn("获取指定时间LocalDateTime[{}]所在年的第一天异常，异常原因为：", localDateTime, e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取当前年的最后一天
+     */
+    public static String getDayStrWithYearEnd() {
+        return DateTimeUtil.formatLocalDate(getDayWithYearEnd(LocalDate.now()), DatePattern.PURE_DATE_PATTERN);
+    }
+
+    /**
+     * 获取当前年的最后一天
+     */
+    public static LocalDate getDayWithYearEnd() {
+        return getDayWithYearEnd(LocalDate.now());
+    }
+
+    /**
+     * 获取指定时间所在年的最后一天
+     *
+     * @param date 指定时间
+     */
+    public static LocalDate getDayWithYearEnd(Date date) {
+        if (date == null) {
+            return null;
+        }
+        try {
+            return getDayWithYearEnd(Objects.requireNonNull(DateTimeUtil.dateToLocalDate(date)));
+        } catch (Exception e) {
+            log.warn("获取指定时间Date[{}]所在年的最后一天异常，异常原因为：", date, e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取指定时间所在年的最后一天
+     *
+     * @param localDate 指定时间
+     */
+    public static LocalDate getDayWithYearEnd(LocalDate localDate) {
+        if (localDate == null) {
+            return null;
+        }
+        try {
+            return localDate.with(TemporalAdjusters.lastDayOfYear());
+        } catch (Exception e) {
+            log.warn("获取指定时间LocalDate[{}]所在年的最后一天异常，异常原因为：", localDate, e);
+            return null;
+        }
+
+    }
+
+    /**
+     * 获取指定时间所在年的最后一天
+     *
+     * @param localDateTime 指定时间
+     */
+    public static LocalDate getDayWithYearEnd(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
+        try {
+            return Objects.requireNonNull(DateTimeUtil.localDateTimeToLocalDate(localDateTime))
+                    .with(TemporalAdjusters.lastDayOfYear());
+        } catch (Exception e) {
+            log.warn("获取指定时间LocalDateTime[{}]所在年的最后一天异常，异常原因为：", localDateTime, e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取当前周的第一天
+     */
+    public static String getDayStrWithWeekFirst() {
+        return DateTimeUtil.formatLocalDate(getDayWithWeekFirst(LocalDate.now()), DatePattern.PURE_DATE_PATTERN);
+    }
+
+    /**
+     * 获取当前周的第一天
+     */
+    public static LocalDate getDayWithWeekFirst() {
+        return getDayWithWeekFirst(LocalDate.now());
+    }
+
+    /**
+     * 获取指定时间所在周的第一天
+     *
+     * @param date 指定时间
+     */
+    public static LocalDate getDayWithWeekFirst(Date date) {
+        if (date == null) {
+            return null;
+        }
+        try {
+            return getDayWithWeekFirst(Objects.requireNonNull(DateTimeUtil.dateToLocalDate(date)));
+        } catch (Exception e) {
+            log.warn("获取指定时间Date[{}]所在周的第一天异常，异常原因为：", date, e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取指定时间所在周的第一天
+     *
+     * @param localDate 指定时间
+     */
+    public static LocalDate getDayWithWeekFirst(LocalDate localDate) {
+        if (localDate == null) {
+            return null;
+        }
+        try {
+            DayOfWeek dayOfWeek = localDate.getDayOfWeek();
+            // Monday is 1, Sunday is 7
+            int daysUntilMonday = dayOfWeek.getValue();
+            return localDate.minusDays(daysUntilMonday - 1);
+        } catch (Exception e) {
+            log.warn("获取指定时间LocalDate[{}]所在周的第一天异常，异常原因为：", localDate, e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取指定时间所在周的第一天
+     *
+     * @param localDateTime 指定时间
+     */
+    public static LocalDate getDayWithWeekFirst(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
+        try {
+            return getDayWithWeekFirst(DateTimeUtil.localDateTimeToLocalDate(localDateTime));
+        } catch (Exception e) {
+            log.warn("获取指定时间LocalDateTime[{}]所在周的第一天异常，异常原因为：", localDateTime, e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取当前周的最后一天
+     */
+    public static String getDayStrWithWeekEnd() {
+        return DateTimeUtil.formatLocalDate(getDayWithWeekEnd(LocalDate.now()), DatePattern.PURE_DATE_PATTERN);
+    }
+
+    /**
+     * 获取当前周的最后一天
+     */
+    public static LocalDate getDayWithWeekEnd() {
+        return getDayWithWeekEnd(LocalDate.now());
+    }
+
+    /**
+     * 获取指定时间所在周的最后一天
+     *
+     * @param date 指定时间
+     */
+    public static LocalDate getDayWithWeekEnd(Date date) {
+        if (date == null) {
+            return null;
+        }
+        try {
+            return getDayWithWeekEnd(Objects.requireNonNull(DateTimeUtil.dateToLocalDate(date)));
+        } catch (Exception e) {
+            log.warn("获取指定时间Date[{}]所在周的最后一天异常，异常原因为：", date, e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取指定时间所在周的最后一天
+     *
+     * @param localDate 指定时间
+     */
+    public static LocalDate getDayWithWeekEnd(LocalDate localDate) {
+        if (localDate == null) {
+            return null;
+        }
+        try {
+            // 加上6天即为周日
+            return getDayWithWeekFirst(localDate).plusDays(6);
+        } catch (Exception e) {
+            log.warn("获取指定时间LocalDate[{}]所在周的最后一天异常，异常原因为：", localDate, e);
+            return null;
+        }
+
+    }
+
+    /**
+     * 获取指定时间所在周的最后一天
+     *
+     * @param localDateTime 指定时间
+     */
+    public static LocalDate getDayWithWeekEnd(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
+        try {
+            return getDayWithWeekEnd(DateTimeUtil.localDateTimeToLocalDate(localDateTime));
+        } catch (Exception e) {
+            log.warn("获取指定时间LocalDateTime[{}]所在周的最后一天异常，异常原因为：", localDateTime, e);
             return null;
         }
     }

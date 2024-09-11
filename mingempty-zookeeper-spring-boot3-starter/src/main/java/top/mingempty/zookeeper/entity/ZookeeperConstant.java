@@ -8,9 +8,12 @@ package top.mingempty.zookeeper.entity;
 public interface ZookeeperConstant {
 
     /**
+     * zookeeper分隔符
+     */
+    String ZOOKEEPER_SEPARATOR = "/";
+
+    /**
      * zookeeper 线程池名称
      */
     String THREAD_FACTORY_NAME = "Zookeeper-Thread-%d";
-
-    String REDISS_PROTOCOL_PREFIX = "rediss://";
 }
