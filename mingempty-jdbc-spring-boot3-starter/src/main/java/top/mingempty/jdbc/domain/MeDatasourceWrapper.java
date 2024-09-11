@@ -12,6 +12,11 @@ import java.sql.SQLTimeoutException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * 对数据源的封装
+ *
+ * @author zzhao
+ */
 public class MeDatasourceWrapper extends AbstractRouter<DataSource> implements DataSource {
 
 
