@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>top.mingempty</groupId>
+        <artifactId>spring-cloud-mingempty-dependencies</artifactId>
+        <version>${dependencies.version}</version>
+        <relativePath>../spring-cloud-mingempty-dependencies/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>mingempty-datasource-spring-boot3-starter</artifactId>
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <project.encoding>UTF-8</project.encoding>
+        <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${project.encoding}</project.reporting.outputEncoding>
+    </properties>
+
+    <dependencies>
+        <!--mapstruct Bean映射 -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+
+        <!-- 自动提示配置 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--jdbc-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jdbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--数据库连接池 HikariCP -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+
+        <!--数据库连接池 c3p0 -->
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--数据库连接池 druid-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--数据库连接池 beecp-->
+        <dependency>
+            <groupId>com.github.chris2018998</groupId>
+            <artifactId>beecp</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--数据库连接池 dbcp2-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--数据库连接池 atomikos-->
+        <dependency>
+            <groupId>com.atomikos</groupId>
+            <artifactId>transactions-jdbc</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!--atomikos6.0.0版本需要自行引入下面两个包-->
+        <dependency>
+            <groupId>com.atomikos</groupId>
+            <artifactId>transactions-jta</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.atomikos</groupId>
+            <artifactId>atomikos-util</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--seata-->
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-all</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--shardingsphere-->
+        <dependency>
+            <groupId>org.apache.shardingsphere</groupId>
+            <artifactId>shardingsphere-jdbc</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+
+        <!--seata-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--nacos配置中心-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+
+        <!--第三方依赖👆  项目自身依赖👇-->
+
+        <!--基础工具类-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-commons</artifactId>
+        </dependency>
+
+        <!--对spring的封装starter-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-spring-boot3-starter</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

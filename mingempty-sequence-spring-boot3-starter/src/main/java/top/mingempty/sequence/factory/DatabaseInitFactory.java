@@ -1,7 +1,7 @@
 package top.mingempty.sequence.factory;
 
 import cn.hutool.core.collection.CollUtil;
-import top.mingempty.jdbc.domain.MeDatasourceWrapper;
+import top.mingempty.datasource.model.DynamicDatasource;
 import top.mingempty.sequence.api.impl.base.DatabaseSequence;
 import top.mingempty.sequence.api.impl.wrapper.DatabaseSequenceWrapper;
 import top.mingempty.sequence.enums.SeqRealizeEnum;
@@ -15,10 +15,10 @@ import java.util.Set;
  * 执行序号对数据库相关的初始化
  */
 public class DatabaseInitFactory implements InitFactory {
-    private final MeDatasourceWrapper meDatasourceWrapper;
+    private final DynamicDatasource dynamicDatasource;
 
     public DatabaseInitFactory() {
-        this.meDatasourceWrapper = SpringContextUtil.gainBean("dataSource", MeDatasourceWrapper.class);
+        this.dynamicDatasource = SpringContextUtil.gainBean("dataSource", DynamicDatasource.class);
     }
 
     /**
@@ -53,7 +53,8 @@ public class DatabaseInitFactory implements InitFactory {
             expirationStrategySequence(cacheSequenceProperties);
             return;
         }
-        DataSource dataSource = meDatasourceWrapper.getResolvedRouter(cacheSequenceProperties.getInstanceName());
+
+        DataSource dataSource = dynamicDatasource.gainInstance(cacheSequenceProperties.getInstanceName());
         DatabaseSequence.DatabaseSequenceHolder.init(cacheSequenceProperties.getInstanceName(),
                 cacheSequenceProperties.getSeqName(), cacheSequenceProperties.getStep(), dataSource);
 
@@ -66,7 +67,7 @@ public class DatabaseInitFactory implements InitFactory {
      */
     @Override
     public void expirationStrategySequence(CacheSequenceProperties cacheSequenceProperties) {
-        DataSource dataSource = meDatasourceWrapper.getResolvedRouter(cacheSequenceProperties.getInstanceName());
+        DataSource dataSource = dynamicDatasource.gainInstance(cacheSequenceProperties.getInstanceName());
         DatabaseSequenceWrapper.DatabaseSequenceHolder.init(cacheSequenceProperties.getInstanceName(),
                 cacheSequenceProperties.getSeqName(), cacheSequenceProperties.getStep(),
                 cacheSequenceProperties.getExpirationStrategy(), dataSource);

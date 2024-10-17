@@ -1,0 +1,48 @@
+# JDBC 逻辑库名称。在集群模式中，使用该参数来联通 ShardingSphere-JDBC 与 ShardingSphere-Proxy。
+# 默认值：logic_db
+#databaseName (?):
+
+mode:
+  type: Standalone
+  repository:
+    type: JDBC
+#    使用druid连接池
+#    type: druid
+
+
+dataSources:
+  ds_1:
+    dataSourceClassName: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: qwer
+    url: jdbc:mysql://10.30.44.14:33061/demo
+  ds_2:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: qwer
+    jdbcUrl: jdbc:mysql://10.30.44.14:33061/demo
+
+  # 配置其他数据源
+
+
+rules:
+  - !SHARDING
+    tables:
+      t_dict_item:
+#        此处需要注意，如果使用多个数据库连接池时，会出现异常
+        actualDataNodes: ds_2.t_dict_item_enable_or_not,ds_2.t_dict_item_dict_entry_type
+        tableStrategy:
+          standard:
+            shardingColumn: entry_code
+            shardingAlgorithmName: t_dict_item_inline
+    shardingAlgorithms:
+      t_dict_item_inline:
+        type: INLINE
+        props:
+          algorithm-expression: t_dict_item_${entry_code}
+
+props:
+  sql-show: true
+

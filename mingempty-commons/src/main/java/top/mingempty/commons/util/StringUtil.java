@@ -38,7 +38,7 @@ public class StringUtil {
      * @param str
      * @return
      */
-    public static String toCamelCase(String str) {
+    public static String lineToUpper(String str) {
         return StrUtil.toCamelCase(str);
     }
 

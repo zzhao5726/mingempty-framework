@@ -14,7 +14,7 @@ public interface GlobalConstant {
      * 默认实例名称
      */
     @Schema(title = "默认实例名称", description = "默认实例名称")
-    String DEFAULT_INSTANCE_NAME = "default";
+    String DEFAULT_INSTANCE_NAME = "def";
 
     /**
      * 业务类型
