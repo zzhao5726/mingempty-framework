@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 public class LocalCacheAspect implements Ordered {
 
 
-    private static final ThreadLocalLink THREAD_LOCAL_LINK = new ThreadLocalLink();
+    private static final ThreadLocalLink<String> THREAD_LOCAL_LINK = new ThreadLocalLink<>();
 
     /**
      * 获取当前线程cache切面名称
@@ -33,7 +33,7 @@ public class LocalCacheAspect implements Ordered {
      * @return
      */
     public static String acquireCacheName() {
-        return THREAD_LOCAL_LINK.acquireName();
+        return THREAD_LOCAL_LINK.acquireData();
     }
 
     /**
@@ -42,7 +42,7 @@ public class LocalCacheAspect implements Ordered {
      * @return
      */
     public static void putCacheName(String cacheName) {
-        THREAD_LOCAL_LINK.putName(cacheName);
+        THREAD_LOCAL_LINK.putData(cacheName);
     }
 
     /**
@@ -51,7 +51,7 @@ public class LocalCacheAspect implements Ordered {
      * @return
      */
     public static void removeCacheName() {
-        THREAD_LOCAL_LINK.removeName();
+        THREAD_LOCAL_LINK.removeData();
     }
 
 

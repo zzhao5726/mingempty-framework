@@ -56,7 +56,7 @@
         <!--对jdbc的封装-->
         <dependency>
             <groupId>top.mingempty</groupId>
-            <artifactId>mingempty-jdbc-spring-boot3-starter</artifactId>
+            <artifactId>mingempty-datasource-spring-boot3-starter</artifactId>
             <optional>true</optional>
         </dependency>
     </dependencies>

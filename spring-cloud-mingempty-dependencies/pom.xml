@@ -24,7 +24,7 @@
         <module>../mingempty-concurrent-spring-boot3-starter</module>
         <module>../spring-cloud-starter-mingempty-openfeign</module>
         <module>../mingempty-gateway</module>
-        <module>../mingempty-jdbc-spring-boot3-starter</module>
+        <module>../mingempty-datasource-spring-boot3-starter</module>
         <module>../mingempty-cache</module>
         <module>../mingempty-zookeeper-spring-boot3-starter</module>
         <module>../mingempty-distributed-lock-spring-boot3-starter</module>
@@ -76,6 +76,12 @@
         <hikari.version>5.1.0</hikari.version>
         <c3p0.version>0.10.1</c3p0.version>
         <druid.version>1.2.23</druid.version>
+        <beecp.version>3.4.2</beecp.version>
+        <dbcp2.version>2.12.0</dbcp2.version>
+        <atomikos.version>6.0.0</atomikos.version>
+        <shardingsphere.version>5.5.0</shardingsphere.version>
+        <seata.version>2.0.0</seata.version>
+        <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
         <redisson-spring-boot-starter.version>3.33.0</redisson-spring-boot-starter.version>
         <zookeeper.version>3.9.2</zookeeper.version>
         <curator.version>5.7.0</curator.version>
@@ -286,8 +292,90 @@
             <!--数据库连接池 druid-spring-boot-starter-->
             <dependency>
                 <groupId>com.alibaba</groupId>
-                <artifactId>druid-spring-boot-starter</artifactId>
+                <artifactId>druid-spring-boot-3-starter</artifactId>
                 <version>${druid.version}</version>
+            </dependency>
+
+            <!--数据库连接池 beecp-->
+            <dependency>
+                <groupId>com.github.chris2018998</groupId>
+                <artifactId>beecp</artifactId>
+                <version>${beecp.version}</version>
+            </dependency>
+
+            <!--数据库连接池 dbcp2-->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-dbcp2</artifactId>
+                <version>${dbcp2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!--数据库连接池 atomikos-->
+            <dependency>
+                <groupId>com.atomikos</groupId>
+                <artifactId>transactions-jdbc</artifactId>
+                <version>${atomikos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.atomikos</groupId>
+                <artifactId>transactions-jta</artifactId>
+                <version>${atomikos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.atomikos</groupId>
+                <artifactId>atomikos-util</artifactId>
+                <version>${atomikos.version}</version>
+            </dependency>
+
+            <!--shardingsphere-->
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-jdbc</artifactId>
+                <version>${shardingsphere.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.shardingsphere</groupId>
+                        <artifactId>shardingsphere-test-util</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.shardingsphere</groupId>
+                        <artifactId>shardingsphere-test-fixture-database</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>ch.qos.logback</groupId>
+                        <artifactId>logback-classic</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>HikariCP</artifactId>
+                        <groupId>com.zaxxer</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!--shardingsphere-->
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-sharding-core</artifactId>
+                <version>${shardingsphere.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.shardingsphere</groupId>
+                        <artifactId>shardingsphere-test-util</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!--seata-->
+            <dependency>
+                <groupId>io.seata</groupId>
+                <artifactId>seata-all</artifactId>
+                <version>${seata.version}</version>
             </dependency>
 
             <!-- redisson-springboot -->
@@ -336,6 +424,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
 
 
             <!--👆👆👆👆👆👆👆👆👆👆👆👆👆👆第三方项目的依赖start 👆👆👆👆👆👆👆👆👆👆👆👆👆👆-->
@@ -454,10 +543,10 @@
                 <version>${dependencies.version}</version>
             </dependency>
 
-            <!--对jdbc的封装-->
+            <!--对datasource的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
-                <artifactId>mingempty-jdbc-spring-boot3-starter</artifactId>
+                <artifactId>mingempty-datasource-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
