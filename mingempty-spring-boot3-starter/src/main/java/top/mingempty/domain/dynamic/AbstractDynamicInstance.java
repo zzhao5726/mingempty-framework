@@ -1,15 +1,16 @@
 package top.mingempty.domain.dynamic;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import top.mingempty.domain.other.GlobalConstant;
+import top.mingempty.commons.exception.BaseBizException;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -28,13 +29,20 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Getter
-public abstract class AbstractDynamicInstance<T> {
+public abstract class AbstractDynamicInstance<T, DI extends DynamicInstance<DI, DP, DC>, DP extends DynamicProperty<DP, DC, DI>, DC extends DynamicConfig>
+        implements DynamicInstance<DI, DP, DC> {
 
     /**
      * 是否启用
      */
     @Schema(title = "是否启用")
     private boolean enabled = true;
+
+    /**
+     * 配置文件
+     */
+    @Schema(title = "配置文件")
+    private DP property;
 
     /**
      * 全量实例集
@@ -49,15 +57,14 @@ public abstract class AbstractDynamicInstance<T> {
     @Schema(title = "指定在找不到当前查找键的特定路由时，是否对默认路由应用宽松回退。")
     private boolean lenientFallback;
 
-    protected AbstractDynamicInstance(T instance) {
-        this(instance, true);
+    protected AbstractDynamicInstance(DP property, T instance) {
+        this(property, instance, true);
     }
 
-    protected AbstractDynamicInstance(T instance, boolean lenientFallback) {
-        this.change(GlobalConstant.DEFAULT_INSTANCE_NAME, Assert.notNull(instance, "属性[默认实例]是必须的"));
-        this.lenientFallback = lenientFallback;
-        //执行后续操作
-        doAfterPropertiesSet();
+    protected AbstractDynamicInstance(DP property, T instance, boolean lenientFallback) {
+        this.put(property.getPrimary(), Assert.notNull(instance, "属性[默认实例]是必须的"));
+        this.lenientFallback = property.getLenientFallback();
+        this.property = property;
     }
 
     /**
@@ -66,21 +73,28 @@ public abstract class AbstractDynamicInstance<T> {
      * @return
      */
     public T determineInstance() {
-        String determineCurrentLookupKey = this.finalDetermineCurrentLookupKey();
-        T router = gainInstance(determineCurrentLookupKey);
-        if (Objects.isNull(router)) {
-            String format = String.format("无法确定查找键[%s]的目标路由器", determineCurrentLookupKey);
-            log.error(format);
-            throw new IllegalStateException(format);
+        String determineCurrentLookupKey = determineCurrentLookupKey();
+        if (StrUtil.isEmpty(determineCurrentLookupKey)) {
+            if (!isLenientFallback()) {
+                return this.gainInstance();
+            }
+            throw new BaseBizException("di-0000000001");
         }
-
-        return router;
+        T router = gainInstance(determineCurrentLookupKey);
+        if (ObjUtil.isNotEmpty(router)) {
+            return router;
+        }
+        if (!isLenientFallback()) {
+            return this.gainInstance();
+        }
+        throw new BaseBizException("di-0000000002", determineCurrentLookupKey);
     }
 
 
     /**
      * 禁用
      */
+    @Override
     public void disable() {
         this.enabled = false;
     }
@@ -89,20 +103,17 @@ public abstract class AbstractDynamicInstance<T> {
     /**
      * 禁用
      */
+    @Override
     public void enable() {
         this.enabled = true;
     }
 
-
     /**
-     * 检索查找实例的方式，如果未找到，则使用默认名称
+     * 当前实例对应配置文件
      */
-    protected final String finalDetermineCurrentLookupKey() {
-        String determineCurrentLookupKey = determineCurrentLookupKey();
-        if (isLenientFallback() && Objects.isNull(determineCurrentLookupKey)) {
-            return GlobalConstant.DEFAULT_INSTANCE_NAME;
-        }
-        return determineCurrentLookupKey;
+    @Override
+    public DP property() {
+        return this.property;
     }
 
 
@@ -122,7 +133,7 @@ public abstract class AbstractDynamicInstance<T> {
      * @return 实例
      */
     public T gainInstance() {
-        return gainInstance(GlobalConstant.DEFAULT_INSTANCE_NAME);
+        return gainInstance(this.getProperty().getPrimary());
     }
 
 
@@ -170,16 +181,26 @@ public abstract class AbstractDynamicInstance<T> {
      * 添加一个路由
      *
      * @param instanceName 实例名称
+     * @param t            实例
      */
-    public void change(String instanceName, T t) {
+    public void put(String instanceName, T t) {
         this.instances.put(instanceName, t);
+    }
+
+    /**
+     * 添加多个个路由
+     *
+     * @param tMap 实例集合
+     */
+    public void putAll(Map<String, T> tMap) {
+        this.instances.putAll(tMap);
     }
 
 
     /**
      * 默认的后续初始化
      */
-    protected void doAfterPropertiesSet() {
+    public void doAfterPropertiesSet() {
     }
 
     /**
@@ -193,5 +214,4 @@ public abstract class AbstractDynamicInstance<T> {
      * @return
      */
     protected abstract Class<T> type();
-
 }
