@@ -1,3 +1,0 @@
-# Environment Post Processors
-org.springframework.boot.env.EnvironmentPostProcessor=\
-top.mingempty.jdbc.postprocessor.RemoveDefaultDatasourceEnvironmentPostProcessor

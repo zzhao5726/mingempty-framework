@@ -1,80 +1,82 @@
 package top.mingempty.domain.other;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * 线程变量链表集
  *
  * @author zzhao
  */
-public class ThreadLocalLink {
+public class ThreadLocalLink<T> {
 
-    private final ThreadLocal<LinkedNode> THREAD_LOCAL
-            = ThreadLocal.withInitial(() -> new LinkedNode(GlobalConstant.DEFAULT_INSTANCE_NAME));
+    private final ThreadLocal<Deque<T>> THREAD_LOCAL;
 
-    /**
-     * 获取当前线程Link切面名称
-     */
-    public String acquireName() {
-        return THREAD_LOCAL.get().getName();
+    public ThreadLocalLink() {
+        this(new ThreadLocal<>());
+    }
+
+    public ThreadLocalLink(ThreadLocal<Deque<T>> threadLocal) {
+        this.THREAD_LOCAL = threadLocal;
     }
 
     /**
-     * 设置当前线程Link切面名称
+     * 获取当前线程Link切面数据
      */
-    public void putName(String name) {
-        if (acquireName().equals(name)) {
+    public T acquireData() {
+        Deque<T> tDeque = THREAD_LOCAL.get();
+        if (tDeque == null) {
+            init();
+        }
+        return THREAD_LOCAL.get().peek();
+    }
+
+    /**
+     * 设置当前线程Link切面数据
+     */
+    public void putData(T data) {
+        if (data == null) {
             return;
         }
-        LinkedNode dsLink = THREAD_LOCAL.get();
-        LinkedNode dsLinkByNext = new LinkedNode(name);
-        dsLink.setNext(dsLinkByNext);
-        dsLinkByNext.setPrev(dsLink);
-        THREAD_LOCAL.set(dsLinkByNext);
-    }
-
-    /**
-     * 移除当前线程Link切面名称
-     */
-    public void removeName() {
-        LinkedNode linkedNode = THREAD_LOCAL.get();
-        if (linkedNode.getPrev() == null) {
-            THREAD_LOCAL.remove();
+        if (THREAD_LOCAL.get() == null) {
+            init();
         }
-        LinkedNode dsLinkPrev = linkedNode.getPrev();
-        dsLinkPrev.setNext(null);
-        THREAD_LOCAL.set(dsLinkPrev);
+        THREAD_LOCAL.get().push(data);
     }
 
+    /**
+     * 清空线程当前数据
+     */
+    public void removeData() {
+        Deque<T> deque = THREAD_LOCAL.get();
+        if (deque != null) {
+            deque.poll();
+            if (deque.isEmpty()) {
+                THREAD_LOCAL.remove();
+            }
+        }
+    }
 
     /**
-     * 链表节点
+     * 强制清空本地线程全量数据
+     */
+    public void removeAll() {
+        Deque<T> deque = THREAD_LOCAL.get();
+        if (deque != null) {
+            deque.clear();
+        }
+        THREAD_LOCAL.remove();
+    }
+
+    /**
      *
-     * @author zzhao
+     * 初始化队列
      */
-    @Getter
-    private static class LinkedNode {
-        /**
-         * 当前名称
-         */
-        private final String name;
-
-        /**
-         * 上一个
-         */
-        @Setter
-        private LinkedNode prev;
-
-        /**
-         * 下一个
-         */
-        @Setter
-        private LinkedNode next;
-
-        public LinkedNode(String name) {
-            this.name = name;
+    private synchronized void init() {
+        if (THREAD_LOCAL.get() == null) {
+            THREAD_LOCAL.set(new ArrayDeque<>());
         }
     }
+
 
 }
