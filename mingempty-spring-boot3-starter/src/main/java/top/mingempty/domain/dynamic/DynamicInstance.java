@@ -30,5 +30,5 @@ public interface DynamicInstance<DI extends DynamicInstance<DI, DP, DC>, DP exte
     /**
      * 当前实例对应配置文件
      */
-    DP properties();
+    DP property();
 }

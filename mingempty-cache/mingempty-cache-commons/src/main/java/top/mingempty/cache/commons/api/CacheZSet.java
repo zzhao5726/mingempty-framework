@@ -1,7 +1,7 @@
 package top.mingempty.cache.commons.api;
 
 import cn.hutool.core.lang.Pair;
-import top.mingempty.commons.util.TimeoutUtils;
+import top.mingempty.commons.util.DateTimeUtil;
 import top.mingempty.domain.base.IPage;
 import top.mingempty.domain.other.GlobalConstant;
 
@@ -1435,7 +1435,7 @@ public interface CacheZSet {
      * @return 包含弹出元素及其分数的Pair对象
      */
     default <E> Pair<E, Double> zsetPopMaxForInstance(String instanceId, String key, Duration duration, Class<E> eClass) {
-        return zsetPopMaxForInstance(instanceId, key, TimeoutUtils.toSeconds(duration), TimeUnit.SECONDS, eClass);
+        return zsetPopMaxForInstance(instanceId, key, DateTimeUtil.toSeconds(duration), TimeUnit.SECONDS, eClass);
     }
 
     /**
@@ -1537,7 +1537,7 @@ public interface CacheZSet {
      * @return 包含弹出元素及其分数的Pair对象
      */
     default <E> Pair<E, Double> zsetPopMinForInstance(String instanceId, String key, Duration duration, Class<E> eClass) {
-        return zsetPopMinForInstance(instanceId, key, TimeoutUtils.toSeconds(duration), TimeUnit.SECONDS, eClass);
+        return zsetPopMinForInstance(instanceId, key, DateTimeUtil.toSeconds(duration), TimeUnit.SECONDS, eClass);
     }
 
     /**
