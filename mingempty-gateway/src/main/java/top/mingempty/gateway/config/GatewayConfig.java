@@ -8,7 +8,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.util.pattern.PathPatternParser;
-import top.mingempty.domain.MeProperties;
+import top.mingempty.domain.MeGloableProperty;
 import top.mingempty.gateway.domain.GatewayConstant;
 import top.mingempty.gateway.domain.GatewayProperties;
 import top.mingempty.gateway.filter.ContextPathFilter;
@@ -89,7 +89,7 @@ public class GatewayConfig {
      * @return 过滤器
      */
     //@Bean
-    public ContextPathFilter contextPathFilter(MeProperties meProperties) {
-        return new ContextPathFilter(meProperties);
+    public ContextPathFilter contextPathFilter(MeGloableProperty meGloableProperty) {
+        return new ContextPathFilter(meGloableProperty);
     }
 }

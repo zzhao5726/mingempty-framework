@@ -12,7 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @Schema(title = "链路日志配置文件")
 @ConfigurationProperties(prefix = "me")
-public class MeProperties {
+public class MeGloableProperty {
 
     /**
      * 是否写进程ID到当前目录

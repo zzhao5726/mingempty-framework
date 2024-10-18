@@ -10,7 +10,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-import top.mingempty.domain.MeProperties;
+import top.mingempty.domain.MeGloableProperty;
 
 
 /**
@@ -22,7 +22,7 @@ import top.mingempty.domain.MeProperties;
 @AllArgsConstructor
 public class ContextPathFilter implements WebFilter, Ordered {
 
-    private final MeProperties meProperties;
+    private final MeGloableProperty meGloableProperty;
 
     /**
      * Process the Web request and (optionally) delegate to the next
@@ -37,7 +37,7 @@ public class ContextPathFilter implements WebFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
 
         String path = request.getURI().getRawPath();
-        if (!path.startsWith(meProperties.getBasePath())) {
+        if (!path.startsWith(meGloableProperty.getBasePath())) {
             ServerHttpResponse response = exchange.getResponse();
             response.setStatusCode(HttpStatus.BAD_GATEWAY);
             DataBuffer buffer = response
@@ -48,7 +48,7 @@ public class ContextPathFilter implements WebFilter, Ordered {
 
         return chain.filter(exchange.mutate()
                 .request(request.mutate()
-                        .path(path.replaceFirst(meProperties.getBasePath(), ""))
+                        .path(path.replaceFirst(meGloableProperty.getBasePath(), ""))
                         .build())
                 .build());
     }
