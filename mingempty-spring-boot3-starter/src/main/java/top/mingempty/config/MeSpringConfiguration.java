@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import top.mingempty.commons.util.JsonUtil;
-import top.mingempty.domain.MeProperties;
+import top.mingempty.domain.MeGloableProperty;
 import top.mingempty.util.BeanFactoryUtil;
 import top.mingempty.util.EnvironmentUtil;
 import top.mingempty.util.MessageSourceUtil;
@@ -20,7 +20,7 @@ import top.mingempty.util.SpringContextUtil;
  *
  * @author zzhao
  */
-@EnableConfigurationProperties(MeProperties.class)
+@EnableConfigurationProperties(MeGloableProperty.class)
 @ComponentScan(basePackages = "top.mingempty.advice")
 public class MeSpringConfiguration {
 
