@@ -131,7 +131,7 @@ public class JacksonUtil {
      */
     public static ObjectMapper build(boolean isEnableIndentOutput, JsonInclude.Include include,
                                      boolean activateDefaultTyping, Map<Class<?>, String> datePatternMap) {
-        return build(isEnableIndentOutput, include, Collections.emptyList(), activateDefaultTyping, Collections.emptyMap());
+        return build(isEnableIndentOutput, include, Collections.emptyList(), activateDefaultTyping, datePatternMap);
     }
 
     /**
