@@ -70,6 +70,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <swagger-annotations-jakarta.version>2.2.22</swagger-annotations-jakarta.version>
         <hutool.version>5.8.28</hutool.version>
+        <bcpkix.version>1.79</bcpkix.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <springdoc-openapi-starte.version>2.6.0</springdoc-openapi-starte.version>
         <hikari.version>5.1.0</hikari.version>
@@ -245,6 +246,14 @@
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
+
+            <!-- 加密和解密协议 -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bcpkix.version}</version>
+            </dependency>
+
 
             <!--ttl-->
             <dependency>

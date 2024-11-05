@@ -1,6 +1,6 @@
 # Environment Post Processors
 org.springframework.boot.env.EnvironmentPostProcessor=\
-top.mingempty.postprocessor.EnAndDeCryptionEnvironmentPostProcessor,\
+top.mingempty.postprocessor.DeCryptionEnvironmentPostProcessor,\
 top.mingempty.postprocessor.ApplicationEnvironmentPostProcessor,\
 top.mingempty.postprocessor.ErrorFormatEnvironmentPostProcessor
 
