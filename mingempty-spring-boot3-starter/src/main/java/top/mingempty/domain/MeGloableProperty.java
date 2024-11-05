@@ -5,12 +5,12 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 链路日志配置文件
+ * 基础配置文件
  *
  * @author zzhao
  */
 @Data
-@Schema(title = "链路日志配置文件")
+@Schema(title = "基础配置文件")
 @ConfigurationProperties(prefix = "me")
 public class MeGloableProperty {
 
