@@ -8,7 +8,7 @@ me:
 spring:
   cloud:
     nacos:
-      server-addr: al31221.pve.mingempty.top:21013
+      server-addr: nacos.mingempty.top:8848
       username: mingempty
       password: mingempty
       config:

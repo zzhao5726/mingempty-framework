@@ -29,6 +29,7 @@
         <module>../mingempty-zookeeper-spring-boot3-starter</module>
         <module>../mingempty-distributed-lock-spring-boot3-starter</module>
         <module>../mingempty-sequence-spring-boot3-starter</module>
+        <module>../mingempty-discovery</module>
 
     </modules>
 
@@ -547,6 +548,13 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-datasource-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对nacos的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-nacos-discovery-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 
