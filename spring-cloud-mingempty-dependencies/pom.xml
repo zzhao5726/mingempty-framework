@@ -453,133 +453,133 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-domain</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--基础工具类-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-commons</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--对spring的封装starter-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--trace链路封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-trace</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--trace链路信息发送封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-trace-api-record</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--trace链路封装starter-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-trace-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--cache封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-cache</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--cache抽象-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-cache-commons</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--本地缓存封装starter-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-local-cache-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--redis封装starter-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-redis-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--对event事件的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-event-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--对zookeeper的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-zookeeper-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--对openapi的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-openapi-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--对concurrent的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-concurrent-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--对分布式锁的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-distributed-lock-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--对序号生成的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-sequence-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--对datasource的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-datasource-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--对nacos的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-nacos-discovery-spring-boot3-starter</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--对openfeign的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>spring-cloud-starter-mingempty-openfeign</artifactId>
-                <version>${dependencies.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
         </dependencies>
