@@ -125,18 +125,4 @@
         </profile>
     </profiles>
 
-
-    <distributionManagement>
-        <repository>
-            <id>rdc-releases</id>
-            <name>Nexus Release Repository</name>
-            <url>https://packages.aliyun.com/maven/repository/2075607-release-VgVYEc/</url>
-        </repository>
-        <snapshotRepository>
-            <id>rdc-snapshots</id>
-            <name>Nexus Snapshot Repository</name>
-            <url>https://packages.aliyun.com/maven/repository/2075607-snapshot-MQJ0b7/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
 </project>
