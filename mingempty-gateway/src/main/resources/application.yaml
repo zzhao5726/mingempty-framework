@@ -4,6 +4,8 @@ me:
   version: 1.0.0
   timestamp: ${current.time}
   using-base-path: false
+  logging:
+    config-name: gateway.xml
 
 spring:
   cloud:
@@ -23,8 +25,6 @@ spring:
   config:
     import:
       - optional:nacos:gateway.yaml
-
-
 
 logging:
   config: classpath:logback-me.xml

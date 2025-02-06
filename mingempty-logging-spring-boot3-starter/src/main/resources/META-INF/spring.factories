@@ -1,0 +1,4 @@
+
+# Run Listeners
+org.springframework.boot.SpringApplicationRunListener=\
+top.mingempty.logging.loader.LogConfigLoaderRunListener
