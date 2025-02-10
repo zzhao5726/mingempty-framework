@@ -1,6 +1,6 @@
 package top.mingempty.cache.commons.api;
 
-import top.mingempty.domain.base.IPage;
+import top.mingempty.domain.base.MePage;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.util.ArrayList;
@@ -443,7 +443,7 @@ public interface CacheSet {
      * @return 集合中的所有元素
      */
     default <E> Set<E> setGetAllForInstance(String instanceId, String key, Class<E> eClass) {
-        return setGetPageForInstance(instanceId, key, IPage.build(1, 0).setSearchCount(false), eClass);
+        return setGetPageForInstance(instanceId, key, MePage.build(1, 0).setSearchCount(false), eClass);
     }
 
     /**
@@ -451,12 +451,12 @@ public interface CacheSet {
      *
      * @param <E>               元素类型
      * @param key               集合的键
-     * @param iPage             分页参数
+     * @param mePage             分页参数
      * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    default <E> Set<E> setGetPage(String key, final IPage iPage, Class<E> eClass) {
-        return setGetPageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage, eClass);
+    default <E> Set<E> setGetPage(String key, final MePage mePage, Class<E> eClass) {
+        return setGetPageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, mePage, eClass);
     }
 
     /**
@@ -465,11 +465,11 @@ public interface CacheSet {
      * @param <E>               元素类型
      * @param instanceId        实例ID
      * @param key               集合的键
-     * @param iPage             分页参数
+     * @param mePage             分页参数
      * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
-    <E> Set<E> setGetPageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass);
+    <E> Set<E> setGetPageForInstance(String instanceId, String key, final MePage mePage, Class<E> eClass);
 
     /**
      * 计算两个集合之间的差异，返回一个包含在第一个集合中但不在第二个集合中的元素的集合

@@ -4,7 +4,7 @@ import cn.hutool.core.lang.Pair;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.CacheManager;
 import top.mingempty.cache.local.api.LocalCacheApi;
-import top.mingempty.domain.base.IPage;
+import top.mingempty.domain.base.MePage;
 
 import java.util.Collection;
 import java.util.List;
@@ -281,12 +281,12 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param iPage      分页参数
+     * @param mePage      分页参数
      * @param eClass  映射中值的类型
      * @return 映射中的所有键-值对
      */
     @Override
-    public <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, IPage iPage, Class<E> eClass) {
+    public <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, MePage mePage, Class<E> eClass) {
         return Map.of();
     }
 
@@ -373,11 +373,11 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param iPage      分页参数
+     * @param mePage      分页参数
      * @return 映射键内所有的hash键
      */
     @Override
-    public Set<String> mapKeysPageForInstance(String instanceId, String key, IPage iPage) {
+    public Set<String> mapKeysPageForInstance(String instanceId, String key, MePage mePage) {
         return Set.of();
     }
 
@@ -610,12 +610,12 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId        实例ID
      * @param key               列表的键
-     * @param iPage             分页参数
+     * @param mePage             分页参数
      * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> List<E> queuePageForInstance(String instanceId, String key, IPage iPage, Class<E> eClass) {
+    public <E> List<E> queuePageForInstance(String instanceId, String key, MePage mePage, Class<E> eClass) {
         return List.of();
     }
 
@@ -851,12 +851,12 @@ public class LocalCacheApiImpl implements LocalCacheApi {
      *
      * @param instanceId        实例ID
      * @param key               集合的键
-     * @param iPage             分页参数
+     * @param mePage             分页参数
      * @param eClass 元素的类型
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> setGetPageForInstance(String instanceId, String key, IPage iPage, Class<E> eClass) {
+    public <E> Set<E> setGetPageForInstance(String instanceId, String key, MePage mePage, Class<E> eClass) {
         return Set.of();
     }
 

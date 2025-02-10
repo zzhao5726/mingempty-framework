@@ -11,6 +11,15 @@
 - **数据源模块 (`mingempty-datasource-spring-boot3-starter`)**
   支持多种数据库连接池（如 Druid、HikariCP 等）和分库分表（ShardingSphere），具备动态数据源切换和事务管理功能。
 
+- **Mybatis模块 (`mingempty-mybatis-spring-boot3-starter`)**
+  集成mybatis，提供逆向生成、审计字段字段注入、表名称替换功能
+
+- **Mybatis模块 (`mingempty-mybatis-plus-spring-boot3-starter`)**
+  集成mybatis-plus，提供逆向生成、审计字段字段注入、表名称替换功能，优化批量查询逻辑
+
+- **Mybatis模块 (`mingempty-mybatis-flex-spring-boot3-starter`)**
+  集成mybatis-flex，提供逆向生成、审计字段字段注入、表名称替换功能
+
 - **分布式锁模块 (`mingempty-distributed-lock-spring-boot3-starter`)**
   基于 Redis 和 Zookeeper 实现分布式锁，确保在分布式环境中对共享资源的安全访问。
 
@@ -42,6 +51,7 @@
 - **服务发现**: Nacos
 - **链路追踪**: Tracing
 - **API 文档**: Swagger, OpenAPI 3.0
+- **Mybatis**: Mybatis, Mybatis Plus, Mybatis Flex
 
 ## 4. 使用场景
 

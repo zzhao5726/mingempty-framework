@@ -1,7 +1,7 @@
 package top.mingempty.cache.commons.api;
 
 import cn.hutool.core.lang.Pair;
-import top.mingempty.domain.base.IPage;
+import top.mingempty.domain.base.MePage;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.util.Collection;
@@ -426,12 +426,12 @@ public interface CacheMap {
      *
      * @param <E>       值的类型
      * @param key       映射的键
-     * @param iPage     分页参数
+     * @param mePage     分页参数
      * @param eClass 映射中值的类型
      * @return 映射中的所有键-值对
      */
-    default <E> Map<String, E> mapGetPage(String key, final IPage iPage, Class<E> eClass) {
-        return mapGetPageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage, eClass);
+    default <E> Map<String, E> mapGetPage(String key, final MePage mePage, Class<E> eClass) {
+        return mapGetPageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, mePage, eClass);
     }
 
     /**
@@ -440,11 +440,11 @@ public interface CacheMap {
      * @param <E>        值的类型
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param iPage      分页参数
+     * @param mePage      分页参数
      * @param eClass  映射中值的类型
      * @return 映射中的所有键-值对
      */
-    <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass);
+    <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, final MePage mePage, Class<E> eClass);
 
     /**
      * 获取指定键的映射大小。
@@ -580,8 +580,8 @@ public interface CacheMap {
      * @param key 映射的键
      * @return 映射键内所有的hash键
      */
-    default Set<String> mapKeysPage(String key, final IPage iPage) {
-        return mapKeysPageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage);
+    default Set<String> mapKeysPage(String key, final MePage mePage) {
+        return mapKeysPageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, mePage);
     }
 
     /**
@@ -589,10 +589,10 @@ public interface CacheMap {
      *
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param iPage      分页参数
+     * @param mePage      分页参数
      * @return 映射键内所有的hash键
      */
-    Set<String> mapKeysPageForInstance(String instanceId, String key, final IPage iPage);
+    Set<String> mapKeysPageForInstance(String instanceId, String key, final MePage mePage);
 
     /**
      * 获取映射键内所有的值

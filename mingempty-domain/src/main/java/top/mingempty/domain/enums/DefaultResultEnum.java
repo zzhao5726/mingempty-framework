@@ -1,14 +1,14 @@
 package top.mingempty.domain.enums;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import top.mingempty.domain.base.IResult;
+import top.mingempty.domain.base.MeResult;
 
 /**
  * 接口结果枚举
  *
  * @author zzhao
  */
-public enum DefaultResultEnum implements IResult {
+public enum DefaultResultEnum implements MeResult {
 
     SUCCESS("G-D-00000", "接口调用成功"),
 

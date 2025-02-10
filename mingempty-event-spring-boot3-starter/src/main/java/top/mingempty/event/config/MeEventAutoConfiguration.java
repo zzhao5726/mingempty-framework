@@ -3,6 +3,7 @@ package top.mingempty.event.config;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 import top.mingempty.event.MeEventPublisher;
 import top.mingempty.event.MeEventtListener;
 
@@ -11,6 +12,7 @@ import top.mingempty.event.MeEventtListener;
  *
  * @author zzhao
  */
+@EnableAsync
 @Configuration
 public class MeEventAutoConfiguration {
 

@@ -19,17 +19,17 @@ import top.mingempty.domain.enums.DirectionEnum;
 @EqualsAndHashCode
 @Accessors(chain = true)
 @Schema(title = "分页参数数据模型", description = "分页参数数据模型")
-public class IPage {
+public class MePage {
 
-    private IPage() {
+    private MePage() {
     }
 
 
-    public static IPage build(long pageNo, long pageSize) {
-        IPage iPage = new IPage();
-        iPage.setPageNo(pageNo);
-        iPage.setPageSize(pageSize);
-        return iPage;
+    public static MePage build(long pageNo, long pageSize) {
+        MePage mePage = new MePage();
+        mePage.setPageNo(pageNo);
+        mePage.setPageSize(pageSize);
+        return mePage;
     }
 
     /**
@@ -50,17 +50,6 @@ public class IPage {
     private long pageSize = 10;
 
     /**
-     * 查询起始索引
-     */
-    @Schema(title = "查询起始索引", description = "查询起始索引")
-    private long startIndex = 0;
-    /**
-     * 查询起始索引
-     */
-    @Schema(title = "查询终止索引", description = "查询终止索引")
-    private long endIndex = 0;
-
-    /**
      * 是否查询总数量
      */
     @Getter
@@ -77,7 +66,7 @@ public class IPage {
      * 排序方式
      */
     @Schema(title = "排序方式", description = "排序方式")
-    private DirectionEnum directionEnum = DirectionEnum.ASC;
+    private DirectionEnum direction = DirectionEnum.ASC;
 
     /**
      * 是否是最后一页
@@ -85,16 +74,6 @@ public class IPage {
     @Schema(title = "是否是最后一页", description = "是否是最后一页")
     private boolean lastPage;
 
-
-    /**
-     * 设置查询起始索引
-     * 私有化以禁止赋值
-     *
-     * @param startIndex 起始索引
-     */
-    private void setStartIndex(long startIndex) {
-        this.startIndex = startIndex;
-    }
 
     /**
      * 设置是否是最后一页标识
@@ -125,31 +104,24 @@ public class IPage {
     /**
      * 获取查询起始索引
      */
+    @Schema(title = "查询起始索引", description = "查询起始索引")
     public long getStartIndex() {
-        if (this.startIndex == 0) {
-            this.startIndex = (this.getPageNo() - 1) * this.getPageSize();
-        }
-        if (this.startIndex < 0) {
-            this.startIndex = 0;
-        }
-        return this.startIndex;
+        return (this.getPageNo() - 1) * this.getPageSize();
     }
 
+    /**
+     * 获取查询终止索引
+     */
+    @Schema(title = "查询终止索引", description = "查询终止索引")
     public long getEndIndex() {
-        if (this.endIndex == 0) {
-            this.endIndex = this.getStartIndex() + this.getPageSize() - 1;
-        }
-        if (this.endIndex < -2) {
-            this.endIndex = -1L;
-        }
-        return this.endIndex;
+        return this.getStartIndex() + this.getPageSize() - 1;
     }
 
     public long getTotal() {
         if (!this.isSearchCount()) {
             return -1L;
         }
-        return total;
+        return this.total;
     }
 
     public boolean isLastPage() {
@@ -158,8 +130,7 @@ public class IPage {
             return Boolean.TRUE;
         }
 
-        if (!this.isSearchCount()
-                && this.getTotal() < 0) {
+        if (!this.isSearchCount()) {
             // 说明是不需要查询总数的
             return Boolean.FALSE;
         }

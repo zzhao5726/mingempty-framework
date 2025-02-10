@@ -24,7 +24,7 @@ import top.mingempty.openapi.domain.OpenApiProperties;
  */
 @Configuration
 @EnableConfigurationProperties(OpenApiProperties.class)
-@ConditionalOnProperty(prefix = "me.openapi", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "me.openapi", name = "enabled", havingValue = "true",matchIfMissing = true)
 public class OpenApiAutoConfiguration {
 
 

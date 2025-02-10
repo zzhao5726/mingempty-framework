@@ -53,7 +53,7 @@ public class BaseHeaderModel implements Serializable {
      * 分页参数数据模型
      */
     @Schema(title = "分页参数数据模型", description = "分页参数数据模型")
-    private IPage iPage;
+    private MePage mePage;
 
     /**
      * 其他参数
