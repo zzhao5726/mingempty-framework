@@ -1,0 +1,10 @@
+me:
+  name: mybatis-generator
+  group: mingempty
+  version: 1.0.0
+  base-path: /generator
+  timestamp: ${current.time}
+
+
+server:
+  port: 8080

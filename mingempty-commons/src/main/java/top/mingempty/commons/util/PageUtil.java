@@ -2,7 +2,7 @@ package top.mingempty.commons.util;
 
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ObjUtil;
-import top.mingempty.domain.base.IPage;
+import top.mingempty.domain.base.MePage;
 
 /**
  * 分页工具类
@@ -21,15 +21,15 @@ public class PageUtil {
     /**
      * 计算分页的起始和终止索引
      *
-     * @param iPage
+     * @param mePage
      * @return
      */
-    public static Pair<Long, Long> calculationStartAndEndIndex(IPage iPage) {
-        if (ObjUtil.isEmpty(iPage)) {
+    public static Pair<Long, Long> calculationStartAndEndIndex(MePage mePage) {
+        if (ObjUtil.isEmpty(mePage)) {
             return DEFAULT_PAIR;
         }
 
-        return calculationStartAndEndIndex(iPage.getTotal(), iPage.getPageSize(), iPage.getStartIndex());
+        return calculationStartAndEndIndex(mePage.getTotal(), mePage.getPageSize(), mePage.getStartIndex());
     }
 
     /**
