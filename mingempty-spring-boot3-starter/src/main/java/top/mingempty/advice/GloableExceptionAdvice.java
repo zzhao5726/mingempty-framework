@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import top.mingempty.commons.exception.BaseException;
 import top.mingempty.commons.trace.TraceContext;
 import top.mingempty.commons.trace.constants.TraceConstant;
-import top.mingempty.domain.base.IRsp;
+import top.mingempty.domain.base.MeRsp;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -67,7 +67,7 @@ public class GloableExceptionAdvice implements Ordered {
             case ErrorResponse errorResponse -> {
                 log.error("ErrorResponse异常，异常原因:", exception);
                 if (Objects.equals(HttpStatus.NOT_FOUND.value(), errorResponse.getStatusCode().value())) {
-                    return IRsp.notFound();
+                    return MeRsp.notFound();
                 }
             }
             case ServletException servletException -> {
@@ -79,7 +79,7 @@ public class GloableExceptionAdvice implements Ordered {
             }
             case null, default -> log.error("系统异常，异常原因:", exception);
         }
-        IRsp<Object> failed = IRsp.failed(message);
+        MeRsp<Object> failed = MeRsp.failed(message);
         Optional.ofNullable(TraceContext.gainTraceContext())
                 .ifPresent(traceContext -> {
                     failed.putParameter(TraceConstant.TRACE_ID, traceContext.getTraceId());
