@@ -19,17 +19,17 @@ import top.mingempty.domain.enums.DirectionEnum;
 @EqualsAndHashCode
 @Accessors(chain = true)
 @Schema(title = "分页参数数据模型", description = "分页参数数据模型")
-public class IPage {
+public class MePage {
 
-    private IPage() {
+    private MePage() {
     }
 
 
-    public static IPage build(long pageNo, long pageSize) {
-        IPage iPage = new IPage();
-        iPage.setPageNo(pageNo);
-        iPage.setPageSize(pageSize);
-        return iPage;
+    public static MePage build(long pageNo, long pageSize) {
+        MePage mePage = new MePage();
+        mePage.setPageNo(pageNo);
+        mePage.setPageSize(pageSize);
+        return mePage;
     }
 
     /**

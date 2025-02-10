@@ -2,7 +2,7 @@ package top.mingempty.cache.commons.api;
 
 import cn.hutool.core.lang.Pair;
 import top.mingempty.commons.util.DateTimeUtil;
-import top.mingempty.domain.base.IPage;
+import top.mingempty.domain.base.MePage;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.time.Duration;
@@ -1619,13 +1619,13 @@ public interface CacheZSet {
      * 获取指定范围的元素。
      *
      * @param key               有序集合的键
-     * @param iPage             分页参数
+     * @param mePage             分页参数
      * @param eClass 类型引用
      * @param <E>               元素类型
      * @return 指定范围的元素集合
      */
-    default <E> Set<E> zsetRange(String key, IPage iPage, Class<E> eClass) {
-        return zsetRangeForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage, eClass);
+    default <E> Set<E> zsetRange(String key, MePage mePage, Class<E> eClass) {
+        return zsetRangeForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, mePage, eClass);
     }
 
     /**
@@ -1633,13 +1633,13 @@ public interface CacheZSet {
      *
      * @param instanceId        实例ID
      * @param key               有序集合的键
-     * @param iPage             分页参数
+     * @param mePage             分页参数
      * @param eClass 类型引用
      * @param <E>               元素类型
      * @return 指定范围的元素集合
      */
-    default <E> Set<E> zsetRangeForInstance(String instanceId, String key, IPage iPage, Class<E> eClass) {
-        return zsetRangeForInstance(instanceId, key, iPage.getStartIndex(), iPage.getEndIndex(), eClass);
+    default <E> Set<E> zsetRangeForInstance(String instanceId, String key, MePage mePage, Class<E> eClass) {
+        return zsetRangeForInstance(instanceId, key, mePage.getStartIndex(), mePage.getEndIndex(), eClass);
     }
 
     /**
@@ -2013,13 +2013,13 @@ public interface CacheZSet {
      * 根据指定的分数范围中反向获取元素，并将其作为集合返回。
      *
      * @param key               有序集合的键
-     * @param iPage             分页参数
+     * @param mePage             分页参数
      * @param eClass 类型引用，用于指定元素的类型
      * @param <E>               元素类型
      * @return 反向获取的元素集合
      */
-    default <E> Set<E> zsetReverseRange(String key, IPage iPage, Class<E> eClass) {
-        return zsetReverseRangeForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage, eClass);
+    default <E> Set<E> zsetReverseRange(String key, MePage mePage, Class<E> eClass) {
+        return zsetReverseRangeForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, mePage, eClass);
     }
 
     /**
@@ -2027,13 +2027,13 @@ public interface CacheZSet {
      *
      * @param instanceId        实例 ID
      * @param key               有序集合的键
-     * @param iPage             分页参数
+     * @param mePage             分页参数
      * @param eClass 类型引用，用于指定元素的类型
      * @param <E>               元素类型
      * @return 反向获取的元素集合
      */
-    default <E> Set<E> zsetReverseRangeForInstance(String instanceId, String key, IPage iPage, Class<E> eClass) {
-        return zsetReverseRangeForInstance(instanceId, key, iPage.getStartIndex(), iPage.getEndIndex(), eClass);
+    default <E> Set<E> zsetReverseRangeForInstance(String instanceId, String key, MePage mePage, Class<E> eClass) {
+        return zsetReverseRangeForInstance(instanceId, key, mePage.getStartIndex(), mePage.getEndIndex(), eClass);
     }
 
     /**

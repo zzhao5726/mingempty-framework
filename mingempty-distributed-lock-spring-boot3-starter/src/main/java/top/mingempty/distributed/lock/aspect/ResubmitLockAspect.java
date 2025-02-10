@@ -16,7 +16,7 @@ import top.mingempty.distributed.lock.enums.TierEnum;
 import top.mingempty.distributed.lock.exception.ResubmitLockException;
 import top.mingempty.distributed.lock.exception.ResubmitUnLockException;
 import top.mingempty.distributed.lock.factory.LockFactory;
-import top.mingempty.domain.base.IRsp;
+import top.mingempty.domain.base.MeRsp;
 import top.mingempty.domain.enums.YesOrNoEnum;
 import top.mingempty.util.AspectUtil;
 import top.mingempty.util.EnvironmentUtil;
@@ -72,8 +72,8 @@ public class ResubmitLockAspect {
                 throw new ResubmitLockException(exception);
             }
 
-            if (IRsp.class.equals(resubmitLock.resultClass())) {
-                return IRsp.resubmit();
+            if (MeRsp.class.equals(resubmitLock.resultClass())) {
+                return MeRsp.resubmit();
             }
             Class<?> resultClass = resubmitLock.resultClass();
             Constructor<?> cs = resultClass.getDeclaredConstructor();

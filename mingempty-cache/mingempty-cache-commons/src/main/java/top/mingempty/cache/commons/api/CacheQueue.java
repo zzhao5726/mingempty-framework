@@ -1,6 +1,6 @@
 package top.mingempty.cache.commons.api;
 
-import top.mingempty.domain.base.IPage;
+import top.mingempty.domain.base.MePage;
 import top.mingempty.domain.other.GlobalConstant;
 
 import java.util.Collection;
@@ -603,7 +603,7 @@ public interface CacheQueue {
      * @return 被弹出的元素
      */
     default <E> List<E> queueAllForInstance(String instanceId, String key, Class<E> eClass) {
-        return queuePageForInstance(instanceId, key, IPage.build(1, 0).setSearchCount(false), eClass);
+        return queuePageForInstance(instanceId, key, MePage.build(1, 0).setSearchCount(false), eClass);
     }
 
     /**
@@ -611,12 +611,12 @@ public interface CacheQueue {
      *
      * @param <E>    元素的类型
      * @param key    列表的键
-     * @param iPage  分页参数
+     * @param mePage  分页参数
      * @param eClass 元素的类型类
      * @return 被弹出的元素
      */
-    default <E> List<E> queuePage(String key, final IPage iPage, Class<E> eClass) {
-        return queuePageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, iPage, eClass);
+    default <E> List<E> queuePage(String key, final MePage mePage, Class<E> eClass) {
+        return queuePageForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, key, mePage, eClass);
     }
 
     /**
@@ -625,11 +625,11 @@ public interface CacheQueue {
      * @param <E>        元素的类型
      * @param instanceId 实例ID
      * @param key        列表的键
-     * @param iPage      分页参数
+     * @param mePage      分页参数
      * @param eClass     元素的类型类
      * @return 被弹出的元素
      */
-    <E> List<E> queuePageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass);
+    <E> List<E> queuePageForInstance(String instanceId, String key, final MePage mePage, Class<E> eClass);
 
     /**
      * 从指定键的列表中删除指定索引的元素。
