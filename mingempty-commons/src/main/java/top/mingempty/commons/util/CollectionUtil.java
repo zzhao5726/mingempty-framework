@@ -3,7 +3,7 @@ package top.mingempty.commons.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import jakarta.validation.constraints.NotNull;
-import top.mingempty.domain.base.IPage;
+import top.mingempty.domain.base.MePage;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,15 +63,15 @@ public class CollectionUtil {
      * 集合截取
      *
      * @param sourceList 数据
-     * @param iPage      分页参数
+     * @param mePage      分页参数
      * @param <T>        泛型
      * @return 截取后的集合
      */
-    public static <T> List<T> batchSubList(Collection<T> sourceList, IPage iPage) {
-        if (iPage == null) {
+    public static <T> List<T> batchSubList(Collection<T> sourceList, MePage mePage) {
+        if (mePage == null) {
             return List.of();
         }
-        return batchSubList(sourceList, iPage.getStartIndex(), iPage.getEndIndex());
+        return batchSubList(sourceList, mePage.getStartIndex(), mePage.getEndIndex());
     }
 
 

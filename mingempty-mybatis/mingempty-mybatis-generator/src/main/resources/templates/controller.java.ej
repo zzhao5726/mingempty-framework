@@ -1,0 +1,52 @@
+package #(package.Controller);
+
+#if(importColtrollerPackages)
+#for(pkg : importColtrollerPackages)
+import #(pkg);
+#end
+#end
+import org.springframework.web.bind.annotation.RequestMapping;
+#if(restControllerStyle)
+import org.springframework.web.bind.annotation.RestController;
+#else
+import org.springframework.stereotype.Controller;
+#end
+#if(superControllerClassPackage)
+import #(package.Entity).#(entity);
+import #(package.Service).#(table.serviceName);
+import #(superControllerClassPackage);
+#end
+
+/**
+ * <p>
+ * #(table.comment ??)
+ * <br>
+ * 前端控制器
+ * </p>
+ *
+ * @author #(author)
+ * @since #(date)
+ */
+#if(coltrollerClassAnnotations)
+#for(pkg : coltrollerClassAnnotations)
+#(pkg)
+#end
+#end
+#if(restControllerStyle)
+@RestController
+#else
+@Controller
+#end
+@RequestMapping("#if(package.ModuleName)/#(package.ModuleName)#end/#if(controllerMappingHyphenStyle)#(controllerMappingHyphen)#else#(table.entityPath)#end")
+#if(kotlin)
+class #(table.controllerName)#if(superControllerClass) : #(superControllerClass)<#(table.serviceName), #(entity)>()#end
+
+#else
+#if(superControllerClass)
+public class #(table.controllerName) extends #(superControllerClass)<#(table.serviceName), #(entity)> {
+#else
+public class #(table.controllerName) {
+#end
+
+}
+#end
