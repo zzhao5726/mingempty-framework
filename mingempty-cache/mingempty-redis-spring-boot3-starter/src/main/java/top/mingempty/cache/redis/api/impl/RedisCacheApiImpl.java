@@ -34,7 +34,7 @@ import top.mingempty.cache.redis.entity.wapper.RedissonClientWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedissonRxClientWrapper;
 import top.mingempty.commons.util.CollectionUtil;
 import top.mingempty.commons.util.JsonUtil;
-import top.mingempty.domain.base.IPage;
+import top.mingempty.domain.base.MePage;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -582,14 +582,14 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param iPage      分页参数
+     * @param mePage      分页参数
      * @param eClass     映射中值的类型
      * @return 映射中的所有键-值对
      */
     @Override
-    public <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, IPage iPage, Class<E> eClass) {
+    public <E> Map<String, E> mapGetPageForInstance(String instanceId, String key, MePage mePage, Class<E> eClass) {
         try {
-            Set<String> keys = mapKeysPageForInstance(instanceId, key, iPage);
+            Set<String> keys = mapKeysPageForInstance(instanceId, key, mePage);
             List<String> keyList = new ArrayList<>(keys);
             List<E> multiGet = mapMultiGetForInstance(instanceId, key, keyList, eClass);
             Map<String, E> map = new HashMap<>();
@@ -723,20 +723,20 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId 实例ID
      * @param key        映射的键
-     * @param iPage      分页参数
+     * @param mePage      分页参数
      * @return 映射键内所有的hash键
      */
     @Override
-    public Set<String> mapKeysPageForInstance(String instanceId, String key, final IPage iPage) {
+    public Set<String> mapKeysPageForInstance(String instanceId, String key, final MePage mePage) {
         try {
             Set<String> keys = mapKeysForInstance(instanceId, key);
-            if (ObjUtil.isEmpty(iPage)) {
+            if (ObjUtil.isEmpty(mePage)) {
                 return keys;
             }
-            if (iPage.isSearchCount()) {
-                iPage.setTotal(mapSizeForInstance(instanceId, key));
+            if (mePage.isSearchCount()) {
+                mePage.setTotal(mapSizeForInstance(instanceId, key));
             }
-            return new HashSet<>(CollectionUtil.batchSubList(keys, iPage));
+            return new HashSet<>(CollectionUtil.batchSubList(keys, mePage));
         } catch (Exception e) {
             log.error("map keys page error", e);
             return Set.of();
@@ -1114,18 +1114,18 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      *
      * @param instanceId 实例ID
      * @param key        列表的键
-     * @param iPage      分页参数
+     * @param mePage      分页参数
      * @param eClass     元素的类型类
      * @return 被弹出的元素
      */
     @Override
-    public <E> List<E> queuePageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass) {
+    public <E> List<E> queuePageForInstance(String instanceId, String key, final MePage mePage, Class<E> eClass) {
         try {
             List<Object> objects = redisOperationsForInstance(instanceId).opsForList()
-                    .range(key, iPage.getStartIndex(), iPage.getEndIndex());
+                    .range(key, mePage.getStartIndex(), mePage.getEndIndex());
 
-            if (iPage.isSearchCount()) {
-                iPage.setTotal(queueSizeForInstance(instanceId, key));
+            if (mePage.isSearchCount()) {
+                mePage.setTotal(queueSizeForInstance(instanceId, key));
             }
             return JsonUtil.toList(redisObjectMapper, objects, eClass);
         } catch (Exception e) {
@@ -1469,10 +1469,10 @@ public class RedisCacheApiImpl implements RedisCacheApi {
      * @return 集合中的所有元素
      */
     @Override
-    public <E> Set<E> setGetPageForInstance(String instanceId, String key, final IPage iPage, Class<E> eClass) {
+    public <E> Set<E> setGetPageForInstance(String instanceId, String key, final MePage mePage, Class<E> eClass) {
         try {
             Set<Object> members = redisOperationsForInstance(instanceId).opsForSet().members(key);
-            List<Object> objectList = CollectionUtil.batchSubList(members, iPage);
+            List<Object> objectList = CollectionUtil.batchSubList(members, mePage);
             List<E> list = JsonUtil.toList(redisObjectMapper, objectList, eClass);
             if (CollUtil.isEmpty(list)) {
                 return Set.of();

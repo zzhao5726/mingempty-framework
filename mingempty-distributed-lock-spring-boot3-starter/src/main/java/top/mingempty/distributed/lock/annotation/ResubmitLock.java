@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import top.mingempty.distributed.lock.enums.ReadWriteEnum;
 import top.mingempty.distributed.lock.enums.RealizeEnum;
 import top.mingempty.distributed.lock.enums.TierEnum;
-import top.mingempty.domain.base.IRsp;
+import top.mingempty.domain.base.MeRsp;
 import top.mingempty.domain.enums.YesOrNoEnum;
 import top.mingempty.domain.other.GlobalConstant;
 
@@ -117,13 +117,13 @@ public @interface ResubmitLock {
 
     /**
      * 返回体的对象类
-     * 默认使用{@link IRsp}。使用默认值时，下列参数不生效。
+     * 默认使用{@link MeRsp}。使用默认值时，下列参数不生效。
      * 使用其它的实体类时，该实体类需要一个无参构造。
      */
     @Schema(title = "返回体的对象类", description = "默认使用IRsp。" +
             "使用默认值时，下列参数不生效。" +
             "使用其它的实体类时，该实体类需要一个无参构造。")
-    Class<?> resultClass() default IRsp.class;
+    Class<?> resultClass() default MeRsp.class;
 
     /**
      * 异常提示编码所在字段

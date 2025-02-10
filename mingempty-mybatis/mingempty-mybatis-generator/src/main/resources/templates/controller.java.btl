@@ -1,0 +1,51 @@
+package ${package.Controller};
+
+<% if(isNotEmpty(importColtrollerPackages)){ %>
+<% for(pkg in importColtrollerPackages){ %>
+import ${pkg};
+<% } %>
+<% } %>
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+<% if(restControllerStyle){ %>
+import org.springframework.web.bind.annotation.RestController;
+<% }else{ %>
+import org.springframework.stereotype.Controller;
+<% } %>
+<% if(isNotEmpty(superControllerClassPackage)){ %>
+import ${package.Entity}.${entity};
+import ${package.Service}.${table.serviceName};
+import ${superControllerClassPackage};
+<% } %>
+
+/**
+ * <p>
+ * ${table.comment!}
+ * <br>
+ * 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+<% if(isNotEmpty(coltrollerClassAnnotations)){ %>
+<% for(pkg in coltrollerClassAnnotations){ %>
+${pkg}
+<% } %>
+<% } %>
+<% if(restControllerStyle){ %>
+@RestController
+<% }else{ %>
+@Controller
+<% } %>
+@RequestMapping("<% if(isNotEmpty(package.ModuleName)){ %>/${package.ModuleName}<% } %>/<% if(controllerMappingHyphenStyle){ %>${controllerMappingHyphen}<% }else{ %>${table.entityPath}<% } %>")
+<% if(kotlin){ %>
+class ${table.controllerName}<% if(isNotEmpty(superControllerClass)){ %> : ${superControllerClass}<${table.serviceName}, ${entity}>()<% } %>
+<% }else{ %>
+    <% if(isNotEmpty(superControllerClass)){ %>
+public class ${table.controllerName} extends ${superControllerClass}<${table.serviceName}, ${entity}> {
+    <% }else{ %>
+public class ${table.controllerName} {
+    <% } %>
+}
+<% } %>

@@ -30,8 +30,11 @@ public class MeCloudListener implements SpringApplicationRunListener {
 
     private final SpringApplication SPRING_APPLICATION;
 
+    private final String[] args;
+
     public MeCloudListener(SpringApplication application, String[] args) {
         this.SPRING_APPLICATION = application;
+        this.args = args;
     }
 
 

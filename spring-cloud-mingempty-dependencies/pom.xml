@@ -31,6 +31,7 @@
         <module>../mingempty-sequence-spring-boot3-starter</module>
         <module>../mingempty-discovery</module>
         <module>../mingempty-logging-spring-boot3-starter</module>
+        <module>../mingempty-mybatis</module>
 
     </modules>
 
@@ -63,11 +64,12 @@
         <micrometer-tracing.version>1.4.2</micrometer-tracing.version>
 
 
-        <mybatis.version>3.5.16</mybatis.version>
+        <mybatis.version>3.5.19</mybatis.version>
+        <mybatis-dynamic.version>1.5.2</mybatis-dynamic.version>
         <mybatis-generator-core.version>1.4.2</mybatis-generator-core.version>
-        <mybatis-spring-boot-starter.version>3.0.3</mybatis-spring-boot-starter.version>
-        <mybatis-plus-spring-boot3-starter.version>3.5.7</mybatis-plus-spring-boot3-starter.version>
-        <mybatis-flex-spring-boot3-starter.version>1.9.3</mybatis-flex-spring-boot3-starter.version>
+        <mybatis-spring-boot-starter.version>3.0.4</mybatis-spring-boot-starter.version>
+        <mybatis-plus-spring-boot3-starter.version>3.5.10.1</mybatis-plus-spring-boot3-starter.version>
+        <mybatis-flex-spring-boot3-starter.version>1.10.7</mybatis-flex-spring-boot3-starter.version>
 
         <apollo.version>2.4.0</apollo.version>
         <sleuth.version>3.1.11</sleuth.version>
@@ -182,6 +184,13 @@
                 <version>${mybatis.version}</version>
             </dependency>
 
+            <!--mybatis-dynamic-sql-->
+            <dependency>
+                <groupId>org.mybatis.dynamic-sql</groupId>
+                <artifactId>mybatis-dynamic-sql</artifactId>
+                <version>${mybatis-dynamic.version}</version>
+            </dependency>
+
             <!--mybatis-generator-->
             <dependency>
                 <groupId>org.mybatis.generator</groupId>
@@ -203,10 +212,31 @@
                 <version>${mybatis-plus-spring-boot3-starter.version}</version>
             </dependency>
 
+            <!-- mybatis-plus-jsqlparser -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis-plus-spring-boot3-starter.version}</version>
+            </dependency>
+
             <!-- mybatis-plus-annotation -->
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-annotation</artifactId>
+                <version>${mybatis-plus-spring-boot3-starter.version}</version>
+            </dependency>
+
+            <!--mybatis-plus-core-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-core</artifactId>
+                <version>${mybatis-plus-spring-boot3-starter.version}</version>
+            </dependency>
+
+            <!--mybatis-plus-spring-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring</artifactId>
                 <version>${mybatis-plus-spring-boot3-starter.version}</version>
             </dependency>
 
@@ -216,6 +246,14 @@
                 <artifactId>mybatis-plus-extension</artifactId>
                 <version>${mybatis-plus-spring-boot3-starter.version}</version>
             </dependency>
+
+            <!--mybatis-plus-generator-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>${mybatis-plus-spring-boot3-starter.version}</version>
+            </dependency>
+
 
             <!--mybatis-flex-->
             <dependency>
@@ -228,6 +266,34 @@
             <dependency>
                 <groupId>com.mybatis-flex</groupId>
                 <artifactId>mybatis-flex-annotation</artifactId>
+                <version>${mybatis-flex-spring-boot3-starter.version}</version>
+            </dependency>
+
+            <!--mybatis-flex-core-->
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-core</artifactId>
+                <version>${mybatis-flex-spring-boot3-starter.version}</version>
+            </dependency>
+
+            <!--mybatis-flex-processor-->
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-processor</artifactId>
+                <version>${mybatis-flex-spring-boot3-starter.version}</version>
+            </dependency>
+
+            <!--mybatis-flex-spring-->
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-spring</artifactId>
+                <version>${mybatis-flex-spring-boot3-starter.version}</version>
+            </dependency>
+
+            <!--mybatis-flex-codegen-->
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-codegen</artifactId>
                 <version>${mybatis-flex-spring-boot3-starter.version}</version>
             </dependency>
 
@@ -461,112 +527,112 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-domain</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--基础工具类-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-commons</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--对spring的封装starter-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--trace链路封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-trace</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--trace链路信息发送封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-trace-api-record</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--trace链路封装starter-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-trace-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--cache封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-cache</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--cache抽象-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-cache-commons</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--本地缓存封装starter-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-local-cache-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--redis封装starter-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-redis-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--对event事件的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-event-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--对zookeeper的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-zookeeper-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--对openapi的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-openapi-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--对concurrent的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-concurrent-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--对分布式锁的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-distributed-lock-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--对序号生成的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-sequence-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--对logging的封装-->
@@ -580,21 +646,63 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-datasource-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对mybatis的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-mybatis-extension</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对mybatis的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-mybatis-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对mybatis-plus的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对mybatis-plus的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-mybatis-plus-extension</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对mybatis-flex的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-mybatis-flex-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对mybatis-flex的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-mybatis-flex-extension</artifactId>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--对nacos的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-nacos-discovery-spring-boot3-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
             <!--对openfeign的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>spring-cloud-starter-mingempty-openfeign</artifactId>
-                <version>${project.version}</version>
+                <version>${dependencies.version}</version>
             </dependency>
 
         </dependencies>

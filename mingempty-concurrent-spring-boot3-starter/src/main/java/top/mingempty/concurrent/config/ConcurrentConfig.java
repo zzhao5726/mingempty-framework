@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.util.Assert;
 import top.mingempty.commons.thread.ThreadFactoryBuilder;
 import top.mingempty.concurrent.model.ConcurrentConstant;
@@ -39,6 +40,7 @@ import java.util.concurrent.TimeUnit;
  * @author zzhao
  */
 @Slf4j
+@EnableAsync
 @Configuration
 @AutoConfigureAfter(value = {MeSpringConfiguration.class})
 @EnableConfigurationProperties(ThreadPoolProperties.class)
