@@ -75,7 +75,7 @@ public class RedissonConfigFactory
             case RedisTypeEnum.MasterSlave -> configMasterSlave(config, properties);
             case RedisTypeEnum.Sentinel -> configSentinel(config, properties);
             case RedisTypeEnum.Replicated -> configReplicated(config, properties);
-            default -> throw new RedisCacheException("0000000003");
+            default -> throw new RedisCacheException("redis-0000000002");
         }
         return config;
     }

@@ -3,6 +3,7 @@ package top.mingempty.cache.redis.entity.wapper;
 import org.redisson.api.BatchOptions;
 import org.redisson.api.ClusterNodesGroup;
 import org.redisson.api.ExecutorOptions;
+import org.redisson.api.LocalCachedMapCacheOptions;
 import org.redisson.api.LocalCachedMapOptions;
 import org.redisson.api.LockOptions;
 import org.redisson.api.MapCacheOptions;
@@ -20,6 +21,7 @@ import org.redisson.api.RBloomFilter;
 import org.redisson.api.RBoundedBlockingQueue;
 import org.redisson.api.RBucket;
 import org.redisson.api.RBuckets;
+import org.redisson.api.RClientSideCaching;
 import org.redisson.api.RCountDownLatch;
 import org.redisson.api.RDelayedQueue;
 import org.redisson.api.RDeque;
@@ -30,13 +32,16 @@ import org.redisson.api.RGeo;
 import org.redisson.api.RHyperLogLog;
 import org.redisson.api.RIdGenerator;
 import org.redisson.api.RJsonBucket;
+import org.redisson.api.RJsonBuckets;
 import org.redisson.api.RKeys;
 import org.redisson.api.RLexSortedSet;
 import org.redisson.api.RList;
 import org.redisson.api.RListMultimap;
 import org.redisson.api.RListMultimapCache;
+import org.redisson.api.RListMultimapCacheNative;
 import org.redisson.api.RLiveObjectService;
 import org.redisson.api.RLocalCachedMap;
+import org.redisson.api.RLocalCachedMapCache;
 import org.redisson.api.RLock;
 import org.redisson.api.RLongAdder;
 import org.redisson.api.RMap;
@@ -63,6 +68,7 @@ import org.redisson.api.RSet;
 import org.redisson.api.RSetCache;
 import org.redisson.api.RSetMultimap;
 import org.redisson.api.RSetMultimapCache;
+import org.redisson.api.RSetMultimapCacheNative;
 import org.redisson.api.RShardedTopic;
 import org.redisson.api.RSortedSet;
 import org.redisson.api.RStream;
@@ -74,6 +80,7 @@ import org.redisson.api.RedissonClient;
 import org.redisson.api.RedissonReactiveClient;
 import org.redisson.api.RedissonRxClient;
 import org.redisson.api.TransactionOptions;
+import org.redisson.api.options.ClientSideCachingOptions;
 import org.redisson.api.options.CommonOptions;
 import org.redisson.api.options.JsonBucketOptions;
 import org.redisson.api.options.KeysOptions;
@@ -89,6 +96,7 @@ import org.redisson.config.Config;
 import top.mingempty.cache.redis.aspect.RedisCacheAspect;
 import top.mingempty.domain.other.AbstractRouter;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -515,6 +523,11 @@ public class RedissonClientWrapper extends AbstractRouter<RedissonClient> implem
         return determineTargetRouter().getJsonBucket(options);
     }
 
+    @Override
+    public RJsonBuckets getJsonBuckets(JsonCodec codec) {
+        return determineTargetRouter().getJsonBuckets(codec);
+    }
+
     /**
      * Returns HyperLogLog instance by name.
      *
@@ -662,6 +675,31 @@ public class RedissonClientWrapper extends AbstractRouter<RedissonClient> implem
     @Override
     public <K, V> RListMultimapCache<K, V> getListMultimapCache(PlainOptions options) {
         return determineTargetRouter().getListMultimapCache(options);
+    }
+
+    @Override
+    public <K, V> RLocalCachedMapCache<K, V> getLocalCachedMapCache(String name, LocalCachedMapCacheOptions<K, V> options) {
+        return determineTargetRouter().getLocalCachedMapCache(name, options);
+    }
+
+    @Override
+    public <K, V> RLocalCachedMapCache<K, V> getLocalCachedMapCache(String name, Codec codec, LocalCachedMapCacheOptions<K, V> options) {
+        return determineTargetRouter().getLocalCachedMapCache(name, codec, options);
+    }
+
+    @Override
+    public <K, V> RListMultimapCacheNative<K, V> getListMultimapCacheNative(String name) {
+        return determineTargetRouter().getListMultimapCacheNative(name);
+    }
+
+    @Override
+    public <K, V> RListMultimapCacheNative<K, V> getListMultimapCacheNative(String name, Codec codec) {
+        return determineTargetRouter().getListMultimapCacheNative(name, codec);
+    }
+
+    @Override
+    public <K, V> RListMultimapCacheNative<K, V> getListMultimapCacheNative(PlainOptions options) {
+        return determineTargetRouter().getListMultimapCacheNative(options);
     }
 
     /**
@@ -891,6 +929,21 @@ public class RedissonClientWrapper extends AbstractRouter<RedissonClient> implem
         return determineTargetRouter().getSetMultimapCache(options);
     }
 
+    @Override
+    public <K, V> RSetMultimapCacheNative<K, V> getSetMultimapCacheNative(String name) {
+        return determineTargetRouter().getSetMultimapCacheNative(name);
+    }
+
+    @Override
+    public <K, V> RSetMultimapCacheNative<K, V> getSetMultimapCacheNative(String name, Codec codec) {
+        return determineTargetRouter().getSetMultimapCacheNative(name, codec);
+    }
+
+    @Override
+    public <K, V> RSetMultimapCacheNative<K, V> getSetMultimapCacheNative(PlainOptions options) {
+        return determineTargetRouter().getSetMultimapCacheNative(options);
+    }
+
     /**
      * Returns semaphore instance by name
      *
@@ -1033,6 +1086,11 @@ public class RedissonClientWrapper extends AbstractRouter<RedissonClient> implem
     @Override
     public RLock getMultiLock(RLock... locks) {
         return determineTargetRouter().getMultiLock(locks);
+    }
+
+    @Override
+    public RLock getMultiLock(String group, Collection<Object> values) {
+        return determineTargetRouter().getMultiLock(group, values);
     }
 
     /**
@@ -2298,6 +2356,11 @@ public class RedissonClientWrapper extends AbstractRouter<RedissonClient> implem
     @Override
     public RLiveObjectService getLiveObjectService(LiveObjectOptions options) {
         return determineTargetRouter().getLiveObjectService(options);
+    }
+
+    @Override
+    public RClientSideCaching getClientSideCaching(ClientSideCachingOptions options) {
+        return determineTargetRouter().getClientSideCaching(options);
     }
 
     /**
