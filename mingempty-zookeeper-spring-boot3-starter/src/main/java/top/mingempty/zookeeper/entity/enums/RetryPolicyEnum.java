@@ -21,7 +21,7 @@ public enum RetryPolicyEnum {
     RETRY_UNTIL_ELAPSED(RetryUntilElapsed.class, "在给定的时间量之后再试", "maxElapsedTimeMs", "sleepMsBetweenRetries"),
     EXPONENTIAL_BACKOFF_RETRY(ExponentialBackoffRetry.class, "重试设定的次数，同时增加两次重试之间的睡眠时间", "baseSleepTimeMs", "maxRetries", "maxSleepMs"),
     BOUNDED_EXPONENTIAL_BACKOFF_RETRY(BoundedExponentialBackoffRetry.class, "重试设定的次数，重试之间的睡眠时间增加（最多达到最大限制）", "baseSleepTimeMs", "maxSleepTimeMs", "maxRetries"),
-    RETRY_FOREVER(RetryForever.class, "始终允许重试", "retryIntervalMs"),
+    RETRY_FOREVER(RetryForever.class, "始终允许重试", "sleepMsBetweenRetry"),
     SESSION_FAILED_RETRY_POLICY(SessionFailedRetryPolicy.class, "会话失败时使用特定的重试策略", "delegatePolicy"),
     ;
 

@@ -35,8 +35,8 @@ public class SequenceConfig {
     }
 
     @Bean
-    @ConditionalOnBean(name = {"redisTemplateWrapper"})
-    @ConditionalOnClass(name = {"top.mingempty.cache.redis.entity.wapper.RedisTemplateWrapper"})
+    @ConditionalOnBean(name = {"redisTemplate"})
+    @ConditionalOnClass(name = {"top.mingempty.cache.redis.entity.wapper.MeRedisTemplate"})
     public InitFactory redisInitFactory() {
         return new RedisInitFactory();
     }

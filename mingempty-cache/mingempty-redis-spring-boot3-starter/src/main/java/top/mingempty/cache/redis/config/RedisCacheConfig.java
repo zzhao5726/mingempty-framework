@@ -24,7 +24,6 @@ import top.mingempty.cache.redis.entity.wapper.RedisCacheConfigurationWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedisCacheManagerWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedisConfigurationWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedisConnectionFactoryWrapper;
-import top.mingempty.cache.redis.entity.wapper.RedisTemplateWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedissonClientWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedissonConfigWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedissonRxClientWrapper;
@@ -111,26 +110,12 @@ public class RedisCacheConfig {
         return meRedisConnectionFactory.build();
     }
 
-    @Bean
-    @ConditionalOnBean(value = {RedisConnectionFactoryWrapper.class, Jackson2JsonRedisSerializer.class})
-    public RedisTemplateFactory redisTemplateFactory(RedisConnectionFactoryWrapper redisConnectionFactoryWrapper,
-                                                     Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer) {
-        return new RedisTemplateFactory(redisCacheProperties,
+    @Bean(value = {"redisTemplate", "meRedisTemplate"})
+    @ConditionalOnBean(value = {RedisConnectionFactoryWrapper.class})
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactoryWrapper redisConnectionFactoryWrapper,
+                                                       Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer) {
+        return RedisTemplateFactory.redisTemplate(redisCacheProperties.getRedis().isEnableTransactionSupport(),
                 redisConnectionFactoryWrapper, jackson2JsonRedisSerializer);
-    }
-
-    @Bean
-    @ConditionalOnBean(value = {RedisTemplateFactory.class})
-    public RedisTemplateWrapper redisTemplateWrapper(RedisTemplateFactory redisTemplateFactory) {
-        return redisTemplateFactory.build();
-    }
-
-    @Bean
-    @ConditionalOnBean(value = {RedisConnectionFactoryWrapper.class, RedisTemplateFactory.class})
-    public RedisTemplate<String, Object> redisTemplate(RedisTemplateFactory redisTemplateFactory,
-                                                       RedisConnectionFactoryWrapper redisConnectionFactoryWrapper) {
-        return redisTemplateFactory
-                .redisTemplate(redisCacheProperties.getRedis().isEnableTransactionSupport(), redisConnectionFactoryWrapper);
     }
 
     /*=================redis👆  CacheManager👇================================*/
@@ -208,10 +193,9 @@ public class RedisCacheConfig {
                                        @Autowired(required = false) RedisCacheManagerWrapper redisCacheManagerWrapper,
                                        @Autowired(required = false) RedissonClientWrapper redissonClientWrapper,
                                        @Autowired(required = false) RedissonRxClientWrapper redissonRxClientWrapper,
-                                       RedisTemplateWrapper redisTemplateWrapper,
                                        RedisTemplate<String, Object> redisTemplate) {
         return new RedisCacheApiImpl(redisObjectMapper, redisCacheManagerWrapper,
-                redissonClientWrapper, redissonRxClientWrapper, redisTemplateWrapper, redisTemplate);
+                redissonClientWrapper, redissonRxClientWrapper, redisTemplate);
     }
 
 

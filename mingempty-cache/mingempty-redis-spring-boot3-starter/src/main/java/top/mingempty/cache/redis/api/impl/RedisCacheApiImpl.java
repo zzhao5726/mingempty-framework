@@ -22,14 +22,13 @@ import org.springframework.data.redis.connection.zset.Aggregate;
 import org.springframework.data.redis.connection.zset.Weights;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
 import top.mingempty.cache.redis.api.RedisCacheApi;
+import top.mingempty.cache.redis.entity.wapper.MeRedisTemplate;
 import top.mingempty.cache.redis.entity.wapper.RedisCacheManagerWrapper;
-import top.mingempty.cache.redis.entity.wapper.RedisTemplateWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedissonClientWrapper;
 import top.mingempty.cache.redis.entity.wapper.RedissonRxClientWrapper;
 import top.mingempty.commons.util.CollectionUtil;
@@ -62,7 +61,6 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     private final RedisCacheManagerWrapper redisCacheManagerWrapper;
     private final RedissonClientWrapper redissonClientWrapper;
     private final RedissonRxClientWrapper redissonRxClientWrapper;
-    private final RedisTemplateWrapper redisTemplateWrapper;
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**
@@ -96,13 +94,17 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     }
 
     /**
-     * 获取RedisTemplateWrapper
+     * 获取RedisTemplate
      *
      * @return RedisOperations<String, Object>
      */
     @Override
-    public RedisOperations<String, Object> redisOperationsForInstance(String instanceId) {
-        return redisTemplateWrapper.getResolvedRouter(instanceId);
+    public RedisTemplate<String, Object> redisOperationsForInstance(String instanceId) {
+        if (redisTemplate != null
+                && redisTemplate instanceof MeRedisTemplate meRedisTemplate) {
+            return meRedisTemplate.gainResolvedRouter(instanceId);
+        }
+        return redisTemplate;
     }
 
     /**
@@ -247,24 +249,24 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     }
 
     /**
-     * 在指定实例中根据命名空间删除所有相关的缓存数据。
+     * 在指定实例中根据指定格式的键删除所有相关的缓存数据。
      *
      * @param instanceId 实例ID
-     * @param namespace  要删除的命名空间
+     * @param pattern  要删除的指定格式的键
      */
     @Override
-    public Boolean delByNamespaceForInstance(String instanceId, String namespace) {
+    public Boolean delByPatternForInstance(String instanceId, String pattern) {
         try {
-            if (namespace == null) {
-                namespace = "";
+            if (pattern == null) {
+                pattern = "";
             }
-            Set<String> keysToDelete = scanForInstance(instanceId, namespace);
+            Set<String> keysToDelete = scanForInstance(instanceId, pattern);
             if (CollUtil.isEmpty(keysToDelete)) {
                 return true;
             }
             return delForInstance(instanceId, keysToDelete) >= 0;
         } catch (Exception e) {
-            log.error("del by namespace error", e);
+            log.error("del by pattern error", e);
             return false;
         }
     }
@@ -278,8 +280,8 @@ public class RedisCacheApiImpl implements RedisCacheApi {
     @Override
     public Boolean clearForInstance(String instanceId) {
         try {
-            redisOperationsForInstance(instanceId).execute((RedisCallback<Object>) connection
-                    -> {
+            redisOperationsForInstance(instanceId)
+                    .execute((RedisCallback<Object>) connection -> {
                 connection.serverCommands().flushAll();
                 return null;
             });
