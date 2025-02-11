@@ -97,14 +97,14 @@ public class LocalCacheApiImpl implements LocalCacheApi {
     }
 
     /**
-     * 在指定实例中根据命名空间删除所有相关的缓存数据。
+     * 在指定实例中根据指定格式的键删除所有相关的缓存数据。
      *
      * @param instanceId 实例ID
-     * @param namespace  要删除的命名空间
+     * @param pattern  要删除的指定格式的键
      * @return 操作是否成功
      */
     @Override
-    public Boolean delByNamespaceForInstance(String instanceId, String namespace) {
+    public Boolean delByPatternForInstance(String instanceId, String pattern) {
         return null;
     }
 

@@ -67,7 +67,7 @@ public interface RedisCacheApi extends RedisCacheMap, RedisCacheSet, RedisCacheZ
     RedissonRxClient redissonRxClientForInstance(String instanceId);
 
     /**
-     * 获取RedisTemplateWrapper
+     * 获取RedisTemplate
      *
      * @return RedisOperations
      */
@@ -76,7 +76,7 @@ public interface RedisCacheApi extends RedisCacheMap, RedisCacheSet, RedisCacheZ
     }
 
     /**
-     * 获取RedisTemplateWrapper
+     * 获取RedisTemplate
      *
      * @return RedisOperations
      */
@@ -99,7 +99,7 @@ public interface RedisCacheApi extends RedisCacheMap, RedisCacheSet, RedisCacheZ
      */
     @Override
     default Boolean delByPrefixUseScanForInstance(String instanceId, String prefix) {
-        return delByNamespaceForInstance(instanceId, prefix);
+        return delByPatternForInstance(instanceId, prefix);
     }
     /**
      * 扫描指定格式的键

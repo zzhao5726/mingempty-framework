@@ -3,9 +3,9 @@ package top.mingempty.sequence.factory;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import top.mingempty.cache.redis.entity.wapper.RedisTemplateWrapper;
+import top.mingempty.cache.redis.entity.wapper.MeRedisTemplate;
 import top.mingempty.sequence.api.impl.base.RedisSequence;
 import top.mingempty.sequence.api.impl.base.SnowflakeIdWorkerSequence;
 import top.mingempty.sequence.api.impl.wrapper.RedisSequenceWrapper;
@@ -33,7 +33,7 @@ public class RedisInitFactory implements InitFactory {
             """
                     local max_id = tonumber(ARGV[1])
                     local new_key_prefix = KEYS[2]
-                    
+                                        
                     local function generate_unique_key()
                       local attempts = 0
                       repeat
@@ -44,7 +44,7 @@ public class RedisInitFactory implements InitFactory {
                           current_id = 0
                         end
                         local new_key = new_key_prefix .. current_id
-                    
+                                        
                         -- 使用 SETNX 来判断 Key 是否存在并设置值
                         if redis.call('SETNX', new_key, '') == 1 then
                           redis.call('EXPIRE', new_key, 300)
@@ -53,16 +53,16 @@ public class RedisInitFactory implements InitFactory {
                       until attempts >= max_id
                       return -1
                     end
-                    
+                                        
                     return generate_unique_key()
                     """;
 
     private final static ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(2);
 
-    private final RedisTemplateWrapper redisTemplateWrapper;
+    private final MeRedisTemplate<String, Object> meRedisTemplate;
 
     public RedisInitFactory() {
-        this.redisTemplateWrapper = SpringContextUtil.gainBean("redisTemplateWrapper", RedisTemplateWrapper.class);
+        this.meRedisTemplate = SpringContextUtil.gainBean("meRedisTemplate", MeRedisTemplate.class);
     }
 
     /**
@@ -89,14 +89,14 @@ public class RedisInitFactory implements InitFactory {
         String nowWorkFolder = allWorkFolder.concat(SeqRealizeEnum.Redis.getSeparator());
 
         instanceNames.forEach(instanceName -> {
-            RedisOperations<String, Object> redisOperations = redisTemplateWrapper.getResolvedRouter(instanceName);
-            Assert.notNull(redisOperations, "redisOperations is null");
+            RedisTemplate<String, Object> redisTemplate = meRedisTemplate.gainResolvedRouter(instanceName);
+            Assert.notNull(redisTemplate, "redisTemplate is null");
 
             DefaultRedisScript<Long> defaultRedisScript = new DefaultRedisScript<>();
             defaultRedisScript.setResultType(Long.class);
             defaultRedisScript.setScriptText(SEQUENCE_SNOWFLAKE_ID_LUA_SCRIPT);
             int maxId = 1 << (SnowflakeIdWorkerSequence.DATA_CENTER_ID_BITS + SnowflakeIdWorkerSequence.WORKER_ID_BITS);
-            Long baseId = redisOperations.execute(defaultRedisScript,
+            Long baseId = redisTemplate.execute(defaultRedisScript,
                     List.of(allWorkFolder, nowWorkFolder), maxId);
             if (baseId == null
                     || baseId == -1) {
@@ -105,17 +105,19 @@ public class RedisInitFactory implements InitFactory {
             SnowflakeIdWorkerSequence.SnowflakeIdWorkerHolder.init(SeqRealizeEnum.Redis, instanceName, baseId.intValue());
 
             //设置定时任务，每隔两分半重新续期
-            scheduledThreadPoolExecutor.scheduleWithFixedDelay(() -> {
-                        if (log.isDebugEnabled()) {
-                            log.debug("雪花算法baseId[{}]续期开始", baseId);
-                        }
-                        redisOperations
-                                .expire(nowWorkFolder.concat(String.valueOf(baseId)), 60 * 5, TimeUnit.SECONDS);
-                        if (log.isDebugEnabled()) {
-                            log.debug("雪花算法baseId[{}]续期完成", baseId);
-                        }
-                    },
-                    60 * 5 / 2, 60 * 5 / 2, TimeUnit.SECONDS);
+            scheduledThreadPoolExecutor
+                    .scheduleWithFixedDelay(() -> {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("雪花算法baseId[{}]续期开始", baseId);
+                                }
+                                redisTemplate
+                                        .expire(nowWorkFolder.concat(String.valueOf(baseId)),
+                                                60 * 5, TimeUnit.SECONDS);
+                                if (log.isDebugEnabled()) {
+                                    log.debug("雪花算法baseId[{}]续期完成", baseId);
+                                }
+                            },
+                            60 * 5 / 2, 60 * 5 / 2, TimeUnit.SECONDS);
 
         });
     }
@@ -131,12 +133,13 @@ public class RedisInitFactory implements InitFactory {
             expirationStrategySequence(cacheSequenceProperties);
             return;
         }
-        RedisOperations<String, Object> redisOperations
-                = redisTemplateWrapper.getResolvedRouter(cacheSequenceProperties.getInstanceName());
+
+        RedisTemplate<String, Object> redisTemplate
+                = meRedisTemplate.gainResolvedRouter(cacheSequenceProperties.getInstanceName());
         RedisSequence.RedisSequenceHolder.init(cacheSequenceProperties.getInstanceName(),
                 cacheSequenceProperties.getSeqName(), cacheSequenceProperties.getStep(),
                 cacheSequenceProperties.getExpirySeconds(),
-                redisOperations);
+                redisTemplate);
     }
 
     /**
@@ -146,13 +149,14 @@ public class RedisInitFactory implements InitFactory {
      */
     @Override
     public void expirationStrategySequence(CacheSequenceProperties cacheSequenceProperties) {
-        RedisOperations<String, Object> redisOperations
-                = redisTemplateWrapper.getResolvedRouter(cacheSequenceProperties.getInstanceName());
+
+        RedisTemplate<String, Object> redisTemplate
+                = meRedisTemplate.gainResolvedRouter(cacheSequenceProperties.getInstanceName());
         RedisSequenceWrapper.RedisSequenceHolder.init(cacheSequenceProperties.getInstanceName(),
                 cacheSequenceProperties.getSeqName(),
                 cacheSequenceProperties.getStep(),
                 cacheSequenceProperties.isExpirationDelete(),
                 cacheSequenceProperties.getExpirationStrategy(),
-                redisOperations);
+                redisTemplate);
     }
 }
