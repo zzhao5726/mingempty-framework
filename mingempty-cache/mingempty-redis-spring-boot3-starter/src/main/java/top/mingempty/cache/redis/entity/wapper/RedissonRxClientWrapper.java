@@ -2,6 +2,7 @@ package top.mingempty.cache.redis.entity.wapper;
 
 import org.redisson.api.BatchOptions;
 import org.redisson.api.ClusterNode;
+import org.redisson.api.LocalCachedMapCacheOptions;
 import org.redisson.api.LocalCachedMapOptions;
 import org.redisson.api.LockOptions;
 import org.redisson.api.MapCacheOptions;
@@ -26,11 +27,14 @@ import org.redisson.api.RGeoRx;
 import org.redisson.api.RHyperLogLogRx;
 import org.redisson.api.RIdGeneratorRx;
 import org.redisson.api.RJsonBucketRx;
+import org.redisson.api.RJsonBucketsRx;
 import org.redisson.api.RKeysRx;
 import org.redisson.api.RLexSortedSetRx;
+import org.redisson.api.RListMultimapCacheNativeRx;
 import org.redisson.api.RListMultimapCacheRx;
 import org.redisson.api.RListMultimapRx;
 import org.redisson.api.RListRx;
+import org.redisson.api.RLocalCachedMapCacheRx;
 import org.redisson.api.RLocalCachedMapRx;
 import org.redisson.api.RLock;
 import org.redisson.api.RLockRx;
@@ -50,6 +54,7 @@ import org.redisson.api.RScriptRx;
 import org.redisson.api.RSearchRx;
 import org.redisson.api.RSemaphoreRx;
 import org.redisson.api.RSetCacheRx;
+import org.redisson.api.RSetMultimapCacheNativeRx;
 import org.redisson.api.RSetMultimapCacheRx;
 import org.redisson.api.RSetMultimapRx;
 import org.redisson.api.RSetRx;
@@ -73,6 +78,7 @@ import org.redisson.config.Config;
 import top.mingempty.cache.redis.aspect.RedisCacheAspect;
 import top.mingempty.domain.other.AbstractRouter;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -486,6 +492,11 @@ public class RedissonRxClientWrapper extends AbstractRouter<RedissonRxClient> im
         return determineTargetRouter().getMultiLock(locks);
     }
 
+    @Override
+    public RLockRx getMultiLock(String group, Collection<Object> values) {
+        return determineTargetRouter().getMultiLock(group, values);
+    }
+
     /**
      * @param locks
      * @return
@@ -786,6 +797,11 @@ public class RedissonRxClientWrapper extends AbstractRouter<RedissonRxClient> im
         return determineTargetRouter().getJsonBucket(options);
     }
 
+    @Override
+    public RJsonBucketsRx getJsonBuckets(JsonCodec codec) {
+        return determineTargetRouter().getJsonBuckets(codec);
+    }
+
     /**
      * Returns HyperLogLog instance by name.
      *
@@ -954,6 +970,21 @@ public class RedissonRxClientWrapper extends AbstractRouter<RedissonRxClient> im
         return determineTargetRouter().getListMultimapCache(options);
     }
 
+    @Override
+    public <K, V> RListMultimapCacheNativeRx<K, V> getListMultimapCacheNative(String name) {
+        return determineTargetRouter().getListMultimapCacheNative(name);
+    }
+
+    @Override
+    public <K, V> RListMultimapCacheNativeRx<K, V> getListMultimapCacheNative(String name, Codec codec) {
+        return determineTargetRouter().getListMultimapCacheNative(name, codec);
+    }
+
+    @Override
+    public <K, V> RListMultimapCacheNativeRx<K, V> getListMultimapCacheNative(PlainOptions options) {
+        return determineTargetRouter().getListMultimapCacheNative(options);
+    }
+
     /**
      * Returns Set based Multimap instance by name.
      *
@@ -1028,6 +1059,21 @@ public class RedissonRxClientWrapper extends AbstractRouter<RedissonRxClient> im
     @Override
     public <K, V> RSetMultimapCacheRx<K, V> getSetMultimapCache(PlainOptions options) {
         return determineTargetRouter().getSetMultimapCache(options);
+    }
+
+    @Override
+    public <K, V> RSetMultimapCacheNativeRx<K, V> getSetMultimapCacheNative(String name) {
+        return determineTargetRouter().getSetMultimapCacheNative(name);
+    }
+
+    @Override
+    public <K, V> RSetMultimapCacheNativeRx<K, V> getSetMultimapCacheNative(String name, Codec codec) {
+        return determineTargetRouter().getSetMultimapCacheNative(name, codec);
+    }
+
+    @Override
+    public <K, V> RSetMultimapCacheNativeRx<K, V> getSetMultimapCacheNative(PlainOptions options) {
+        return determineTargetRouter().getSetMultimapCacheNative(options);
     }
 
     /**
@@ -1131,6 +1177,16 @@ public class RedissonRxClientWrapper extends AbstractRouter<RedissonRxClient> im
     @Override
     public <K, V> RLocalCachedMapRx<K, V> getLocalCachedMap(org.redisson.api.options.LocalCachedMapOptions<K, V> options) {
         return determineTargetRouter().getLocalCachedMap(options);
+    }
+
+    @Override
+    public <K, V> RLocalCachedMapCacheRx<K, V> getLocalCachedMapCache(String name, LocalCachedMapCacheOptions<K, V> options) {
+        return determineTargetRouter().getLocalCachedMapCache(name, options);
+    }
+
+    @Override
+    public <K, V> RLocalCachedMapCacheRx<K, V> getLocalCachedMapCache(String name, Codec codec, LocalCachedMapCacheOptions<K, V> options) {
+        return determineTargetRouter().getLocalCachedMapCache(name, codec, options);
     }
 
     /**

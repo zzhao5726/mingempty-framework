@@ -71,13 +71,14 @@ public class RedisConfigurationFactory
             case Sentinel -> {
                 return sentinelConfig(properties);
             }
-            default -> throw new RedisCacheException("0000000003");
+            default -> throw new RedisCacheException("redis-0000000002");
         }
     }
 
 
     public RedisStaticMasterReplicaConfiguration masterReplicaConfig(RedisProperties properties) {
-        RedisStaticMasterReplicaConfiguration config = new RedisStaticMasterReplicaConfiguration(properties.getHost(), properties.getPort());
+        RedisStaticMasterReplicaConfiguration config
+                = new RedisStaticMasterReplicaConfiguration(properties.getHost(), properties.getPort());
         config.setUsername(properties.getUsername());
         config.setPassword(RedisPassword.of(properties.getPassword()));
         config.setDatabase(properties.getDatabase());

@@ -13,12 +13,12 @@ public class RedisUrlSyntaxException extends BaseCommonException {
     private final String url;
 
     public RedisUrlSyntaxException(String url, Exception cause) {
-        super("0000000002", cause, url);
+        super("redis-0000000001", cause, url);
         this.url = url;
     }
 
     public RedisUrlSyntaxException(String url) {
-        super("0000000002", url);
+        super("redis-0000000001", url);
         this.url = url;
     }
 
