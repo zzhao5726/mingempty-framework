@@ -208,26 +208,26 @@ public interface CacheApi extends CacheStr, CacheQueue, CacheSet, CacheZSet, Cac
     Long delForInstance(String instanceId, Collection<String> keys);
 
     /**
-     * 根据命名空间删除所有相关的缓存数据。
+     * 根据指定格式的键删除所有相关的缓存数据。
      * <p>
      * 使用默认的实例名进行操作。
      * </p>
      *
-     * @param namespace 要删除的命名空间
+     * @param pattern 要删除的指定格式的键
      * @return 操作是否成功
      */
-    default Boolean delByNamespace(String namespace) {
-        return delByNamespaceForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, namespace);
+    default Boolean delByPattern(String pattern) {
+        return delByPatternForInstance(GlobalConstant.DEFAULT_INSTANCE_NAME, pattern);
     }
 
     /**
-     * 在指定实例中根据命名空间删除所有相关的缓存数据。
+     * 在指定实例中根据指定格式的键删除所有相关的缓存数据。
      *
      * @param instanceId 实例ID
-     * @param namespace  要删除的命名空间
+     * @param pattern  要删除的指定格式的键
      * @return 操作是否成功
      */
-    Boolean delByNamespaceForInstance(String instanceId, String namespace);
+    Boolean delByPatternForInstance(String instanceId, String pattern);
 
     /**
      * 清空缓存中的所有数据。
