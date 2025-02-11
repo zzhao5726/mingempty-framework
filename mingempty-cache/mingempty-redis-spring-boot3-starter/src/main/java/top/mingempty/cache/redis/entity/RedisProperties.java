@@ -1,6 +1,7 @@
 package top.mingempty.cache.redis.entity;
 
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
@@ -50,11 +51,6 @@ public class RedisProperties implements BuilderWrapperParent {
     private ConnectionInfo connectionInfo;
 
     /**
-     * Redis 服务器主机。
-     */
-    private String host = "localhost";
-
-    /**
      * Redis 服务器的登录用户名。
      */
     private String username;
@@ -68,11 +64,6 @@ public class RedisProperties implements BuilderWrapperParent {
      * Redis 哨兵服务器的登录密码。
      */
     private String sentinelPassword;
-
-    /**
-     * Redis 服务器端口。
-     */
-    private int port = 6379;
 
     /**
      * 是否启用 SSL 支持。
@@ -112,7 +103,9 @@ public class RedisProperties implements BuilderWrapperParent {
     /**
      * “主机：端口”的列表。
      */
-    private List<String> nodes;
+    private List<String> nodes = new ArrayList<>() {{
+        this.add("localhost:6379");
+    }};
 
     /**
      * 设置自适应拓扑更新的超时。默认30S
@@ -159,6 +152,29 @@ public class RedisProperties implements BuilderWrapperParent {
      */
     private boolean registerToSpring;
 
+    public String getHost() {
+        List<String> nodes = getNodes();
+        if (CollUtil.isEmpty(nodes)) {
+            return "localhost";
+        }
+        String[] split = nodes.getFirst().split(":");
+        if (split.length == 2) {
+            return split[0];
+        }
+        throw new RedisUrlSyntaxException(nodes.getFirst());
+    }
+
+    public int getPort() {
+        List<String> nodes = getNodes();
+        if (CollUtil.isEmpty(nodes)) {
+            return 6379;
+        }
+        String[] split = nodes.getFirst().split(":");
+        if (split.length == 2) {
+            return Integer.parseInt(split[1]);
+        }
+        throw new RedisUrlSyntaxException(nodes.getFirst());
+    }
 
     public String getAddress() {
         return this.getHost().concat(":").concat(String.valueOf(this.getPort()));
@@ -186,11 +202,10 @@ public class RedisProperties implements BuilderWrapperParent {
                 return this.connectionInfo;
             }
             this.connectionInfo = parseUrl(this.getUrl());
-            this.setHost(connectionInfo.getHostName());
-            this.setPort(connectionInfo.getPort());
+            this.setNodes(List.of(connectionInfo.getHostName() + ":" + connectionInfo.getPort()));
             this.setUsername(connectionInfo.getUsername());
             this.setPassword(connectionInfo.getPassword());
-            this.setSsl(connectionInfo.useSsl);
+            this.setSsl(connectionInfo.isUseSsl());
             this.setUrl(null);
         }
         return this.connectionInfo;
