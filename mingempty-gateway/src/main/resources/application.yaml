@@ -22,12 +22,9 @@ spring:
 
   config:
     import:
-      - optional:nacos:mingempty-gateway.yaml
-
+      - optional:nacos:gateway.yaml
 
 
 
 logging:
   config: classpath:logback-me.xml
-
-
