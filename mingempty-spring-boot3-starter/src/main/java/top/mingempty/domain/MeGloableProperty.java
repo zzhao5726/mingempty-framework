@@ -3,6 +3,7 @@ package top.mingempty.domain;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.web.cors.CorsConfiguration;
 
 /**
  * 基础配置文件
@@ -83,6 +84,18 @@ public class MeGloableProperty {
      */
     @Schema(title = "项目编译时间")
     private String timestamp;
+
+    /**
+     * 是否启用跨域过滤器
+     */
+    @Schema(title = "是否启用跨域过滤器")
+    private boolean enabledCorsFilter = true;
+
+    /**
+     * 跨域配置
+     */
+    @Schema(title = "跨域配置")
+    private CorsConfiguration corsConfiguration;
 
 
 }

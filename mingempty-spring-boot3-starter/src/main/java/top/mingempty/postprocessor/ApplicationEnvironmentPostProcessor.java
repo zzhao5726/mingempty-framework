@@ -54,8 +54,10 @@ public class ApplicationEnvironmentPostProcessor implements EnvironmentPostProce
             log.debug("系统基础信息增强。appName:[{}],appGroup:[{}],appVersion:[{}],basePath:[{}]",
                     appName, appGroup, appVersion, basePath);
         } else {
-            environment.getSystemProperties().remove("server.servlet.context-path");
-            environment.getSystemProperties().remove("spring.webflux.base-path");
+            environment.getSystemProperties().put("me.base-path", "");
+            environment.getSystemProperties().put("server.servlet.context-path", "");
+            environment.getSystemProperties().put("spring.webflux.base-path", "");
+            environment.getSystemProperties().put("me.using-base-path", false);
             log.debug("系统基础信息增强。appName:[{}],appGroup:[{}],appVersion:[{}]",
                     appName, appGroup, appVersion);
         }
