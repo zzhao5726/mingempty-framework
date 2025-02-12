@@ -3,7 +3,6 @@ package top.mingempty.gateway.domain;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
 
@@ -27,11 +26,4 @@ public class GatewayProperties {
      */
     @Schema(title = "配置需要清洗的请求头")
     private List<String> clearHeaders = List.of();
-
-    /**
-     * 跨域配置
-     */
-    @Schema(title = "跨域配置")
-    private CorsConfiguration corsConfiguration;
-
 }

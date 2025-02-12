@@ -20,8 +20,6 @@ spring:
         namespace: 9d0a606f-63ca-4aef-8a97-2832b140f114
         group: DEFAULT_GROUP
 
-
-
   config:
     import:
       - optional:nacos:gateway.yaml

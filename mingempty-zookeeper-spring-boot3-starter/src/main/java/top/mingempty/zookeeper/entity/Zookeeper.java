@@ -35,7 +35,7 @@ public class Zookeeper implements BuilderWrapperParent {
     /**
      * 设置要连接的服务器列表
      * <p>
-     * 集群环境是用英文分号分隔
+     * 集群环境是用英文逗号分隔
      */
     private String connectString = "127.0.0.1:2181";
 

@@ -35,6 +35,11 @@ public class NacosConfig {
         metadata.put("startup.time", DateTimeUtil.formatLocalDateTime(LocalDateTime.now()));
         metadata.put("me.group", meGloableProperty.getGroup());
         metadata.put("me.version", meGloableProperty.getVersion());
+        if (meGloableProperty.isUsingBasePath()) {
+            metadata.put("me.base-path", meGloableProperty.getBasePath());
+        } else {
+            metadata.put("me.base-path", "");
+        }
         return nacosDiscoveryProperties;
     }
 
