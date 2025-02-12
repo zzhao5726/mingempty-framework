@@ -6,18 +6,6 @@ package top.mingempty.gateway.domain;
  * @author zzhao
  */
 public interface GatewayConstant {
-
-
-    /**
-     * Access-Control-Expose-Headers
-     */
-    String ALL = "*";
-
-    /**
-     * Access-Control-Max-Age
-     */
-    Long MAX_AGE = 18000L;
-
     /**
      * 请求开始时间常量
      */
