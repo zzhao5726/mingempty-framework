@@ -55,4 +55,17 @@ public interface GlobalConstant {
      */
     @Schema(title = "字符串常量", description = "标识当前请求来源于内部")
     String REQUEST_FROM_INNER = "request-from-inner";
+
+
+    /**
+     * Access-Control-Expose-Headers
+     */
+    @Schema(title = "Access-Control-Expose-Headers", description = "Access-Control-Expose-Headers")
+    String ALL = "*";
+
+    /**
+     * Access-Control-Max-Age
+     */
+    @Schema(title = "Access-Control-Max-Age", description = "Access-Control-Max-Age")
+    Long MAX_AGE = 18000L;
 }
