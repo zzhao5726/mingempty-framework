@@ -3,11 +3,11 @@ package top.mingempty.openapi.postprocessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.boot.env.OriginTrackedMapPropertySource;
+import org.springframework.boot.origin.OriginTrackedValue;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.springframework.core.env.PropertySource;
 
 /**
  * 系统基础信息增强
@@ -17,6 +17,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public class RemoveDefaultOpenApiEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
+    private final static String ORIGIN_TRACKED_MAP_PROPERTY_SOURCE_CLASS_NAME = OriginTrackedMapPropertySource.class.getName();
+
     /**
      * Post-process the given {@code environment}.
      *
@@ -25,23 +27,28 @@ public class RemoveDefaultOpenApiEnvironmentPostProcessor implements Environment
      */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-
-        List<String> removeKeys = new CopyOnWriteArrayList<>();
-
-        environment.getSystemProperties()
-                .entrySet()
-                .parallelStream()
-                .forEach(entry -> {
-                    if (entry.getKey().startsWith("springdoc")) {
-                        if (!environment.getSystemProperties().containsKey(entry.getKey())) {
-                            environment.getSystemProperties().put(entry.getKey().replace("springdoc", "me.openapi.spring"), entry.getValue());
+        if (environment.getProperty("me.openapi.enabled", Boolean.class, Boolean.FALSE)) {
+            environment.getPropertySources().stream()
+                    .filter(item -> ORIGIN_TRACKED_MAP_PROPERTY_SOURCE_CLASS_NAME.equals(item.getClass().getName()))
+                    .map(item -> (OriginTrackedMapPropertySource) item)
+                    .map(PropertySource::getSource)
+                    .flatMap(map -> map.entrySet().stream())
+                    .forEach(entry -> {
+                        String newKey = "";
+                        if (entry.getKey().startsWith("me.openapi.springdoc")) {
+                            newKey = entry.getKey().replace("me.openapi.springdoc", "springdoc");
+                        } else if (entry.getKey().startsWith("me.openapi.swagger-ui")) {
+                            newKey = entry.getKey().replace("me.openapi.swagger-ui", "springdoc.swagger-ui");
                         }
-                        removeKeys.add(entry.getKey());
-                    }
-                });
-        removeKeys.parallelStream().forEach(key -> environment.getSystemProperties().remove(key));
-
-        removeKeys.clear();
+                        if (!newKey.isEmpty()) {
+                            if (environment.containsProperty(newKey)) {
+                                environment.getSystemProperties().put(newKey, environment.getProperty(newKey));
+                            } else if ((entry.getValue() instanceof OriginTrackedValue originTrackedValue)) {
+                                environment.getSystemProperties().put(newKey, originTrackedValue.getValue());
+                            }
+                        }
+                    });
+        }
     }
 
     /**
