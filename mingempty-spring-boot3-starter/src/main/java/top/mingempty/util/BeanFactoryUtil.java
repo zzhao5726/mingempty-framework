@@ -37,6 +37,10 @@ public class BeanFactoryUtil implements BeanFactoryAware {
         DEFAULT_LISTABLE_BEAN_FACTORY.registerSingleton(beanName, obj);
     }
 
+    public static <T> void registerSingleton(String beanName, Object singletonObject) {
+        DEFAULT_LISTABLE_BEAN_FACTORY.registerSingleton(beanName, singletonObject);
+    }
+
     public static void destroy(String className) {
         String beanName = beanName(className);
         DEFAULT_LISTABLE_BEAN_FACTORY.destroySingleton(beanName);

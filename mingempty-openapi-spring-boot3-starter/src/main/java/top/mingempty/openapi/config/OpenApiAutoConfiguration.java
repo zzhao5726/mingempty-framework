@@ -5,14 +5,12 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springdoc.core.properties.SpringDocConfigProperties;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import top.mingempty.openapi.domain.OpenApiProperties;
 
@@ -22,31 +20,25 @@ import top.mingempty.openapi.domain.OpenApiProperties;
  *
  * @author zzhao
  */
+@Order(9)
 @Configuration
+@AllArgsConstructor
 @EnableConfigurationProperties(OpenApiProperties.class)
-@ConditionalOnProperty(prefix = "me.openapi", name = "enabled", havingValue = "true",matchIfMissing = true)
+@ConditionalOnProperty(prefix = "me.openapi", name = "enabled", havingValue = "true")
 public class OpenApiAutoConfiguration {
 
+    private final OpenApiProperties openApiProperties;
 
     @Bean
-    @Primary
-    @ConfigurationProperties(prefix = "me.openapi.spring")
-    @ConditionalOnMissingBean(SpringDocConfigProperties.class)
-    public SpringDocConfigProperties springDocConfigProperties() {
-        SpringDocConfigProperties springDocConfigProperties = new SpringDocConfigProperties();
-        return springDocConfigProperties;
-    }
-
-    @Bean
-    public OpenAPI openAPI(OpenApiProperties openApiProperties) {
-        OpenAPI openAPI = new OpenAPI().info(info(openApiProperties));
+    public OpenAPI openAPI() {
+        OpenAPI openAPI = new OpenAPI()
+                .info(info())
+                .specVersion(openApiProperties.getSpecVersion());
         // oauth2.0 password
-        openAPI.schemaRequirement(HttpHeaders.AUTHORIZATION, this.securityScheme());
-        return openAPI;
+        openAPI.schemaRequirement(HttpHeaders.AUTHORIZATION, this.securityScheme());return openAPI;
     }
 
-
-    private Info info(OpenApiProperties openApiProperties) {
+    private Info info() {
         return new Info()
                 .title(openApiProperties.getTitle())
                 .version(openApiProperties.getVersion())
@@ -66,5 +58,4 @@ public class OpenApiAutoConfiguration {
     private SecurityScheme securityScheme() {
         return new SecurityScheme();
     }
-
 }
