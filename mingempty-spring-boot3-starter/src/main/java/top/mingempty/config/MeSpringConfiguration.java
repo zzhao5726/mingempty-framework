@@ -20,42 +20,45 @@ import top.mingempty.util.SpringContextUtil;
  *
  * @author zzhao
  */
-@EnableConfigurationProperties(MeGloableProperty.class)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @ComponentScan(basePackages = "top.mingempty.advice")
-public class MeSpringConfiguration {
+@EnableConfigurationProperties(MeGloableProperty.class)
+public class MeSpringConfiguration implements Ordered{
 
     @Bean
     @Primary
     @ConditionalOnMissingBean
-    public static ObjectMapper meObjectMapper() {
+    public ObjectMapper objectMapper() {
         return JsonUtil.DEFAULT_OBJECT_MAPPER;
     }
 
-
     @Bean
     @ConditionalOnMissingBean(name = "springContextUtil")
-    public static SpringContextUtil springContextUtil() {
+    public SpringContextUtil springContextUtil() {
         return new SpringContextUtil();
     }
 
     @Bean
     @ConditionalOnMissingBean(name = "environmentUtil")
-    public static EnvironmentUtil environmentUtil() {
+    public EnvironmentUtil environmentUtil() {
         return new EnvironmentUtil();
     }
 
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
     @ConditionalOnMissingBean(name = "messageSourceUtil")
-    public static MessageSourceUtil messageSourceUtil() {
+    public MessageSourceUtil messageSourceUtil() {
         return new MessageSourceUtil();
     }
 
     @Bean
     @ConditionalOnMissingBean(name = "beanFactoryUtil")
-    public static BeanFactoryUtil beanFactoryUtil() {
+    public BeanFactoryUtil beanFactoryUtil() {
         return new BeanFactoryUtil();
     }
 
 
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
+    }
 }
