@@ -4,6 +4,8 @@ me:
   version: 1.0.0
   timestamp: ${current.time}
   using-base-path: false
+  logging:
+    config-name: gateway.xml
 
 spring:
   cloud:
@@ -17,8 +19,6 @@ spring:
       discovery:
         namespace: 9d0a606f-63ca-4aef-8a97-2832b140f114
         group: DEFAULT_GROUP
-
-
 
   config:
     import:
