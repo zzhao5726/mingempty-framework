@@ -72,6 +72,12 @@
             <groupId>top.mingempty</groupId>
             <artifactId>mingempty-trace-spring-boot3-starter</artifactId>
         </dependency>
+
+        <!--对logging的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-logging-spring-boot3-starter</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
