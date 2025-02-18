@@ -1,13 +1,15 @@
 package top.mingempty.concurrent.pool;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.util.ObjectUtils;
+import top.mingempty.concurrent.model.ConcurrentProperties;
 import top.mingempty.concurrent.model.ConcurrentResult;
 import top.mingempty.concurrent.model.ExecutorServiceThreadLocal;
-import top.mingempty.concurrent.model.ThreadPoolProperties;
-import top.mingempty.domain.other.AbstractRouter;
-import top.mingempty.domain.other.GlobalConstant;
+import top.mingempty.concurrent.model.ThreadPoolConfig;
+import top.mingempty.concurrent.thread.AbstractDelegatingContext;
+import top.mingempty.domain.dynamic.AbstractDynamicInstance;
 
 import java.security.PrivilegedAction;
 import java.util.Collection;
@@ -24,6 +26,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +37,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class PoolRouterExecutorService
-        extends AbstractRouter<ExecutorService>
+        extends AbstractDynamicInstance<ExecutorService, PoolRouterExecutorService, ConcurrentProperties, ThreadPoolConfig>
         implements ExecutorService, DisposableBean {
 
     /**
@@ -47,19 +50,13 @@ public class PoolRouterExecutorService
      */
     private final TimeUnit awaitTerminationTimeUnit;
 
-    /**
-     * 配置文件
-     */
-    private final ThreadPoolProperties threadPoolProperties;
-
-    public PoolRouterExecutorService(ThreadPoolProperties threadPoolProperties, String defaultTargetName,
-                                     Map<String, ExecutorService> targetRouter) {
-        super(defaultTargetName, targetRouter);
-        this.threadPoolProperties = threadPoolProperties;
-        this.awaitTermination = ObjectUtils.isEmpty(threadPoolProperties.getAwaitTermination())
-                ? 1L : threadPoolProperties.getAwaitTermination();
-        this.awaitTerminationTimeUnit = ObjectUtils.isEmpty(threadPoolProperties.getAwaitTerminationTimeUnit())
-                ? TimeUnit.MINUTES : threadPoolProperties.getAwaitTerminationTimeUnit();
+    public PoolRouterExecutorService(ConcurrentProperties concurrentProperties,
+                                     ExecutorService instance) {
+        super(concurrentProperties, instance);
+        this.awaitTermination = ObjectUtils.isEmpty(concurrentProperties.getAwaitTermination())
+                ? 1L : concurrentProperties.getAwaitTermination();
+        this.awaitTerminationTimeUnit = ObjectUtils.isEmpty(concurrentProperties.getAwaitTerminationTimeUnit())
+                ? TimeUnit.MINUTES : concurrentProperties.getAwaitTerminationTimeUnit();
     }
 
     /**
@@ -72,6 +69,11 @@ public class PoolRouterExecutorService
         } finally {
             ExecutorServiceThreadLocal.remove();
         }
+    }
+
+    @Override
+    protected Class<ExecutorService> type() {
+        return ExecutorService.class;
     }
 
     /************************ExecutorService方法封装----------start*********************************************/
@@ -95,7 +97,7 @@ public class PoolRouterExecutorService
      */
     @Override
     public void shutdown() {
-        this.getResolvedRouters()
+        this.gainInstances()
                 .parallelStream()
                 .forEach(ExecutorService::shutdown);
     }
@@ -125,7 +127,7 @@ public class PoolRouterExecutorService
      */
     @Override
     public List<Runnable> shutdownNow() {
-        return this.getResolvedRouters()
+        return this.gainInstances()
                 .parallelStream()
                 .map(ExecutorService::shutdownNow)
                 .flatMap(Collection::stream)
@@ -139,7 +141,7 @@ public class PoolRouterExecutorService
      */
     @Override
     public boolean isShutdown() {
-        return this.getResolvedRouters()
+        return this.gainInstances()
                 .parallelStream()
                 .allMatch(ExecutorService::isShutdown);
     }
@@ -153,7 +155,7 @@ public class PoolRouterExecutorService
      */
     @Override
     public boolean isTerminated() {
-        return this.getResolvedRouters()
+        return this.gainInstances()
                 .parallelStream()
                 .allMatch(ExecutorService::isTerminated);
     }
@@ -171,24 +173,12 @@ public class PoolRouterExecutorService
      */
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-        return this.getResolvedRouter()
-                .entrySet()
+
+        return this.gainInstances()
                 .parallelStream()
-                .allMatch(entry -> {
+                .allMatch(executorService -> {
                     try {
-                        if (GlobalConstant.DEFAULT_INSTANCE_NAME.equals(entry.getKey())) {
-                            return getResolvedDefaultRouter().awaitTermination(timeout, unit);
-                        } else {
-                            ThreadPoolProperties threadPoolPropertiesByOther =
-                                    this.threadPoolProperties.getOtherThreadPoolProperties().get(entry.getKey());
-                            long awaitTerminationByOther =
-                                    ObjectUtils.isEmpty(threadPoolPropertiesByOther.getAwaitTermination())
-                                            ? 1L : threadPoolPropertiesByOther.getAwaitTermination();
-                            TimeUnit awaitTerminationTimeUnitByOther =
-                                    ObjectUtils.isEmpty(threadPoolPropertiesByOther.getAwaitTerminationTimeUnit())
-                                            ? TimeUnit.MINUTES : threadPoolPropertiesByOther.getAwaitTerminationTimeUnit();
-                            return entry.getValue().awaitTermination(awaitTerminationByOther, awaitTerminationTimeUnitByOther);
-                        }
+                        return executorService.awaitTermination(timeout, unit);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -219,7 +209,7 @@ public class PoolRouterExecutorService
      */
     @Override
     public <T> Future<T> submit(Callable<T> task) {
-        return this.determineTargetRouter().submit(task);
+        return submit(() -> this.determineInstance().submit(task), task);
     }
 
     /**
@@ -236,7 +226,7 @@ public class PoolRouterExecutorService
      */
     @Override
     public <T> Future<T> submit(Runnable task, T result) {
-        return this.determineTargetRouter().submit(task, result);
+        return submit(() -> this.determineInstance().submit(task, result), task);
     }
 
     /**
@@ -252,8 +242,26 @@ public class PoolRouterExecutorService
      */
     @Override
     public Future<Void> submit(Runnable task) {
-        return (Future<Void>) this.determineTargetRouter().submit(task);
+        return submit(() -> (Future<Void>) this.determineInstance().submit(task), task);
     }
+
+
+    public <T, V, R extends Future<V>> Future<V> submit(Supplier<R> supplier, T task) {
+        boolean isClear = false;
+        try {
+            if (task instanceof AbstractDelegatingContext<?> abstractDelegatingContext
+                    && StrUtil.isNotEmpty(abstractDelegatingContext.getInstanceName())) {
+                ExecutorServiceThreadLocal.put(abstractDelegatingContext.getInstanceName());
+                isClear = true;
+            }
+            return supplier.get();
+        } finally {
+            if (isClear) {
+                ExecutorServiceThreadLocal.remove();
+            }
+        }
+    }
+
 
     /**
      * Executes the given tasks, returning a list of Futures holding
@@ -277,7 +285,7 @@ public class PoolRouterExecutorService
      */
     @Override
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
-        return this.determineTargetRouter().invokeAll(tasks);
+        return this.determineInstance().invokeAll(tasks);
     }
 
     /**
@@ -309,7 +317,7 @@ public class PoolRouterExecutorService
      */
     @Override
     public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
-        return this.determineTargetRouter().invokeAll(tasks, timeout, unit);
+        return this.determineInstance().invokeAll(tasks, timeout, unit);
     }
 
     /**
@@ -332,7 +340,7 @@ public class PoolRouterExecutorService
      */
     @Override
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
-        return this.determineTargetRouter().invokeAny(tasks);
+        return this.determineInstance().invokeAny(tasks);
     }
 
     /**
@@ -359,7 +367,7 @@ public class PoolRouterExecutorService
      */
     @Override
     public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return this.determineTargetRouter().invokeAny(tasks, timeout, unit);
+        return this.determineInstance().invokeAny(tasks, timeout, unit);
     }
 
     /**
@@ -374,7 +382,7 @@ public class PoolRouterExecutorService
      */
     @Override
     public void execute(Runnable command) {
-        this.determineTargetRouter().execute(command);
+        this.determineInstance().execute(command);
     }
 
     /************************ExecutorService方法封装----------end*********************************************/
