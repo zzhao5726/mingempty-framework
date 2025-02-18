@@ -1,7 +1,6 @@
 package top.mingempty.concurrent.model.enums;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import top.mingempty.concurrent.pool.RejectedRunsPolicy;
 
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -44,24 +43,14 @@ public enum RejectedExecutionHandlerEnum {
 
 
     public static RejectedExecutionHandler rejectedExecutionHandler(RejectedExecutionHandlerEnum rejectedExecutionHandlerEnum) {
-        switch (rejectedExecutionHandlerEnum) {
-            case DiscardPolicy: {
-                return new ThreadPoolExecutor.DiscardPolicy();
-            }
-            case DiscardOldestPolicy: {
-                return new ThreadPoolExecutor.DiscardOldestPolicy();
-            }
-            case CallerRunsPolicy: {
-                return new ThreadPoolExecutor.CallerRunsPolicy();
-            }
-            case RejectedRunsPolicy: {
-                return new RejectedRunsPolicy();
-            }
+        return switch (rejectedExecutionHandlerEnum) {
+            case DiscardPolicy -> new ThreadPoolExecutor.DiscardPolicy();
+            case DiscardOldestPolicy -> new ThreadPoolExecutor.DiscardOldestPolicy();
+            case CallerRunsPolicy -> new ThreadPoolExecutor.CallerRunsPolicy();
+            case RejectedRunsPolicy -> top.mingempty.domain.other.RejectedRunsPolicy.INSTANCE;
             // AbortPolicy类型采用默认分支
-            default: {
-                return new ThreadPoolExecutor.AbortPolicy();
-            }
-        }
+            default -> new ThreadPoolExecutor.AbortPolicy();
+        };
     }
 
 }

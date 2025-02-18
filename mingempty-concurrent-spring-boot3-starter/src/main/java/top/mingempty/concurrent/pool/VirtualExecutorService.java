@@ -3,8 +3,11 @@ package top.mingempty.concurrent.pool;
 import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
+import top.mingempty.concurrent.model.ConcurrentConstant;
+import top.mingempty.concurrent.record.util.TaskUtil;
 import top.mingempty.concurrent.thread.AbstractDelegatingCallable;
 import top.mingempty.concurrent.thread.AbstractDelegatingRunnable;
+import top.mingempty.concurrent.thread.DelegatingFutureTask;
 
 import java.security.PrivilegedAction;
 import java.util.Collection;
@@ -27,7 +30,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class VirtualExecutorService implements DisposableBean, ExecutorService {
 
-
     private final ExecutorService VIRTUAL_EXECUTOR_SERVICE;
 
     /**
@@ -41,7 +43,7 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
     private final TimeUnit unit;
 
     public VirtualExecutorService() {
-        this("me-Virtual-Thread", null, null);
+        this(ConcurrentConstant.VIRTUAL_THREAD_POOL_NAME, null, null);
     }
 
     public VirtualExecutorService(String virtualName, Long timeout, TimeUnit unit) {
@@ -49,7 +51,7 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
         this.unit = unit == null ? TimeUnit.MINUTES : unit;
         this.VIRTUAL_EXECUTOR_SERVICE = Executors.newThreadPerTaskExecutor(Thread
                 .ofVirtual()
-                .name(virtualName == null ? "me-Virtual-Thread-" : virtualName, 0)
+                .name(virtualName == null ? ConcurrentConstant.VIRTUAL_THREAD_POOL_NAME : virtualName, 0)
                 .factory());
     }
 
@@ -165,7 +167,8 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
      */
     @Override
     public <T> Future<T> submit(Callable<T> task) {
-        return VIRTUAL_EXECUTOR_SERVICE.submit(AbstractDelegatingCallable.delegatingCallable(task));
+        TaskUtil.record(task, ConcurrentConstant.VIRTUAL_THREAD_EXECUTOR_NAME);
+        return VIRTUAL_EXECUTOR_SERVICE.submit(task);
     }
 
     /**
@@ -182,6 +185,7 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
      */
     @Override
     public <T> Future<T> submit(Runnable task, T result) {
+        TaskUtil.record(task, ConcurrentConstant.VIRTUAL_THREAD_EXECUTOR_NAME);
         return VIRTUAL_EXECUTOR_SERVICE.submit(AbstractDelegatingRunnable.delegatingRunnable(task), result);
     }
 
@@ -198,6 +202,7 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
      */
     @Override
     public Future<?> submit(Runnable task) {
+        TaskUtil.record(task, ConcurrentConstant.VIRTUAL_THREAD_EXECUTOR_NAME);
         return VIRTUAL_EXECUTOR_SERVICE.submit(AbstractDelegatingRunnable.delegatingRunnable(task));
     }
 
@@ -344,7 +349,12 @@ public class VirtualExecutorService implements DisposableBean, ExecutorService {
      */
     @Override
     public void execute(Runnable command) {
-        VIRTUAL_EXECUTOR_SERVICE.execute(AbstractDelegatingRunnable.delegatingRunnable(command));
+        if (command instanceof DelegatingFutureTask) {
+            VIRTUAL_EXECUTOR_SERVICE.execute(command);
+        }
+        TaskUtil.record(command, ConcurrentConstant.VIRTUAL_THREAD_EXECUTOR_NAME);
+        VIRTUAL_EXECUTOR_SERVICE.execute(new DelegatingFutureTask<>(command));
+
     }
 
     /**
