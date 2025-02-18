@@ -1,5 +1,6 @@
 package top.mingempty.commons.trace;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +32,7 @@ public class TraceContext {
      */
     @Setter
     @Getter
+    @JsonIgnore
     @Schema(title = "当前链路地理、政治或文化区域")
     private volatile Locale locale = Locale.getDefault();
 
@@ -53,7 +55,7 @@ public class TraceContext {
      */
     @Getter
     @Schema(title = "方法名称")
-    private final String functionName;
+    private  String functionName;
 
 
     /**
@@ -61,7 +63,7 @@ public class TraceContext {
      */
     @Getter
     @Schema(title = "整个调用链路树的唯一ID")
-    private final String traceId;
+    private  String traceId;
 
 
     /**
@@ -69,41 +71,42 @@ public class TraceContext {
      */
     @Getter
     @Schema(title = "本次调用在整个调用链路树中的位置")
-    private final String spanId;
+    private  String spanId;
 
 
     /**
      * 本次调用在整个调用链路树中的位置
      */
     @Schema(title = "本次调用在整个调用链路树中的位置")
-    private final AtomicInteger spanCount;
+    private  AtomicInteger spanCount;
 
     /**
      * 线程重入次数
      */
     @Schema(title = "线程重入次数")
-    private final AtomicInteger threadReentryCount;
+    private  AtomicInteger threadReentryCount;
 
     /**
      * 链路入口来源
      */
     @Getter
     @Schema(title = "链路入口来源")
-    private final ProtocolEnum protocolEnum;
+    private  ProtocolEnum protocolEnum;
 
     /**
      * 链路树类型
      */
     @Getter
     @Schema(title = "链路树类型")
-    private final SpanTypeEnum spanTypeEnum;
+    private  SpanTypeEnum spanTypeEnum;
 
     /**
      * 线程计数器
      */
     @Getter
+    @JsonIgnore
     @Schema(title = "线程计数器")
-    private final StopWatch stopWatch = new StopWatch();
+    private final   StopWatch stopWatch = new StopWatch();
 
     /**
      * 是否是旧的链路树
@@ -112,6 +115,8 @@ public class TraceContext {
     @Schema(title = "是否是旧的链路树")
     private boolean oldSpan = false;
 
+    private TraceContext() {
+    }
 
     public TraceContext(String functionName,
                         String traceId,

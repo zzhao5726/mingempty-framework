@@ -2,8 +2,8 @@ package top.mingempty.concurrent.thread;
 
 
 import com.alibaba.ttl.TtlCallable;
-import top.mingempty.commons.exception.BaseCommonException;
 import top.mingempty.commons.trace.TraceContext;
+import top.mingempty.concurrent.exception.ConcurrentException;
 import top.mingempty.concurrent.model.enums.PriorityEnum;
 
 import java.util.Map;
@@ -22,6 +22,7 @@ public abstract class AbstractDelegatingCallable<V>
 
 
     public AbstractDelegatingCallable() {
+        super();
     }
 
     public AbstractDelegatingCallable(CountDownLatch countDownLatch) {
@@ -115,12 +116,8 @@ public abstract class AbstractDelegatingCallable<V>
      * @return 返回委托的Callable
      */
     public static <V> Callable<V> delegatingCallable(Callable<V> callable, PriorityEnum priorityEnum) {
-        if (callable instanceof AbstractDelegatingCallable) {
-            return callable;
-        }
-
-        if (callable instanceof TtlCallable ttlRunnable
-                && ttlRunnable.getCallable() instanceof AbstractDelegatingCallable) {
+        AbstractDelegatingCallable<V> abstractDelegatingCallable = gainDelegatingCallable(callable);
+        if (abstractDelegatingCallable != null) {
             return callable;
         }
 
@@ -128,8 +125,27 @@ public abstract class AbstractDelegatingCallable<V>
             try {
                 return callable.call();
             } catch (Exception e) {
-                throw new BaseCommonException("0000000001", e);
+                throw new ConcurrentException("concurrent-0000000004", e);
             }
         }, priorityEnum);
+    }
+
+    /**
+     * 获取自定义代理的Callable
+     *
+     * @param callable 原始Callable
+     * @param <V>
+     * @return
+     */
+    public static <V> AbstractDelegatingCallable<V> gainDelegatingCallable(Callable<V> callable) {
+        if (callable instanceof AbstractDelegatingCallable<V> abstractDelegatingCallable) {
+            return abstractDelegatingCallable;
+        }
+
+        if (callable instanceof TtlCallable<V> ttlCallable
+                && ttlCallable.getCallable() instanceof AbstractDelegatingCallable<V> abstractDelegatingCallable) {
+            return abstractDelegatingCallable;
+        }
+        return null;
     }
 }

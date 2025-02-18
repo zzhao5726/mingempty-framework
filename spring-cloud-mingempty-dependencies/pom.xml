@@ -33,6 +33,7 @@
         <module>../mingempty-logging-spring-boot3-starter</module>
         <module>../mingempty-mybatis</module>
 
+        <module>../mingempty-mq</module>
     </modules>
 
     <properties>
@@ -191,6 +192,13 @@
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis</artifactId>
                 <version>${mybatis.version}</version>
+            </dependency>
+
+            <!--mybatis-spring-->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${mybatis-spring-boot-starter.version}</version>
             </dependency>
 
             <!--mybatis-dynamic-sql-->
@@ -686,6 +694,13 @@
                 <version>${dependencies.version}</version>
             </dependency>
 
+            <!--对rabbit-mq的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-rabbit1-mq-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
             <!--对nacos的封装-->
             <dependency>
                 <groupId>top.mingempty</groupId>
@@ -697,6 +712,28 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>spring-cloud-starter-mingempty-openfeign</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--对spring-cloud-stream的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>spring-cloud-starter-mingempty-stream</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--基于spring-cloud-stream对kafka的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-kafka-mq-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+
+            <!--基于spring-cloud-stream对rabbitmq的封装-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-rabbit-mq-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 

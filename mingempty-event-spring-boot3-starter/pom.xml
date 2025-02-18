@@ -31,12 +31,39 @@
             <optional>true</optional>
         </dependency>
 
+        <!--spring事务-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--mybatis-->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--mybatis-spring-->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!--第三方依赖👆  项目自身依赖👇-->
 
         <!--trace链路封装starter-->
         <dependency>
             <groupId>top.mingempty</groupId>
             <artifactId>mingempty-trace-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--对concurrent的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-concurrent-spring-boot3-starter</artifactId>
         </dependency>
     </dependencies>
 

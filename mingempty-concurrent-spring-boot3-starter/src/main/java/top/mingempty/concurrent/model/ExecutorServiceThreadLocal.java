@@ -1,7 +1,7 @@
 package top.mingempty.concurrent.model;
 
 
-import top.mingempty.domain.other.GlobalConstant;
+import top.mingempty.domain.other.ThreadLocalLink;
 
 /**
  * 设置线程池别名
@@ -10,8 +10,7 @@ import top.mingempty.domain.other.GlobalConstant;
  */
 public class ExecutorServiceThreadLocal {
 
-    private static final ThreadLocal<String> THREAD_LOCAL = ThreadLocal.withInitial(() -> GlobalConstant.DEFAULT_INSTANCE_NAME);
-
+    private static final ThreadLocalLink<String> THREAD_LOCAL_LINK = new ThreadLocalLink<>();
 
     /**
      * 设置当前线程变量
@@ -19,7 +18,7 @@ public class ExecutorServiceThreadLocal {
      * @param threadPoolName 线程池名称
      */
     public static void put(String threadPoolName) {
-        THREAD_LOCAL.set(threadPoolName);
+        THREAD_LOCAL_LINK.putData(threadPoolName);
     }
 
     /**
@@ -28,14 +27,14 @@ public class ExecutorServiceThreadLocal {
      * @return
      */
     public static String gain() {
-        return THREAD_LOCAL.get();
+        return THREAD_LOCAL_LINK.acquireData();
     }
 
     /**
      * 移除当前线程变量
      */
     public static void remove() {
-        THREAD_LOCAL.remove();
+        THREAD_LOCAL_LINK.removeData();
     }
 
 

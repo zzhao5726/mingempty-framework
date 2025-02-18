@@ -1,0 +1,75 @@
+spring:
+  cloud:
+    function:
+      definition: myInput1;myInput2;myInput3
+    stream:
+      # 绑定器配置（必须指定为rabbit）
+      binders:
+        rabbit:
+          type: rabbit
+          environment: # RabbitMQ 高级连接参数（可选）
+            spring:
+              rabbitmq:
+                addresses: rabbitmq.mingempty.top:5672,rabbitmq.mingempty.top:5673,rabbitmq.mingempty.top:5674
+                username: admin            # 用户名（默认guest）
+                password: admin            # 密码（默认guest）
+                virtual-host: /            # 虚拟主机（默认/）
+                connection-timeout: 5000   # 连接超时（毫秒）
+                ssl:
+                  enabled: false
+                publisher-confirm-type: correlated  # 开启发送确认
+        kafka:
+          type: rabbit
+          environment: # RabbitMQ 高级连接参数（可选）
+            spring:
+              kafka:
+                bootstrap-servers:
+                  - kafka.mingempty.top:9092
+                  - kafka.mingempty.top:9093
+                  - kafka.mingempty.top:9094
+      # 通道绑定配置（核心部分）
+      bindings:
+        # 生产者配置
+        myOutput-out-0:
+          binder: rabbit
+          destination: demo-exchange
+          contentType: application/json
+        # 消费者1配置
+        myInput1-in-0:
+          binder: rabbit
+          destination: demo-exchange
+          group: group1
+          contentType: application/json
+        # 生产者配置
+        myOutput2-out-0:
+          binder: kafka
+          destination: demo2-exchange
+          contentType: application/json
+        # 消费者2配置
+        myInput2-in-0:
+          binder: kafka
+          destination: demo2-exchange
+          group: group2
+          contentType: application/json
+        # 消费者2配置
+        myInput3-in-0:
+          binder: kafka
+          destination: demo2-exchange
+          group: group3
+          contentType: application/json
+
+
+
+me:
+  name: mq-demo
+  group: mingempty
+  version: 1.0.0
+  timestamp: ${current.time}
+  base-path: /mq-demo
+  trace:
+    enabled: true
+
+
+
+logging:
+  config: classpath:logback-me.xml
