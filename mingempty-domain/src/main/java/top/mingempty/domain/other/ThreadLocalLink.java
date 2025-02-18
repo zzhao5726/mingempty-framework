@@ -26,7 +26,7 @@ public class ThreadLocalLink<T> {
     public T acquireData() {
         Deque<T> tDeque = THREAD_LOCAL.get();
         if (tDeque == null) {
-            init();
+            return null;
         }
         return THREAD_LOCAL.get().peek();
     }
