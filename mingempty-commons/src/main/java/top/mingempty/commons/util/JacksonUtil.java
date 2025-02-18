@@ -155,7 +155,7 @@ public class JacksonUtil {
         // 使用Builder模式构建ObjectMapper实例，配置各种序列化和反序列化选项
         JsonMapper.Builder builder = JsonMapper.builder()
                 .configure(SerializationFeature.INDENT_OUTPUT, isEnableIndentOutput)
-                .configure(MapperFeature.USE_ANNOTATIONS, false)
+                .configure(MapperFeature.USE_ANNOTATIONS, true)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 //识别Java8时间
                 .addModule(new ParameterNamesModule())

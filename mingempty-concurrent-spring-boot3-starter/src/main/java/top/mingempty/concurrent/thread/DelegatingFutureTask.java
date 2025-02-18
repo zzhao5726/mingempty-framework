@@ -1,7 +1,5 @@
 package top.mingempty.concurrent.thread;
 
-import com.alibaba.ttl.TtlCallable;
-import com.alibaba.ttl.TtlRunnable;
 import lombok.Getter;
 import top.mingempty.concurrent.model.enums.PriorityEnum;
 
@@ -26,30 +24,10 @@ public class DelegatingFutureTask<T>
     public DelegatingFutureTask(Callable<T> callable) {
         super(AbstractDelegatingCallable.delegatingCallable(callable));
         Integer priority = PriorityEnum.D.getPriority();
-        if (callable instanceof AbstractDelegatingCallable<?> abstractDelegatingCallable) {
+        AbstractDelegatingCallable<T> abstractDelegatingCallable
+                = AbstractDelegatingCallable.gainDelegatingCallable(callable);
+        if (abstractDelegatingCallable != null) {
             priority = abstractDelegatingCallable.getPriority();
-        }
-
-        if (callable instanceof TtlCallable ttlCallable
-                && ttlCallable.getCallable() instanceof AbstractDelegatingCallable<?> abstractDelegatingCallable) {
-            priority = abstractDelegatingCallable.getPriority();
-
-        }
-        this.priority = priority;
-    }
-
-    public DelegatingFutureTask(Runnable runnable, T result) {
-        super(AbstractDelegatingRunnable.delegatingRunnable(runnable), result);
-        Integer priority = PriorityEnum.D.getPriority();
-
-        if (runnable instanceof AbstractDelegatingRunnable abstractDelegatingRunnable) {
-            priority = abstractDelegatingRunnable.getPriority();
-        }
-
-        if (runnable instanceof TtlRunnable ttlRunnable
-                && ttlRunnable.getRunnable() instanceof AbstractDelegatingCallable<?> abstractDelegatingRunnable) {
-            priority = abstractDelegatingRunnable.getPriority();
-
         }
         this.priority = priority;
     }
@@ -57,6 +35,25 @@ public class DelegatingFutureTask<T>
     public DelegatingFutureTask(Callable<T> callable, PriorityEnum priorityEnum) {
         super(AbstractDelegatingCallable.delegatingCallable(callable, priorityEnum));
         this.priority = priorityEnum == null ? PriorityEnum.D.getPriority() : priorityEnum.getPriority();
+    }
+
+    public DelegatingFutureTask(Runnable runnable) {
+        this(runnable, (T) null);
+    }
+
+    public DelegatingFutureTask(Runnable runnable, PriorityEnum priorityEnum) {
+        this(runnable, null, priorityEnum);
+    }
+
+    public DelegatingFutureTask(Runnable runnable, T result) {
+        super(AbstractDelegatingRunnable.delegatingRunnable(runnable), result);
+        Integer priority = PriorityEnum.D.getPriority();
+        AbstractDelegatingRunnable abstractDelegatingRunnable
+                = AbstractDelegatingRunnable.gainDelegatingRunnable(runnable);
+        if (abstractDelegatingRunnable != null) {
+            priority = abstractDelegatingRunnable.getPriority();
+        }
+        this.priority = priority;
     }
 
     public DelegatingFutureTask(Runnable runnable, T result, PriorityEnum priorityEnum) {

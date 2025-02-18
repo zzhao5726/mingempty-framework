@@ -1,1 +1,2 @@
-top.mingempty.concurrent.config.ConcurrentConfig
+top.mingempty.concurrent.config.ConcurrentConfiguration
+top.mingempty.concurrent.config.ConcurrentRecordConfiguration

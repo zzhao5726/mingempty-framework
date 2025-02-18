@@ -20,6 +20,7 @@ public abstract class AbstractDelegatingRunnable
 
 
     public AbstractDelegatingRunnable() {
+        super();
     }
 
     public AbstractDelegatingRunnable(CountDownLatch countDownLatch) {
@@ -99,15 +100,15 @@ public abstract class AbstractDelegatingRunnable
      * 线程真正执行的业务方法
      */
     @Override
-    public Void realRun() throws Exception {
-        runReal();
+    public final Void realCall() throws Exception {
+        realRun();
         return null;
     }
 
     /**
      * 线程真正执行的业务方法，无返回值
      */
-    public abstract void runReal();
+    public abstract void realRun();
 
 
     /**
@@ -129,15 +130,29 @@ public abstract class AbstractDelegatingRunnable
      * @return 返回委托的Runnable
      */
     public static Runnable delegatingRunnable(Runnable runnable, PriorityEnum priorityEnum) {
-        if (runnable instanceof AbstractDelegatingRunnable) {
-            return runnable;
-        }
-
-        if (runnable instanceof TtlRunnable ttlRunnable
-                && ttlRunnable.getRunnable() instanceof AbstractDelegatingRunnable) {
+        AbstractDelegatingRunnable abstractDelegatingRunnable = gainDelegatingRunnable(runnable);
+        if (abstractDelegatingRunnable != null) {
             return runnable;
         }
         //转换为DelegatingRunnable
         return new SimpleDelegatingRunnable(runnable::run, priorityEnum);
+    }
+
+    /**
+     * 获取自定义代理的Runnable
+     *
+     * @param runnable 原始Runnable
+     * @return
+     */
+    public static AbstractDelegatingRunnable gainDelegatingRunnable(Runnable runnable) {
+        if (runnable instanceof AbstractDelegatingRunnable abstractDelegatingRunnable) {
+            return abstractDelegatingRunnable;
+        }
+
+        if (runnable instanceof TtlRunnable ttlRunnable
+                && ttlRunnable.getRunnable() instanceof AbstractDelegatingRunnable abstractDelegatingRunnable) {
+            return abstractDelegatingRunnable;
+        }
+        return null;
     }
 }

@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.event.record.mapper.PublisherRecordMapper">
+  <resultMap id="BaseResultMap" type="top.mingempty.event.record.model.PublisherRecordPo">
+    <id column="event_id" jdbcType="VARCHAR" property="eventId" />
+    <result column="event_type" jdbcType="VARCHAR" property="eventType" />
+    <result column="biz_no" jdbcType="VARCHAR" property="bizNo" />
+    <result column="event_class" jdbcType="VARCHAR" property="eventClass" />
+    <result column="event_status" jdbcType="CHAR" property="eventStatus" />
+    <result column="record_time" jdbcType="TIMESTAMP" property="recordTime" />
+    <result column="completion_time" jdbcType="TIMESTAMP" property="completionTime" />
+    <result column="trace_id" jdbcType="VARCHAR" property="traceId" />
+    <result column="span_id" jdbcType="VARCHAR" property="spanId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="create_operator" jdbcType="VARCHAR" property="createOperator" />
+    <result column="update_operator" jdbcType="VARCHAR" property="updateOperator" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="top.mingempty.event.record.model.PublisherRecordPo">
+    <result column="event_data" jdbcType="LONGVARCHAR" property="eventData" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    event_id, event_type, biz_no, event_class, event_status, record_time, completion_time, 
+    trace_id, span_id, create_time, update_time, create_operator, update_operator
+  </sql>
+  <sql id="Blob_Column_List">
+    event_data
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="top.mingempty.event.record.model.PublisherRecordExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from t_event_publisher_record
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="top.mingempty.event.record.model.PublisherRecordExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_event_publisher_record
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from t_event_publisher_record
+    where event_id = #{eventId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from t_event_publisher_record
+    where event_id = #{eventId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="top.mingempty.event.record.model.PublisherRecordExample">
+    delete from t_event_publisher_record
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="top.mingempty.event.record.model.PublisherRecordPo">
+    insert into t_event_publisher_record (event_id, event_type, biz_no, 
+      event_class, event_status, record_time, 
+      completion_time, trace_id, span_id, 
+      create_time, update_time, create_operator, 
+      update_operator, event_data)
+    values (#{eventId,jdbcType=VARCHAR}, #{eventType,jdbcType=VARCHAR}, #{bizNo,jdbcType=VARCHAR}, 
+      #{eventClass,jdbcType=VARCHAR}, #{eventStatus,jdbcType=CHAR}, #{recordTime,jdbcType=TIMESTAMP}, 
+      #{completionTime,jdbcType=TIMESTAMP}, #{traceId,jdbcType=VARCHAR}, #{spanId,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createOperator,jdbcType=VARCHAR}, 
+      #{updateOperator,jdbcType=VARCHAR}, #{eventData,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="top.mingempty.event.record.model.PublisherRecordPo">
+    insert into t_event_publisher_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="eventId != null">
+        event_id,
+      </if>
+      <if test="eventType != null">
+        event_type,
+      </if>
+      <if test="bizNo != null">
+        biz_no,
+      </if>
+      <if test="eventClass != null">
+        event_class,
+      </if>
+      <if test="eventStatus != null">
+        event_status,
+      </if>
+      <if test="recordTime != null">
+        record_time,
+      </if>
+      <if test="completionTime != null">
+        completion_time,
+      </if>
+      <if test="traceId != null">
+        trace_id,
+      </if>
+      <if test="spanId != null">
+        span_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="createOperator != null">
+        create_operator,
+      </if>
+      <if test="updateOperator != null">
+        update_operator,
+      </if>
+      <if test="eventData != null">
+        event_data,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="eventId != null">
+        #{eventId,jdbcType=VARCHAR},
+      </if>
+      <if test="eventType != null">
+        #{eventType,jdbcType=VARCHAR},
+      </if>
+      <if test="bizNo != null">
+        #{bizNo,jdbcType=VARCHAR},
+      </if>
+      <if test="eventClass != null">
+        #{eventClass,jdbcType=VARCHAR},
+      </if>
+      <if test="eventStatus != null">
+        #{eventStatus,jdbcType=CHAR},
+      </if>
+      <if test="recordTime != null">
+        #{recordTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="completionTime != null">
+        #{completionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="traceId != null">
+        #{traceId,jdbcType=VARCHAR},
+      </if>
+      <if test="spanId != null">
+        #{spanId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createOperator != null">
+        #{createOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="updateOperator != null">
+        #{updateOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="eventData != null">
+        #{eventData,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="top.mingempty.event.record.model.PublisherRecordExample" resultType="java.lang.Long">
+    select count(*) from t_event_publisher_record
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update t_event_publisher_record
+    <set>
+      <if test="row.eventId != null">
+        event_id = #{row.eventId,jdbcType=VARCHAR},
+      </if>
+      <if test="row.eventType != null">
+        event_type = #{row.eventType,jdbcType=VARCHAR},
+      </if>
+      <if test="row.bizNo != null">
+        biz_no = #{row.bizNo,jdbcType=VARCHAR},
+      </if>
+      <if test="row.eventClass != null">
+        event_class = #{row.eventClass,jdbcType=VARCHAR},
+      </if>
+      <if test="row.eventStatus != null">
+        event_status = #{row.eventStatus,jdbcType=CHAR},
+      </if>
+      <if test="row.recordTime != null">
+        record_time = #{row.recordTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="row.completionTime != null">
+        completion_time = #{row.completionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="row.traceId != null">
+        trace_id = #{row.traceId,jdbcType=VARCHAR},
+      </if>
+      <if test="row.spanId != null">
+        span_id = #{row.spanId,jdbcType=VARCHAR},
+      </if>
+      <if test="row.createTime != null">
+        create_time = #{row.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="row.updateTime != null">
+        update_time = #{row.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="row.createOperator != null">
+        create_operator = #{row.createOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="row.updateOperator != null">
+        update_operator = #{row.updateOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="row.eventData != null">
+        event_data = #{row.eventData,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update t_event_publisher_record
+    set event_id = #{row.eventId,jdbcType=VARCHAR},
+      event_type = #{row.eventType,jdbcType=VARCHAR},
+      biz_no = #{row.bizNo,jdbcType=VARCHAR},
+      event_class = #{row.eventClass,jdbcType=VARCHAR},
+      event_status = #{row.eventStatus,jdbcType=CHAR},
+      record_time = #{row.recordTime,jdbcType=TIMESTAMP},
+      completion_time = #{row.completionTime,jdbcType=TIMESTAMP},
+      trace_id = #{row.traceId,jdbcType=VARCHAR},
+      span_id = #{row.spanId,jdbcType=VARCHAR},
+      create_time = #{row.createTime,jdbcType=TIMESTAMP},
+      update_time = #{row.updateTime,jdbcType=TIMESTAMP},
+      create_operator = #{row.createOperator,jdbcType=VARCHAR},
+      update_operator = #{row.updateOperator,jdbcType=VARCHAR},
+      event_data = #{row.eventData,jdbcType=LONGVARCHAR}
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update t_event_publisher_record
+    set event_id = #{row.eventId,jdbcType=VARCHAR},
+      event_type = #{row.eventType,jdbcType=VARCHAR},
+      biz_no = #{row.bizNo,jdbcType=VARCHAR},
+      event_class = #{row.eventClass,jdbcType=VARCHAR},
+      event_status = #{row.eventStatus,jdbcType=CHAR},
+      record_time = #{row.recordTime,jdbcType=TIMESTAMP},
+      completion_time = #{row.completionTime,jdbcType=TIMESTAMP},
+      trace_id = #{row.traceId,jdbcType=VARCHAR},
+      span_id = #{row.spanId,jdbcType=VARCHAR},
+      create_time = #{row.createTime,jdbcType=TIMESTAMP},
+      update_time = #{row.updateTime,jdbcType=TIMESTAMP},
+      create_operator = #{row.createOperator,jdbcType=VARCHAR},
+      update_operator = #{row.updateOperator,jdbcType=VARCHAR}
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="top.mingempty.event.record.model.PublisherRecordPo">
+    update t_event_publisher_record
+    <set>
+      <if test="eventType != null">
+        event_type = #{eventType,jdbcType=VARCHAR},
+      </if>
+      <if test="bizNo != null">
+        biz_no = #{bizNo,jdbcType=VARCHAR},
+      </if>
+      <if test="eventClass != null">
+        event_class = #{eventClass,jdbcType=VARCHAR},
+      </if>
+      <if test="eventStatus != null">
+        event_status = #{eventStatus,jdbcType=CHAR},
+      </if>
+      <if test="recordTime != null">
+        record_time = #{recordTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="completionTime != null">
+        completion_time = #{completionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="traceId != null">
+        trace_id = #{traceId,jdbcType=VARCHAR},
+      </if>
+      <if test="spanId != null">
+        span_id = #{spanId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createOperator != null">
+        create_operator = #{createOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="updateOperator != null">
+        update_operator = #{updateOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="eventData != null">
+        event_data = #{eventData,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where event_id = #{eventId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="top.mingempty.event.record.model.PublisherRecordPo">
+    update t_event_publisher_record
+    set event_type = #{eventType,jdbcType=VARCHAR},
+      biz_no = #{bizNo,jdbcType=VARCHAR},
+      event_class = #{eventClass,jdbcType=VARCHAR},
+      event_status = #{eventStatus,jdbcType=CHAR},
+      record_time = #{recordTime,jdbcType=TIMESTAMP},
+      completion_time = #{completionTime,jdbcType=TIMESTAMP},
+      trace_id = #{traceId,jdbcType=VARCHAR},
+      span_id = #{spanId,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_operator = #{createOperator,jdbcType=VARCHAR},
+      update_operator = #{updateOperator,jdbcType=VARCHAR},
+      event_data = #{eventData,jdbcType=LONGVARCHAR}
+    where event_id = #{eventId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="top.mingempty.event.record.model.PublisherRecordPo">
+    update t_event_publisher_record
+    set event_type = #{eventType,jdbcType=VARCHAR},
+      biz_no = #{bizNo,jdbcType=VARCHAR},
+      event_class = #{eventClass,jdbcType=VARCHAR},
+      event_status = #{eventStatus,jdbcType=CHAR},
+      record_time = #{recordTime,jdbcType=TIMESTAMP},
+      completion_time = #{completionTime,jdbcType=TIMESTAMP},
+      trace_id = #{traceId,jdbcType=VARCHAR},
+      span_id = #{spanId,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_operator = #{createOperator,jdbcType=VARCHAR},
+      update_operator = #{updateOperator,jdbcType=VARCHAR}
+    where event_id = #{eventId,jdbcType=VARCHAR}
+  </update>
+  <delete id="batchDelete" parameterType="java.lang.String">
+    delete from t_event_publisher_record where event_id in (
+    <foreach collection="eventIdS" index="index" item="eventId" separator=",">
+      #{eventId}
+    </foreach>
+    )
+  </delete>
+  <insert id="batchInsert" parameterType="java.util.List">
+    insert into t_event_publisher_record (event_id, 
+      event_type, biz_no, event_class, 
+      event_status, record_time, completion_time, 
+      trace_id, span_id, create_time, 
+      update_time, create_operator, 
+      update_operator, event_data
+      )
+    values <foreach collection="list" item="item" index="index" separator="," >
+	  (#{item.eventId,jdbcType=VARCHAR}, 
+      #{item.eventType,jdbcType=VARCHAR}, #{item.bizNo,jdbcType=VARCHAR}, #{item.eventClass,jdbcType=VARCHAR}, 
+      #{item.eventStatus,jdbcType=CHAR}, #{item.recordTime,jdbcType=TIMESTAMP}, #{item.completionTime,jdbcType=TIMESTAMP}, 
+      #{item.traceId,jdbcType=VARCHAR}, #{item.spanId,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, 
+      #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createOperator,jdbcType=VARCHAR}, 
+      #{item.updateOperator,jdbcType=VARCHAR}, #{item.eventData,jdbcType=LONGVARCHAR}
+      )
+	  </foreach>
+  </insert>
+</mapper>

@@ -19,8 +19,14 @@ public interface ConcurrentConstant {
 
 
     /**
+     * 虚拟线程池名称
+     */
+    @Schema(title = "虚拟线程池名称", description = "虚拟线程池名称")
+    String VIRTUAL_THREAD_POOL_NAME = "Virtual-Thread-";
+
+    /**
      * 虚拟线程执行器名称
      */
     @Schema(title = "虚拟线程执行器名称", description = "虚拟线程执行器名称")
-    String VIRTUAL = "virtual";
+    String VIRTUAL_THREAD_EXECUTOR_NAME = "VIRTUAL_EXECUTOR";
 }
