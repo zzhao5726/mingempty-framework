@@ -22,15 +22,15 @@ public class SimpleDelegatingCallable<V>
     private final Supplier<V> supplier;
 
     public SimpleDelegatingCallable(Supplier<V> supplier) {
-        this(supplier, null, null, null);
+        this(supplier, (PriorityEnum) null);
     }
 
     public SimpleDelegatingCallable(Supplier<V> supplier, PriorityEnum priorityEnum) {
-        this(supplier, priorityEnum, null, null);
+        this(supplier, priorityEnum, (TraceContext) null);
     }
 
     public SimpleDelegatingCallable(Supplier<V> supplier, TraceContext traceContext) {
-        this(supplier, null, traceContext, null);
+        this(supplier, null, traceContext);
     }
 
     public SimpleDelegatingCallable(Supplier<V> supplier, CountDownLatch countDownLatch) {
@@ -56,13 +56,8 @@ public class SimpleDelegatingCallable<V>
         this.supplier = supplier;
     }
 
-    /**
-     * 线程真正执行的业务方法
-     *
-     * @return 线程执行结果
-     */
     @Override
-    public V realRun() throws Exception {
+    public V realCall() throws Exception {
         return supplier.get();
     }
 }
