@@ -193,6 +193,13 @@
                 <version>${mybatis.version}</version>
             </dependency>
 
+            <!--mybatis-spring-->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${mybatis-spring-boot-starter.version}</version>
+            </dependency>
+
             <!--mybatis-dynamic-sql-->
             <dependency>
                 <groupId>org.mybatis.dynamic-sql</groupId>

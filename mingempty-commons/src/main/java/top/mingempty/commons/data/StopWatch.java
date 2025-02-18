@@ -3,6 +3,7 @@ package top.mingempty.commons.data;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import top.mingempty.domain.other.GlobalConstant;
 
@@ -89,6 +90,7 @@ public class StopWatch {
     /**
      * 最后一次任务对象
      */
+    @JsonIgnore
     private TaskInfo lastTaskInfo;
     /**
      * 总任务数

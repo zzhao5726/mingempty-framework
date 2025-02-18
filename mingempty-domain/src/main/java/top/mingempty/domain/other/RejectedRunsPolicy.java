@@ -1,4 +1,4 @@
-package top.mingempty.concurrent.pool;
+package top.mingempty.domain.other;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,6 +12,8 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Slf4j
 public class RejectedRunsPolicy implements RejectedExecutionHandler {
+    public final static RejectedRunsPolicy INSTANCE = new RejectedRunsPolicy();
+
     /**
      * 重写拒绝策略
      *
