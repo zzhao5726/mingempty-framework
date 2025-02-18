@@ -39,7 +39,7 @@ public interface WrapperBuilder<T extends AbstractRouter<B>, B, P extends Builde
         }
         String beanName = Optional.ofNullable(instanceName)
                 .flatMap((name -> Optional.of(SpringContextUtil.gainDefaultBeanName(instanceName, bean.getClass()))))
-                .orElseThrow(() -> new BaseCommonException("0000000005"));
+                .orElseThrow(() -> new BaseCommonException("di-0000000003"));
         SpringContextUtil.registerBean(beanName, (Class<B>) bean.getClass(), () -> bean);
     }
 

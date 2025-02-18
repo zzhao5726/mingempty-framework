@@ -14,7 +14,6 @@ public class ParallelStreamTrace implements IBuilder<ParallelStreamTrace> {
 
     private final TraceContext traceContext = TraceAdapterUtil.gainTraceContext();
 
-
     /**
      * 私有化构造器
      */

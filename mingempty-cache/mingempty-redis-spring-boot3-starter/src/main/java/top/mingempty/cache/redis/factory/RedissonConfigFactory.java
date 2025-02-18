@@ -63,10 +63,10 @@ public class RedissonConfigFactory
 
         //设置使用虚拟线程
         config.setExecutor(Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
-                .name("redisson-virtual-thread", 0)
+                .name("redisson-virtual-thread-", 0)
                 .factory()));
         config.setNettyExecutor(Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
-                .name("redisson-netty-virtual-thread", 0)
+                .name("redisson-netty-virtual-thread-", 0)
                 .factory()));
 
         switch (properties.getType()) {

@@ -22,15 +22,15 @@ public class SimpleDelegatingRunnable
     private final ApplyFunction applyFunction;
 
     public SimpleDelegatingRunnable(ApplyFunction applyFunction) {
-        this(applyFunction, null, null, null);
+        this(applyFunction, (PriorityEnum) null);
     }
 
     public SimpleDelegatingRunnable(ApplyFunction applyFunction, PriorityEnum priorityEnum) {
-        this(applyFunction, priorityEnum, null, null);
+        this(applyFunction, priorityEnum, (TraceContext) null);
     }
 
     public SimpleDelegatingRunnable(ApplyFunction applyFunction, TraceContext traceContext) {
-        this(applyFunction, null, traceContext, null);
+        this(applyFunction, null, traceContext);
     }
 
     public SimpleDelegatingRunnable(ApplyFunction applyFunction, CountDownLatch countDownLatch) {
@@ -61,7 +61,7 @@ public class SimpleDelegatingRunnable
      * 线程真正执行的业务方法，无返回值
      */
     @Override
-    public void runReal() {
+    public void realRun() {
         applyFunction.apply();
     }
 }

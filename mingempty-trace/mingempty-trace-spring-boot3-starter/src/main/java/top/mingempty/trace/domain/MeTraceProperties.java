@@ -18,6 +18,12 @@ public class MeTraceProperties {
      * 是否开启链路日志
      */
     @Schema(title = "是否开启链路日志")
-    private boolean enabled;
+    private boolean enabled = true;
+
+    /**
+     * 是否开启默认链路日志记录
+     */
+    @Schema(title = "是否开启默认链路日志记录")
+    private boolean enabledDefaultRecord = true;
 
 }

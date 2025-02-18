@@ -2,11 +2,15 @@ package top.mingempty.concurrent.pool;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
+import top.mingempty.concurrent.record.util.TaskUtil;
 import top.mingempty.concurrent.thread.DelegatingFutureTask;
+import top.mingempty.domain.other.RejectedRunsPolicy;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadFactory;
@@ -21,11 +25,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class DelegatingThreadPoolExecutor extends ThreadPoolExecutor {
 
-    /**
-     * The default rejected execution handler.
-     */
-    private static final RejectedExecutionHandler DEFAULT_REJECTED_EXECUTION_HANDLER =
-            new RejectedRunsPolicy();
+    private final String threadPoolName;
 
     /**
      * Creates a new {@code ThreadPoolExecutor} with the given initial
@@ -51,9 +51,9 @@ public class DelegatingThreadPoolExecutor extends ThreadPoolExecutor {
      *                                  {@code maximumPoolSize < corePoolSize}
      * @throws NullPointerException     if {@code workQueue} is null
      */
-    public DelegatingThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+    public DelegatingThreadPoolExecutor(String threadPoolName, int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
                                         BlockingQueue<Runnable> workQueue) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, Executors.defaultThreadFactory(), null);
+        this(threadPoolName, corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, Executors.defaultThreadFactory(), null);
     }
 
     /**
@@ -81,9 +81,9 @@ public class DelegatingThreadPoolExecutor extends ThreadPoolExecutor {
      * @throws NullPointerException     if {@code workQueue}
      *                                  or {@code threadFactory} is null
      */
-    public DelegatingThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+    public DelegatingThreadPoolExecutor(String threadPoolName, int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
                                         BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, DEFAULT_REJECTED_EXECUTION_HANDLER);
+        this(threadPoolName, corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, RejectedRunsPolicy.INSTANCE);
     }
 
     /**
@@ -111,9 +111,9 @@ public class DelegatingThreadPoolExecutor extends ThreadPoolExecutor {
      * @throws NullPointerException     if {@code workQueue}
      *                                  or {@code handler} is null
      */
-    public DelegatingThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+    public DelegatingThreadPoolExecutor(String threadPoolName, int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
                                         BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, Executors.defaultThreadFactory(), handler);
+        this(threadPoolName, corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, Executors.defaultThreadFactory(), handler);
     }
 
     /**
@@ -143,13 +143,32 @@ public class DelegatingThreadPoolExecutor extends ThreadPoolExecutor {
      * @throws NullPointerException     if {@code workQueue}
      *                                  or {@code threadFactory} or {@code handler} is null
      */
-    public DelegatingThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+    public DelegatingThreadPoolExecutor(String threadPoolName, int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
                                         BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory,
                                         RejectedExecutionHandler handler) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
+        Assert.hasText(threadPoolName, "线程池名称不可为空");
+        this.threadPoolName = threadPoolName;
         this.prestartAllCoreThreads();
     }
 
+    @Override
+    public Future<?> submit(Runnable task) {
+        TaskUtil.record(task, threadPoolName);
+        return super.submit(task);
+    }
+
+    @Override
+    public <T> Future<T> submit(Runnable task, T result) {
+        TaskUtil.record(task, threadPoolName);
+        return super.submit(task, result);
+    }
+
+    @Override
+    public <T> Future<T> submit(Callable<T> task) {
+        TaskUtil.record(task, threadPoolName);
+        return super.submit(task);
+    }
 
     /**
      * 封装为自己的FutureTask
@@ -162,7 +181,6 @@ public class DelegatingThreadPoolExecutor extends ThreadPoolExecutor {
     @Override
     protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
         return new DelegatingFutureTask<T>(runnable, value);
-
     }
 
     /**
@@ -175,5 +193,14 @@ public class DelegatingThreadPoolExecutor extends ThreadPoolExecutor {
     @Override
     protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
         return new DelegatingFutureTask<T>(callable);
+    }
+
+    @Override
+    public void execute(Runnable command) {
+        if (command instanceof DelegatingFutureTask) {
+            super.execute(command);
+        }
+        TaskUtil.record(command, threadPoolName);
+        super.execute(new DelegatingFutureTask<>(command));
     }
 }
