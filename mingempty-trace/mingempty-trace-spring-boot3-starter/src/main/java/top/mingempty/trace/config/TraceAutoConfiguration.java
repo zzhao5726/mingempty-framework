@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import top.mingempty.trace.adapter.DefaultTraceRecordPushAdapter;
 import top.mingempty.trace.adapter.TraceRecordPushAdapter;
@@ -19,14 +20,16 @@ import top.mingempty.trace.filter.TraceMvcFilter;
  *
  * @author zzhao
  */
+@Configuration
 @EnableConfigurationProperties(MeTraceProperties.class)
-public class TraceConfiguration {
+@ConditionalOnProperty(prefix = "me.trace", name = "enabled", havingValue = "true", matchIfMissing = true)
+public class TraceAutoConfiguration {
 
 
     @Bean
     @Primary
     @ConditionalOnMissingBean(value = {TraceRecordPushAdapter.class})
-    @ConditionalOnProperty(prefix = "me.trace", name = "enabled", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = "me.trace", name = "enabled-default-record", havingValue = "true", matchIfMissing = true)
     public TraceRecordPushAdapter defaultTraceRecordPushAdapter() {
         return new DefaultTraceRecordPushAdapter();
     }

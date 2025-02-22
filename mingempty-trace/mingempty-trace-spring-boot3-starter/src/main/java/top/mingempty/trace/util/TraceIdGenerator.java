@@ -12,7 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TraceIdGenerator {
 
-    private static final AtomicInteger SEQUENCE = new AtomicInteger(0);
+    private static final int INITIAL_SEQUENCE = 1000;
+    private static final AtomicInteger SEQUENCE = new AtomicInteger(INITIAL_SEQUENCE - 1);
     private static final int MAX_SEQUENCE = 9999;
     private static final String PROCESS_ID_STR = String.format("%05d", ProcessUtil.processId());
     private static final String IP_HEX = IpUtils.ipv4ToHex();
@@ -46,13 +47,14 @@ public class TraceIdGenerator {
      *
      * @return
      */
-    private synchronized static int getNextSequence() {
-        int currentSeq = SEQUENCE.getAndIncrement();
-        if (currentSeq >= MAX_SEQUENCE) {
-            SEQUENCE.set(1000);
-            currentSeq = SEQUENCE.getAndIncrement();
-        }
-        return currentSeq;
+    private static int getNextSequence() {
+        int current;
+        int next;
+        do {
+            current = SEQUENCE.get();
+            next = current >= MAX_SEQUENCE ? INITIAL_SEQUENCE : current + 1;
+        } while (!SEQUENCE.compareAndSet(current, next));
+        return next;
     }
 
 
