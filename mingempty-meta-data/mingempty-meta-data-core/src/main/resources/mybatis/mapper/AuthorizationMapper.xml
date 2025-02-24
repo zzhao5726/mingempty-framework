@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.mapper.AuthorizationMapper">
+
+    <insert id="transferChange">
+        insert into t_meta_data_authorization(
+        authorization_id
+        , entry_code
+        , authorization_type
+        , authorization_code
+        , create_time
+        , update_time
+        , create_operator
+        , update_operator
+        )
+        select
+        base.authorization_id
+        , base.entry_code
+        , base.authorization_type
+        , base.authorization_code
+        , base.create_time
+        , base.update_time
+        , base.create_operator
+        , base.update_operator
+        from t_meta_data_change_authorization base
+        <where>
+            <include refid="top.mingempty.meta.data.mapper.ChangeAuthorizationMapper.base-query-param"/>
+            <include refid="top.mingempty.meta.data.mapper.ChangeAuthorizationMapper.max-query"/>
+        </where>
+        on duplicate key update
+        authorization_id=values(authorization_id)
+        , update_time=values(update_time)
+        , update_operator=values(update_operator
+        )
+    </insert>
+    <delete id="deleteChange">
+        delete del
+        from t_meta_data_authorization del
+        inner join t_meta_data_change_authorization base
+        on base.entry_code = del.entry_code
+        and base.authorization_type = del.authorization_type
+        and base.authorization_code = del.authorization_code
+        and base.delete_status = '1'
+        <where>
+            <include refid="top.mingempty.meta.data.mapper.ChangeAuthorizationMapper.base-query-param"/>
+            <include refid="top.mingempty.meta.data.mapper.ChangeAuthorizationMapper.max-query"/>
+        </where>
+    </delete>
+
+</mapper>

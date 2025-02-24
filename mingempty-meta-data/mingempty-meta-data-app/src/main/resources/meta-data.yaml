@@ -1,0 +1,108 @@
+me:
+  openapi:
+    enabled: true
+    description: 公共码值服务
+  datasource:
+    def:
+      url: jdbc:mysql://mysql.mingempty.top:3306/meta_data?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: zzhao
+      password: MySQL5726_zzhao
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  mybatis:
+    audit-enabled: true
+    audit-operator: SYS
+  mybatis-flex:
+    enabled: true
+    replaced-table-name: true
+  cache:
+    redis:
+      type: cluster
+      nodes:
+        - redis.mingempty.top:6379
+        - redis.mingempty.top:6380
+        - redis.mingempty.top:6381
+        - redis.mingempty.top:6382
+        - redis.mingempty.top:6383
+        - redis.mingempty.top:6384
+      password: redis@123
+  zookeeper:
+    enabled: true
+    one:
+      connect-string: zookeeper.mingempty.top:2181,zookeeper.mingempty.top:2182,zookeeper.mingempty.top:2183
+      retry-policy-enum: RETRY_FOREVER
+      sleep-ms-between-retry: 1000
+  sequence:
+    snowflake-id-worker-instances:
+      zookeeper:
+        - def
+    cache-sequences:
+      - seq-name: demo
+        seq-realize: redis
+        instance-name: def
+  event:
+    pool:
+      name: event
+      thread-name: Event-Delegating-ThreadPool-%d
+      core-pool-size: 5
+      maximum-pool-size: 20
+      work-queue-enum: array
+      max-pool-size: 500
+      rejected-execution-handler-enum: rejectedrunspolicy
+
+
+spring:
+  rabbitmq:
+    addresses: rabbitmq.mingempty.top:5672,rabbitmq.mingempty.top:5673,rabbitmq.mingempty.top:5674
+    username: admin            # 用户名（默认guest）
+    password: admin            # 密码（默认guest）
+    virtual-host: /            # 虚拟主机（默认/）
+    connection-timeout: 5000   # 连接超时（毫秒）
+    # 开启发送确认
+    publisher-confirm-type: correlated
+    ssl:
+      enabled: false
+  cloud:
+    stream:
+      # 绑定器配置（必须指定为rabbit）
+      binders:
+        rabbit:
+          type: rabbit
+          environment: # RabbitMQ 高级连接参数（可选）
+            spring:
+              rabbitmq:
+                addresses: rabbitmq.mingempty.top:5672,rabbitmq.mingempty.top:5673,rabbitmq.mingempty.top:5674
+                username: admin            # 用户名（默认guest）
+                password: admin            # 密码（默认guest）
+                virtual-host: /            # 虚拟主机（默认/）
+                connection-timeout: 5000   # 连接超时（毫秒）
+                # 开启发送确认
+                publisher-confirm-type: correlated
+                ssl:
+                  enabled: false
+      # 通道绑定配置（核心部分）
+      bindings:
+        # 生产者配置
+        entry-change-out-0:
+          binder: rabbit
+          destination: entry-change-exchange
+          contentType: application/json
+          group: entry-change
+        # 消费者配置
+        entryChange-in-0:
+          binder: rabbit
+          destination: entry-change-exchange
+          group: entry-change
+          contentType: application/json
+      rabbit:
+        bindings:
+          entryChange-in-0:
+            consumer:
+              # 自动确认
+              acknowledge-mode: AUTO
+              # 创建的连接数量
+              max-concurrency: 2
+              # 是否重新排队
+              requeue-rejected: true
+
+    function:
+      definition: entryChange

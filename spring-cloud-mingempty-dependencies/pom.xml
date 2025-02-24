@@ -34,6 +34,8 @@
         <module>../mingempty-mybatis</module>
 
         <module>../mingempty-mq</module>
+        <module>../mingempty-meta-data</module>
+
     </modules>
 
     <properties>
@@ -734,6 +736,27 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-rabbit-mq-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--meta-data-model-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-meta-data-model</artifactId>
+                <version>${version}</version>
+            </dependency>
+
+            <!--meta-data-api-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-meta-data-api</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--meta-data-api-openfeign-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-meta-data-api-openfeign</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 

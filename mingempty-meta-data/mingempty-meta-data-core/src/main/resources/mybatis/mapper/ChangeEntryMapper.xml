@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.mapper.ChangeEntryMapper">
+    <sql id="base-query-param">
+        <if test="entryQueryBo.entryCode != null">
+            and base.entry_code = #{entryQueryBo.entryCode}
+        </if>
+        <if test="entryQueryBo.entryCodeLike != null">
+            and base.entry_code like concat('%', #{entryQueryBo.entryCodeLike}, '%')
+        </if>
+        <if test="entryQueryBo.entryCodes != null  and !entryQueryBo.entryCodes.isEmpty() ">
+            and base.entry_code IN
+            <foreach collection="entryQueryBo.entryCodes" item="entryCode" open="(" separator="," close=")">
+                #{entryCode}
+            </foreach>
+        </if>
+        <if test="entryQueryBo.entryName != null">
+            and base.entry_name like concat('%', #{entryQueryBo.entryName}, '%')
+        </if>
+        <if test="entryQueryBo.entryType != null">
+            and base.entry_type = #{entryQueryBo.entryType}
+        </if>
+        <if test="entryQueryBo.entrySharding != null">
+            and base.entry_sharding = #{entryQueryBo.entrySharding}
+        </if>
+        <if test="entryQueryBo.deleteStatus != null">
+            and base.delete_status = #{entryQueryBo.deleteStatus}
+        </if>
+        <if test="entryQueryBo.deleteTime != null">
+            and base.delete_time = #{entryQueryBo.deleteTime}
+        </if>
+        <if test="entryQueryBo.deleteOperator != null">
+            and base.delete_operator = #{entryQueryBo.deleteOperator}
+        </if>
+    </sql>
+
+    <sql id="max-query">
+        and exists(select 1
+        from (SELECT maxbase.entry_code, max(maxbase.entry_version) as entry_version
+        FROM t_meta_data_change_entry maxbase
+        <where>
+            <if test="entryQueryBo.entryCode != null">
+                and maxbase.entry_code = #{entryQueryBo.entryCode}
+            </if>
+            <if test="entryQueryBo.entryCodeLike != null">
+                and maxbase.entry_code like concat('%', #{entryQueryBo.entryCodeLike}, '%')
+            </if>
+            <if test="entryQueryBo.entryCodes != null  and !entryQueryBo.entryCodes.isEmpty() ">
+                and maxbase.entry_code IN
+                <foreach collection="entryQueryBo.entryCodes" item="entryCode" open="(" separator="," close=")">
+                    #{entryCode}
+                </foreach>
+            </if>
+            <if test="entryQueryBo.entryVersion != null ">
+                and maxbase.entry_version &lt;= #{entryQueryBo.entryVersion}
+            </if>
+        </where>
+        group by maxbase.entry_code) maxversion
+        where base.entry_code = maxversion.entry_code
+        and base.entry_version = maxversion.entry_version)
+    </sql>
+
+    <select id="queryCount" resultType="java.lang.Long">
+        select count(1)
+        from t_meta_data_change_entry base
+        <where>
+            <include refid="base-query-param"/>
+            <include refid="max-query"/>
+        </where>
+    </select>
+
+    <select id="queryLimit" resultType="top.mingempty.meta.data.model.po.ChangeEntryPo" >
+        select base.*
+        from t_meta_data_change_entry base
+        <where>
+            <include refid="base-query-param"/>
+            <include refid="max-query"/>
+        </where>
+        order by base.sort
+        limit #{startIndex},#{pageSize}
+    </select>
+
+    <select id="query" resultType="top.mingempty.meta.data.model.po.ChangeEntryPo" >
+        select base.*
+        from t_meta_data_change_entry base
+        <where>
+            <include refid="base-query-param"/>
+            <include refid="max-query"/>
+        </where>
+    </select>
+</mapper>

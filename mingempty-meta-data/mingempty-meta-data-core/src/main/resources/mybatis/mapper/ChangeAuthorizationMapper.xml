@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.mapper.ChangeAuthorizationMapper">
+    <sql id="base-query-param">
+        <if test="authorizationQueryBo.entryCode != null">
+            and base.entry_code = #{authorizationQueryBo.entryCode}
+        </if>
+        <if test="authorizationQueryBo.entryCodeLike != null">
+            and base.entry_code like concat('%', #{authorizationQueryBo.entryCodeLike}, '%')
+        </if>
+        <if test="authorizationQueryBo.entryCodes != null  and !authorizationQueryBo.entryCodes.isEmpty() ">
+            and base.entry_code IN
+            <foreach collection="authorizationQueryBo.entryCodes" item="entryCode" open="(" separator="," close=")">
+                #{entryCode}
+            </foreach>
+        </if>
+        <if test="authorizationQueryBo.authorizationType != null">
+            and base.authorization_type = #{authorizationQueryBo.authorizationType}
+        </if>
+        <if test="authorizationQueryBo.authorizationCode != null">
+            and base.authorization_code = #{authorizationQueryBo.authorizationCode}
+        </if>
+        <if test="authorizationQueryBo.deleteStatus != null">
+            and base.delete_status = #{authorizationQueryBo.deleteStatus}
+        </if>
+        <if test="authorizationQueryBo.deleteTime != null">
+            and base.delete_time = #{authorizationQueryBo.deleteTime}
+        </if>
+        <if test="authorizationQueryBo.deleteOperator != null">
+            and base.delete_operator = #{authorizationQueryBo.deleteOperator}
+        </if>
+    </sql>
+
+    <sql id="max-query">
+        and exists(select 1
+        from (SELECT maxbase.entry_code,maxbase.authorization_type,maxbase.authorization_code, max(maxbase.entry_version) as entry_version
+        FROM t_meta_data_change_authorization maxbase
+        <where>
+            <if test="authorizationQueryBo.entryCode != null">
+                and maxbase.entry_code = #{authorizationQueryBo.entryCode}
+            </if>
+            <if test="authorizationQueryBo.entryCodeLike != null">
+                and maxbase.entry_code like concat('%', #{authorizationQueryBo.entryCodeLike}, '%')
+            </if>
+            <if test="authorizationQueryBo.entryCodes != null  and !authorizationQueryBo.entryCodes.isEmpty() ">
+                and maxbase.entry_code IN
+                <foreach collection="authorizationQueryBo.entryCodes" item="entryCode" open="(" separator="," close=")">
+                    #{entryCode}
+                </foreach>
+            </if>
+            <if test="authorizationQueryBo.entryVersion != null ">
+                and maxbase.entry_version &lt;= #{authorizationQueryBo.entryVersion}
+            </if>
+        </where>
+        group by maxbase.entry_code,maxbase.authorization_type,maxbase.authorization_code) maxversion
+        where base.entry_code = maxversion.entry_code
+        and base.authorization_type = maxversion.authorization_type
+        and base.authorization_code = maxversion.authorization_code
+        and base.entry_version = maxversion.entry_version)
+    </sql>
+
+</mapper>

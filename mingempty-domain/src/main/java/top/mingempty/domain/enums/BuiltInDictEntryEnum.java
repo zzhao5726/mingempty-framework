@@ -22,7 +22,7 @@ public enum BuiltInDictEntryEnum implements BaseMetaData<BuiltInDictEntryEnum, S
     YES_OR_NO("yes_or_no", "是否-YN"),
 
     @Schema(title = "字典标签", description = "字典标签")
-    DICT_TAG("dict_tag", "字典标签"),
+    DICT_LABEL("dict_label", "字典标签"),
 
     @Schema(title = "业务类别", description = "业务类别")
     SERVICE_CATEGORY("service_category", "业务类别"),

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.mapper.EntryMapper">
+
+    <insert id="transferChange">
+        insert into t_meta_data_entry(
+        entry_id
+        , entry_code
+        , entry_name
+        , entry_type
+        , entry_sharding
+        , sort
+        , delete_status
+        , delete_time
+        , delete_operator
+        , create_time
+        , update_time
+        , create_operator
+        , update_operator
+        )
+        select
+        base.entry_id
+        , base.entry_code
+        , base.entry_name
+        , base.entry_type
+        , base.entry_sharding
+        , base.sort
+        , base.delete_status
+        , base.delete_time
+        , base.delete_operator
+        , base.create_time
+        , base.update_time
+        , base.create_operator
+        , base.update_operator
+        from t_meta_data_change_entry base
+        <where>
+            <include refid="top.mingempty.meta.data.mapper.ChangeEntryMapper.base-query-param"/>
+            <include refid="top.mingempty.meta.data.mapper.ChangeEntryMapper.max-query"/>
+        </where>
+        on duplicate key update
+        entry_id=values(entry_id)
+        , entry_name=values(entry_name)
+        , entry_type=values(entry_type)
+        , entry_sharding=values(entry_sharding)
+        , sort=values(sort)
+        , delete_status=values(delete_status)
+        , delete_time=values(delete_time)
+        , delete_operator=values(delete_operator)
+        , update_time=values(update_time)
+        , update_operator=values(update_operator)
+    </insert>
+
+    <select id="queryCount" resultType="java.lang.Long">
+        select count(1)
+        from t_meta_data_entry base
+        <where>
+            <include refid="top.mingempty.meta.data.mapper.ChangeEntryMapper.base-query-param"/>
+        </where>
+    </select>
+
+    <select id="queryLimit" resultType="top.mingempty.meta.data.model.po.EntryPo">
+        select base.*
+        from t_meta_data_entry base
+        <where>
+            <include refid="top.mingempty.meta.data.mapper.ChangeEntryMapper.base-query-param"/>
+        </where>
+        order by base.sort
+        limit #{startIndex},#{pageSize}
+    </select>
+
+    <select id="query" resultType="top.mingempty.meta.data.model.po.EntryPo">
+        select base.*
+        from t_meta_data_entry base
+        <where>
+            <include refid="top.mingempty.meta.data.mapper.ChangeEntryMapper.base-query-param"/>
+        </where>
+    </select>
+</mapper>
