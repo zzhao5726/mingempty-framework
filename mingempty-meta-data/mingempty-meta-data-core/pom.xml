@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>top.mingempty</groupId>
+        <artifactId>mingempty-meta-data</artifactId>
+        <version>${dependencies.version}</version>
+    </parent>
+
+    <artifactId>mingempty-meta-data-core</artifactId>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <project.encoding>UTF-8</project.encoding>
+        <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${project.encoding}</project.reporting.outputEncoding>
+    </properties>
+
+    <dependencies>
+
+        <!--第三方依赖👆  项目自身依赖👇-->
+        <!--meta-data-api-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-meta-data-api</artifactId>
+        </dependency>
+
+        <!--对mybatis-flex的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-mybatis-flex-extension</artifactId>
+        </dependency>
+
+        <!--对event事件的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-event-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--对concurrent的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-concurrent-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--redis封装starter-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-redis-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--对zookeeper的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-zookeeper-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--本地缓存封装starter-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-local-cache-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--对序号生成的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-sequence-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--基于spring-cloud-stream对rabbitmq的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-rabbit-mq-spring-boot3-starter</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>

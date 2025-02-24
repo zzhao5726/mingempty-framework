@@ -26,4 +26,10 @@ public class GatewayProperties {
      */
     @Schema(title = "配置需要清洗的请求头")
     private List<String> clearHeaders = List.of();
+
+    /**
+     * 默认菜单数据
+     */
+    @Schema(title = "默认菜单数据")
+    private String defaultMenu;
 }
