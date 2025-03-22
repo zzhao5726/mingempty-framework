@@ -34,6 +34,7 @@
         <module>../mingempty-mybatis</module>
 
         <module>../mingempty-mq</module>
+        <module>../mingempty-auth</module>
     </modules>
 
     <properties>
@@ -60,7 +61,6 @@
         <spring-cloud.version>2023.0.2</spring-cloud.version>
         <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
         <spring-cloud-tencent.version>1.13.2-2023.0.0</spring-cloud-tencent.version>
-        <security-oauth2-authorization-server.version>1.3.1</security-oauth2-authorization-server.version>
         <dubbo.version>3.2.12</dubbo.version>
         <micrometer-tracing.version>1.4.2</micrometer-tracing.version>
         <springdoc-openapi.version>2.6.0</springdoc-openapi.version>
@@ -93,6 +93,7 @@
         <redisson-spring-boot-starter.version>3.45.0</redisson-spring-boot-starter.version>
         <zookeeper.version>3.9.2</zookeeper.version>
         <curator.version>5.7.0</curator.version>
+        <bootstrap.version>5.3.3</bootstrap.version>
 
     </properties>
 
@@ -521,6 +522,14 @@
                 </exclusions>
             </dependency>
 
+            <!-- bootstrap -->
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>bootstrap</artifactId>
+                <version>${bootstrap.version}</version>
+            </dependency>
+
+
 
             <!--👆👆👆👆👆👆👆👆👆👆👆👆👆👆第三方项目的依赖start 👆👆👆👆👆👆👆👆👆👆👆👆👆👆-->
 
@@ -734,6 +743,34 @@
             <dependency>
                 <groupId>top.mingempty</groupId>
                 <artifactId>mingempty-rabbit-mq-spring-boot3-starter</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--auth-model-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-auth-model</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--auth-api-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-auth-api</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--auth-api-openfeign-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-auth-api-openfeign</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--auth-security-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-auth-security</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
 

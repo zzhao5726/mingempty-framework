@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>top.mingempty</groupId>
+        <artifactId>mingempty-auth</artifactId>
+        <version>${dependencies.version}</version>
+    </parent>
+
+    <artifactId>mingempty-auth-core</artifactId>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <project.encoding>UTF-8</project.encoding>
+        <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${project.encoding}</project.reporting.outputEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- oauth2-client -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+
+        <!-- oauth2-authorization-server -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-authorization-server</artifactId>
+        </dependency>
+
+        <!-- MyBatis Plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.5.3.1</version>
+        </dependency>
+        <!--第三方依赖👆  项目自身依赖👇-->
+
+        <!--基础工具类-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-commons</artifactId>
+        </dependency>
+
+        <!--对spring的封装starter-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--redis封装starter-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-redis-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--trace链路封装starter-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-trace-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--auth-api-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-auth-api</artifactId>
+        </dependency>
+
+        <!--auth-security-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-auth-security</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>top.mingempty</groupId>
+                    <artifactId>mingempty-auth-api-openfeign</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <configuration>
+                    <!-- install 时忽略此model -->
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <!-- deploy 时忽略此model -->
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
