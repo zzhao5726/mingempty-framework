@@ -1,6 +1,7 @@
 package top.mingempty.domain.enums;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 import top.mingempty.domain.base.MeResult;
 
 /**
@@ -8,7 +9,9 @@ import top.mingempty.domain.base.MeResult;
  *
  * @author zzhao
  */
-public enum DefaultResultEnum implements MeResult {
+@Getter
+@Schema(title = "接口结果枚举")
+public enum DefaultResultEnum implements MeResult, BaseMetaData<DefaultResultEnum, String> {
 
     SUCCESS("G-D-00000", "接口调用成功"),
 
@@ -40,12 +43,12 @@ public enum DefaultResultEnum implements MeResult {
     }
 
     @Override
-    public String getCode() {
-        return this.code;
+    public String getItemCode() {
+        return getCode();
     }
 
     @Override
-    public String getMessage() {
-        return this.message;
+    public String getItemName() {
+        return getMessage();
     }
 }

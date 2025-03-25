@@ -15,7 +15,7 @@ import java.util.Optional;
 @Slf4j
 @Getter
 @Schema(title = "排序方式枚举", description = "排序方式枚举")
-public enum DirectionEnum {
+public enum DirectionEnum implements BaseMetaData<DirectionEnum, String> {
 
     @Schema(title = "升序", description = "升序")
     ASC("asc", "升序"),

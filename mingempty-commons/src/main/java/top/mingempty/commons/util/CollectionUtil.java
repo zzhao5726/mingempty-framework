@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -63,7 +65,7 @@ public class CollectionUtil {
      * 集合截取
      *
      * @param sourceList 数据
-     * @param mePage      分页参数
+     * @param mePage     分页参数
      * @param <T>        泛型
      * @return 截取后的集合
      */
@@ -241,4 +243,20 @@ public class CollectionUtil {
     }
 
 
+    /**
+     * 求取集合2{@code coll2}对集合1{@code coll1}的差集
+     *
+     * @param coll1 集合1
+     * @param coll2 集合2
+     * @param <T>   集合元素类型
+     * @return 差集
+     */
+    public static <T> Collection<T> subtract(Collection<T> coll1, Collection<T> coll2) {
+        if (CollUtil.isEmpty(coll2)) {
+            return Optional.ofNullable(coll1)
+                    .map(CopyOnWriteArrayList::new)
+                    .orElse(new CopyOnWriteArrayList<>());
+        }
+        return CollUtil.subtract(coll1, coll2);
+    }
 }
