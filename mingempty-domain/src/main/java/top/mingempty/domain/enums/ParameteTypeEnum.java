@@ -3,12 +3,6 @@ package top.mingempty.domain.enums;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 /**
  * 参数类型枚举
  *
@@ -16,7 +10,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @Schema(title = "参数类型枚举")
-public enum ParameteTypeEnum {
+public enum ParameteTypeEnum implements BaseMetaData<ParameteTypeEnum, Integer> {
 
 
     /**
@@ -36,30 +30,16 @@ public enum ParameteTypeEnum {
      * 编码
      */
     @Schema(title = "编码")
-    private final int code;
+    private final Integer itemCode;
 
     /**
      * 描述
      */
     @Schema(title = "描述")
-    private final String desc;
+    private final String itemName;
 
-    ParameteTypeEnum(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
-
-
-    private final static Map<Integer, ParameteTypeEnum> PARAMETE_TYPE_ENUM_OPTIONAL_MAP =
-            Arrays.stream(ParameteTypeEnum.values())
-                    .parallel()
-                    .collect(Collectors.toMap(ParameteTypeEnum::getCode, Function.identity()));
-
-
-    /**
-     * 通过编码查找
-     */
-    public static Optional<ParameteTypeEnum> find(Integer code) {
-        return Optional.ofNullable(PARAMETE_TYPE_ENUM_OPTIONAL_MAP.get(code));
+    ParameteTypeEnum(Integer itemCode, String itemName) {
+        this.itemCode = itemCode;
+        this.itemName = itemName;
     }
 }

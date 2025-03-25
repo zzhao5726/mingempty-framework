@@ -30,7 +30,7 @@ public enum SeqRealizeEnum {
      * 数据库
      */
     @Schema(title = "数据库")
-    Database("", "_"),
+    Database("", "|"),
 
     ;
 
