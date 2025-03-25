@@ -3,11 +3,6 @@ package top.mingempty.domain.enums;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 /**
  * 内置字典条目枚举
  *
@@ -15,7 +10,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @Schema(title = "内置字典条目枚举", description = "内置字典条目枚举")
-public enum BuiltInDictEntryEnum {
+public enum BuiltInDictEntryEnum implements BaseMetaData<BuiltInDictEntryEnum, String> {
 
     @Schema(title = "启用状态", description = "启用状态")
     ENABLED_OR_NOT("enabled_or_not", "启用状态"),
@@ -34,9 +29,7 @@ public enum BuiltInDictEntryEnum {
 
     @Schema(title = "业务参数", description = "业务参数")
     SERVICE_PARAMETER("service_parameter", "业务参数"),
-
     ;
-
 
     /**
      * 条目编码
@@ -55,20 +48,15 @@ public enum BuiltInDictEntryEnum {
         this.entryName = entryName;
     }
 
-    private final static Map<String, BuiltInDictEntryEnum> BUILT_IN_DICT_ENTRY_ENUM_OPTIONAL_MAP =
-            Arrays.stream(BuiltInDictEntryEnum.values())
-                    .parallel()
-                    .collect(Collectors.toMap(BuiltInDictEntryEnum::getEntryCode, Function.identity()));
 
-    /**
-     * 判断是否是内置条目编码
-     *
-     * @param entryCode
-     * @return
-     */
-    public boolean isBuiltInEntryCode(String entryCode) {
-        return BUILT_IN_DICT_ENTRY_ENUM_OPTIONAL_MAP.containsKey(entryCode);
+    @Override
+    public String getItemCode() {
+        return getEntryCode();
     }
 
+    @Override
+    public String getItemName() {
+        return getEntryName();
+    }
 
 }

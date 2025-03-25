@@ -3,11 +3,7 @@ package top.mingempty.domain.enums;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
-import java.util.Arrays;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * 是否-YN枚举
@@ -16,7 +12,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @Schema(title = "是否-YN枚举", description = "是否-YN枚举")
-public enum YesOrNoEnum {
+public enum YesOrNoEnum implements BaseMetaData<YesOrNoEnum, String> {
 
     @Schema(title = "否", description = "否")
     YES("Y", "否"),
@@ -25,12 +21,10 @@ public enum YesOrNoEnum {
     NO("N", "是"),
     ;
 
-
     YesOrNoEnum(String itemCode, String itemName) {
         this.itemCode = itemCode;
         this.itemName = itemName;
     }
-
 
     /**
      * 字典项编码
@@ -44,15 +38,34 @@ public enum YesOrNoEnum {
     @Schema(title = "字典项名称")
     private final String itemName;
 
-    private final static Map<String, YesOrNoEnum> YES_OR_NO_ENUM_OPTIONAL_MAP =
-            Arrays.stream(YesOrNoEnum.values())
-                    .parallel()
-                    .collect(Collectors.toMap(YesOrNoEnum::getItemCode, Function.identity()));
+    /**
+     * 将字典项编码转换为小写
+     *
+     * @return
+     */
+    @Schema(title = "将字典项编码转换为小写")
+    public String toLowerCase() {
+        return itemCode.toLowerCase();
+    }
+
 
     /**
-     * 通过编码查找
+     * 根据小写字典项编码获取枚举
+     *
+     * @param itemCode 字典项编码
+     * @return 枚举
      */
-    public static Optional<YesOrNoEnum> find(String itemCode) {
-        return Optional.ofNullable(YES_OR_NO_ENUM_OPTIONAL_MAP.get(itemCode));
+    public static YesOrNoEnum findOneWithLowerCase(String itemCode) {
+        return EnumHelper.INSTANCE.findOne(YesOrNoEnum.class, itemCode.toUpperCase());
+    }
+
+    /**
+     * 根据小写字典项编码获取枚举
+     *
+     * @param itemCode 字典项编码
+     * @return 枚举
+     */
+    public static Optional<YesOrNoEnum> findOptionalWithLowerCase(String itemCode) {
+        return EnumHelper.INSTANCE.findOptional(YesOrNoEnum.class, itemCode.toUpperCase());
     }
 }

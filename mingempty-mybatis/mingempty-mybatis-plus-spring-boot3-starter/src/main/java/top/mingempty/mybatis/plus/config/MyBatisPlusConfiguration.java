@@ -1,7 +1,9 @@
 package top.mingempty.mybatis.plus.config;
 
 import cn.hutool.core.util.ObjUtil;
+import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
+import com.baomidou.mybatisplus.core.handlers.CompositeEnumTypeHandler;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
@@ -10,13 +12,18 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.apache.ibatis.type.TypeHandler;
+import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import top.mingempty.commons.util.ReflectionUtil;
 import top.mingempty.mybatis.config.MyBatisConfiguration;
+import top.mingempty.mybatis.plus.handlers.MeMpCompositeEnumTypeHandler;
 import top.mingempty.mybatis.plus.model.MybatisPlusProperties;
 import top.mingempty.mybatis.tool.ReplacedTableNameTool;
 
@@ -82,6 +89,28 @@ public class MyBatisPlusConfiguration {
                 .map(replacedTableName -> replacedTableName.getOrDefault(tableName, tableName))
                 .orElse(tableName));
         return dynamicTableNameInnerInterceptor;
+    }
+
+    @Configuration
+    @ConditionalOnClass(name = {"com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer"})
+    public static class MeConfigurationCustomizer {
+        /**
+         * mybatis后置配置
+         *
+         * @return
+         */
+        @Bean
+        public ConfigurationCustomizer mybatisConfigurationCustomizer() {
+            return mybatisConfiguration -> {
+                TypeHandlerRegistry typeHandlerRegistry = mybatisConfiguration.getTypeHandlerRegistry();
+                Class<? extends TypeHandler> defaultEnumTypeHandler
+                        = ReflectionUtil.getValue("defaultEnumTypeHandler", typeHandlerRegistry);
+                if (CompositeEnumTypeHandler.class.equals(defaultEnumTypeHandler)) {
+                    // 设置默认枚举处理器（替换为你实际的类）
+                    mybatisConfiguration.setDefaultEnumTypeHandler(MeMpCompositeEnumTypeHandler.class);
+                }
+            };
+        }
     }
 
 }
