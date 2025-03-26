@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.repository.mapper.ChangeItemMapper">
+    <sql id="base-select-column">
+        <choose>
+            <when test="itemQuery.selectColumns != null and !itemQuery.selectColumns.isEmpty() ">
+                <foreach collection="itemQuery.selectColumns" item="selectColumn" separator=",">
+                    base.${selectColumn}
+                </foreach>
+            </when>
+            <otherwise>
+                base.*
+            </otherwise>
+        </choose>
+    </sql>
+    <sql id="base-query-param">
+        <if test="itemQuery.entryCode != null">
+            and base.entry_code = #{itemQuery.entryCode}
+        </if>
+        <if test="itemQuery.entryCodeLike != null">
+            and base.entry_code like concat('%', #{itemQuery.entryCodeLike}, '%')
+        </if>
+        <if test="itemQuery.entryCodes != null  and !itemQuery.entryCodes.isEmpty() ">
+            and base.entry_code IN
+            <foreach collection="itemQuery.entryCodes" item="entryCode" open="(" separator="," close=")">
+                #{entryCode}
+            </foreach>
+        </if>
+        <if test="itemQuery.itemParentCode != null">
+            and base.item_parent_code = #{itemQuery.itemParentCode}
+        </if>
+        <if test="itemQuery.labelCode != null">
+            and exists(select 1
+            from t_meta_data_label label
+            where base.entry_code = label.entry_code
+            and base.item_code = label.item_code
+            and label.label_code = #{itemQuery.labelCode})
+        </if>
+        <if test="itemQuery.itemCode != null">
+            and base.item_code = #{itemQuery.itemCode}
+        </if>
+        <if test="itemQuery.itemCodeLike != null">
+            and base.item_code like concat('%', #{itemQuery.itemCodeLike}, '%')
+        </if>
+        <if test="itemQuery.itemCodes != null  and !itemQuery.itemCodes.isEmpty() ">
+            and base.item_code IN
+            <foreach collection="itemQuery.itemCodes" item="itemCode" open="(" separator="," close=")">
+                #{itemCode}
+            </foreach>
+        </if>
+        <if test="itemQuery.itemName != null">
+            and base.item_name = #{itemQuery.itemName}
+        </if>
+        <if test="itemQuery.itemNameLike != null">
+            and base.item_name like concat('%', #{itemQuery.itemNameLike}, '%')
+        </if>
+        <if test="itemQuery.deleteStatus != null">
+            and base.delete_status = #{itemQuery.deleteStatus}
+        </if>
+        <if test="itemQuery.deleteTime != null">
+            and base.delete_time = #{itemQuery.deleteTime}
+        </if>
+        <if test="itemQuery.deleteOperator != null">
+            and base.delete_operator = #{itemQuery.deleteOperator}
+        </if>
+        <if test="itemQuery.extraFieldConditions != null and itemQuery.extraFieldConditions!='' ">
+            and ${itemQuery.extraFieldConditions}
+        </if>
+    </sql>
+
+    <sql id="max-query">
+        <if test="itemQuery.entryVersion != null">
+            and exists(select 1
+            from (SELECT maxbase.entry_code
+            , maxbase.maxbase
+            , max(maxbase.entry_version) as entry_version
+            FROM t_meta_data_change_item maxbase
+            <where>
+                <if test="itemQuery.entryCode != null">
+                    and maxbase.entry_code = #{itemQuery.entryCode}
+                </if>
+                <if test="itemQuery.entryCodeLike != null">
+                    and maxbase.entry_code like concat('%', #{itemQuery.entryCodeLike}, '%')
+                </if>
+                <if test="itemQuery.entryCodes != null  and !itemQuery.entryCodes.isEmpty() ">
+                    and maxbase.entry_code IN
+                    <foreach collection="itemQuery.entryCodes" item="entryCode" open="(" separator="," close=")">
+                        #{entryCode}
+                    </foreach>
+                </if>
+                <if test="itemQuery.entryVersion != null ">
+                    and maxbase.entry_version &lt;= #{itemQuery.entryVersion}
+                </if>
+            </where>
+            group by maxbase.entry_code,maxbase.item_code) maxversion
+            where base.entry_code = maxversion.entry_code
+            and base.item_code = maxversion.item_code
+            and base.entry_version = maxversion.entry_version)
+        </if>
+    </sql>
+
+
+    <select id="queryCount" resultType="java.lang.Long">
+        select count(item_id)
+        from t_meta_data_change_item base
+        <where>
+            <include refid="base-query-param"/>
+            <include refid="max-query"/>
+        </where>
+    </select>
+
+    <select id="query" resultType="top.mingempty.meta.data.repository.model.po.ChangeItemPo">
+        select
+        <include refid="base-select-column"/>
+        from t_meta_data_change_item base
+        <where>
+            <include refid="base-query-param"/>
+            <include refid="max-query"/>
+        </where>
+        order by base.entry_code,base.item_sort
+        <include refid="top.mingempty.BaseMapper.limit"/>
+    </select>
+</mapper>

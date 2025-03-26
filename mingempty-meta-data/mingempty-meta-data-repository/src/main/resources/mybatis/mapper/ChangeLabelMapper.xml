@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.repository.mapper.ChangeLabelMapper">
+    <sql id="base-select-column">
+        <choose>
+            <when test="labelQuery.selectColumns != null and !labelQuery.selectColumns.isEmpty() ">
+                <foreach collection="labelQuery.selectColumns" item="selectColumn" separator=",">
+                    base.${selectColumn}
+                </foreach>
+            </when>
+            <otherwise>
+                base.*
+            </otherwise>
+        </choose>
+    </sql>
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>top.mingempty</groupId>
+        <artifactId>mingempty-meta-data</artifactId>
+        <version>${dependencies.version}</version>
+    </parent>
+
+    <artifactId>mingempty-meta-data-application</artifactId>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <project.encoding>UTF-8</project.encoding>
+        <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${project.encoding}</project.reporting.outputEncoding>
+    </properties>
+
+    <dependencies>
+
+        <!--第三方依赖👆  项目自身依赖👇-->
+        <!--元数据管理   领域层-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-meta-data-domain</artifactId>
+        </dependency>
+
+        <!--元数据管理   基础设施-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-meta-data-infrastructure</artifactId>
+        </dependency>
+
+        <!--元数据管理   仓储-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-meta-data-repository</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <!-- deploy 时忽略此model -->
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    </build>
+
+</project>

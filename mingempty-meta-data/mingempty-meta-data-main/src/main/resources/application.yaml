@@ -1,0 +1,56 @@
+me:
+  name: meta-data-service
+  group: mingempty
+  version: 1.0.0
+  timestamp: ${current.time}
+  base-path: /meta-data
+  logging:
+    config-name: meta-data.xml
+
+spring:
+  cloud:
+    nacos:
+      server-addr: nacos.mingempty.top:8848
+      username: mingempty
+      password: mingempty
+      config:
+        namespace: 9d0a606f-63ca-4aef-8a97-2832b140f114
+        group: ${me.group:DEFAULT_GROUP}
+      discovery:
+        namespace: 9d0a606f-63ca-4aef-8a97-2832b140f114
+        group: ${me.group:DEFAULT_GROUP}
+  config:
+    import:
+      - optional:nacos:meta-data.yaml
+
+logging:
+  config: classpath:logback-me.xml
+
+
+mybatis-flex:
+  mapper-locations: classpath*:/mybatis/mapper/**/*.xml
+
+server:
+  port: 8081
+
+# application.yml
+dubbo:
+  registry:
+    address: nacos://${spring.cloud.nacos.server-addr:127.0.0.1:8848}
+    username: ${spring.cloud.nacos.username:nacos}
+    password: ${spring.cloud.nacos.password:nacos}
+    group: ${spring.cloud.nacos.discovery.group:DEFAULT_GROUP}
+    version: ${me.version:1.0.0}
+    parameters:
+      namespace: ${spring.cloud.nacos.discovery.namespace:}
+      register-consumer-url: true
+    # This will enable application-level service discovery only (the recommended service discovery method for Dubbo3).
+    # For users upgrading from Dubbo2.x, please set the value to 'all' for smooth migration.
+    register-mode: instance
+  protocol:
+    name: tri
+    port: 50051
+  application:
+    name: ${me.name:mingempty}
+    logger: slf4j
+

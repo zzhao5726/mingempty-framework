@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.repository.mapper.OperationHistoryMapper">
+    <sql id="base-select-column">
+        <choose>
+            <when test="operationHistoryQuery.selectColumns != null and !operationHistoryQuery.selectColumns.isEmpty() ">
+                <foreach collection="operationHistoryQuery.selectColumns" item="selectColumn" separator=",">
+                    base.${selectColumn}
+                </foreach>
+            </when>
+            <otherwise>
+                base.*
+            </otherwise>
+        </choose>
+    </sql>
+    <sql id="base-query-param">
+        <if test="operationHistoryQuery.entryCode != null">
+            and base.entry_code = #{operationHistoryQuery.entryCode}
+        </if>
+        <if test="operationHistoryQuery.entryCodeLike != null">
+            and base.entry_code like concat('%', #{operationHistoryQuery.entryCodeLike}, '%')
+        </if>
+        <if test="operationHistoryQuery.entryCodes != null  and !operationHistoryQuery.entryCodes.isEmpty() ">
+            and base.entry_code IN
+            <foreach collection="operationHistoryQuery.entryCodes" item="entryCode" open="(" separator="," close=")">
+                #{entryCode}
+            </foreach>
+        </if>
+        <if test="operationHistoryQuery.entryVersion != null">
+            and base.entry_version = #{operationHistoryQuery.entryVersion}
+        </if>
+        <if test="operationHistoryQuery.restoreEntryVersion != null">
+            and base.restore_entry_version = #{operationHistoryQuery.restoreEntryVersion}
+        </if>
+        <if test="operationHistoryQuery.operationType != null">
+            and base.operation_type = #{operationHistoryQuery.operationType}
+        </if>
+        <if test="operationHistoryQuery.operatorCode != null">
+            and base.operator_code = #{operationHistoryQuery.operatorCode}
+        </if>
+        <choose>
+            <!-- 当 operationTimeByStart 和 operationTimeByEnd 都不为空时，使用 BETWEEN AND -->
+            <when test="operationHistoryQuery.operationTimeByStart != null and operationHistoryQuery.operationTimeByEnd != null">
+                AND base.operation_time BETWEEN #{operationHistoryQuery.operationTimeByStart} AND
+                #{operationHistoryQuery.operationTimeByEnd}
+            </when>
+            <!-- 只要有一个为空，使用大于或小于 -->
+            <otherwise>
+                <if test="operationHistoryQuery.operationTimeByStart != null">
+                    AND base.operation_time &gt;= #{operationHistoryQuery.operationTimeByStart}
+                </if>
+                <if test="operationHistoryQuery.operationTimeByEnd != null">
+                    AND base.operation_time &lt;= #{operationHistoryQuery.operationTimeByEnd}
+                </if>
+            </otherwise>
+        </choose>
+        <if test="operationHistoryQuery.batchId != null">
+            and base.batch_id = #{operationHistoryQuery.batchId}
+        </if>
+    </sql>
+
+
+    <select id="gainMaxVersion" resultType="java.lang.Long">
+        select ifnull(max(entry_version), 0)
+        from t_meta_data_operation_history
+        where entry_code = #{entryCode}
+    </select>
+
+    <select id="queryCount" resultType="java.lang.Long">
+        select count(base.operation_history_id) from t_meta_data_operation_history base
+        <where>
+            <include refid="base-query-param"></include>
+        </where>
+    </select>
+
+    <select id="query" resultType="top.mingempty.meta.data.repository.model.po.OperationHistoryPo">
+        select base.* from t_meta_data_operation_history base
+        <where>
+            <include refid="base-query-param"></include>
+        </where>
+        order by base.entry_code, base.entry_version
+        <include refid="top.mingempty.BaseMapper.limit"/>
+    </select>
+</mapper>

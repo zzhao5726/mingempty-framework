@@ -358,4 +358,38 @@ public class MePubConditions {
         return sb.toString().replaceAll(" 1 != 1  or ", "");
     }
 
+    public static ValueCondition cloneValueCondition(ValueCondition extraFieldCondition) {
+        if (extraFieldCondition == null) {
+            return null;
+        }
+        ValueCondition valueCondition = new ValueCondition();
+        valueCondition.setType(extraFieldCondition.getType());
+        valueCondition.setColumn(extraFieldCondition.getColumn());
+        valueCondition.setValue(extraFieldCondition.getValue());
+        if (extraFieldCondition.getBetween() != null) {
+            Between between = new Between();
+            between.setStart(extraFieldCondition.getBetween().getStart());
+            between.setEnd(extraFieldCondition.getBetween().getEnd());
+            valueCondition.setBetween(between);
+        }
+        if (extraFieldCondition.getIn() != null) {
+            valueCondition.setIn(List.copyOf(extraFieldCondition.getIn()));
+        }
+        if (extraFieldCondition.getConditions() != null) {
+            valueCondition.setConditions(new ArrayList<>(cloneValueConditions(extraFieldCondition.getConditions())));
+        }
+
+        return valueCondition;
+    }
+
+    public static Collection<ValueCondition> cloneValueConditions(Collection<ValueCondition> extraFieldConditions) {
+        if (extraFieldConditions == null) {
+            return List.of();
+        }
+        return extraFieldConditions
+                .parallelStream()
+                .map(MePubConditions::cloneValueCondition)
+                .collect(Collectors.toList());
+    }
+
 }

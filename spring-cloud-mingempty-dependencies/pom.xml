@@ -34,6 +34,7 @@
         <module>../mingempty-mybatis</module>
         <module>../mingempty-mq</module>
         <module>../mingempty-dubbo-spring-boot3-starter</module>
+        <module>../mingempty-meta-data</module>
     </modules>
 
     <properties>
@@ -164,6 +165,20 @@
                 <version>${springdoc-openapi.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!--测试-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring-boot.version}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>android-json</artifactId>
+                        <groupId>com.vaadin.external.google</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!--oauth2-->
@@ -735,6 +750,28 @@
                 <artifactId>mingempty-dubbo-spring-boot3-starter</artifactId>
                 <version>${dependencies.version}</version>
             </dependency>
+
+            <!--元数据管理门面  领域依赖-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-meta-data-facade-domain</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--元数据管理门面  feign-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-meta-data-facade-feign</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
+            <!--元数据管理门面  rpc-->
+            <dependency>
+                <groupId>top.mingempty</groupId>
+                <artifactId>mingempty-meta-data-facade-rpc</artifactId>
+                <version>${dependencies.version}</version>
+            </dependency>
+
 
         </dependencies>
     </dependencyManagement>

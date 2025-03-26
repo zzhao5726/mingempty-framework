@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.repository.mapper.ChangeEntryMapper">
+    <sql id="base-select-column">
+        <choose>
+            <when test="entryQuery.selectColumns != null and !entryQuery.selectColumns.isEmpty() ">
+                <foreach collection="entryQuery.selectColumns" item="selectColumn" separator=",">
+                    base.${selectColumn}
+                </foreach>
+            </when>
+            <otherwise>
+                base.*
+            </otherwise>
+        </choose>
+    </sql>
+    <sql id="base-query-param">
+        <if test="entryQuery.entryCode != null">
+            and base.entry_code = #{entryQuery.entryCode}
+        </if>
+        <if test="entryQuery.entryCodeLike != null">
+            and base.entry_code like concat('%', #{entryQuery.entryCodeLike}, '%')
+        </if>
+        <if test="entryQuery.entryCodes != null  and !entryQuery.entryCodes.isEmpty() ">
+            and base.entry_code IN
+            <foreach collection="entryQuery.entryCodes" item="entryCode" open="(" separator="," close=")">
+                #{entryCode}
+            </foreach>
+        </if>
+        <if test="entryQuery.entryName != null">
+            and base.entry_name = #{entryQuery.entryName}
+        </if>
+        <if test="entryQuery.entryNameLike != null">
+            and base.entry_name like concat('%', #{entryQuery.entryNameLike}, '%')
+        </if>
+        <if test="entryQuery.entryType != null">
+            and base.entry_type = #{entryQuery.entryType}
+        </if>
+        <if test="entryQuery.entrySharding != null">
+            and base.entry_sharding = #{entryQuery.entrySharding}
+        </if>
+        <if test="entryQuery.deleteStatus != null">
+            and base.delete_status = #{entryQuery.deleteStatus}
+        </if>
+        <if test="entryQuery.deleteTime != null">
+            and base.delete_time = #{entryQuery.deleteTime}
+        </if>
+        <if test="entryQuery.deleteOperator != null">
+            and base.delete_operator = #{entryQuery.deleteOperator}
+        </if>
+    </sql>
+
+    <sql id="max-query">
+        <if test="entryQuery.entryVersion != null">
+            and exists(select 1
+            from (SELECT maxbase.entry_code
+            , max(maxbase.entry_version) as entry_version
+            FROM t_meta_data_change_entry maxbase
+            <where>
+                <if test="entryQuery.entryCode != null">
+                    and maxbase.entry_code = #{entryQuery.entryCode}
+                </if>
+                <if test="entryQuery.entryCodeLike != null">
+                    and maxbase.entry_code like concat('%', #{entryQuery.entryCodeLike}, '%')
+                </if>
+                <if test="entryQuery.entryCodes != null  and !entryQuery.entryCodes.isEmpty() ">
+                    and maxbase.entry_code IN
+                    <foreach collection="entryQuery.entryCodes" item="entryCode" open="(" separator="," close=")">
+                        #{entryCode}
+                    </foreach>
+                </if>
+                <if test="entryQuery.entryVersion != null ">
+                    and maxbase.entry_version &lt;= #{entryQuery.entryVersion}
+                </if>
+            </where>
+            group by maxbase.entry_code) maxversion
+            where base.entry_code = maxversion.entry_code
+            and base.entry_version = maxversion.entry_version)
+        </if>
+    </sql>
+
+    <select id="queryCount" resultType="java.lang.Long">
+        select count(entry_id)
+        from t_meta_data_change_entry base
+        <where>
+            <include refid="base-query-param"/>
+            <include refid="max-query"/>
+        </where>
+    </select>
+
+    <select id="query" resultType="top.mingempty.meta.data.repository.model.po.ChangeEntryPo">
+        select base.*
+        from t_meta_data_change_entry base
+        <where>
+            <include refid="base-query-param"/>
+            <include refid="max-query"/>
+        </where>
+        order by base.sort
+        <include refid="top.mingempty.BaseMapper.limit"/>
+    </select>
+
+</mapper>

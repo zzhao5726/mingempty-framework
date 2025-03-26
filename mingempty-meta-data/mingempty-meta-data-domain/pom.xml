@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>top.mingempty</groupId>
+        <artifactId>mingempty-meta-data</artifactId>
+        <version>${dependencies.version}</version>
+    </parent>
+
+    <artifactId>mingempty-meta-data-domain</artifactId>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <project.encoding>UTF-8</project.encoding>
+        <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${project.encoding}</project.reporting.outputEncoding>
+    </properties>
+
+    <dependencies>
+        <!--jakarta.annotation-->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+
+        <!--第三方依赖👆  项目自身依赖👇-->
+        <!--对spring的封装starter-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--对concurrent的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-concurrent-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--对分布式锁的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-distributed-lock-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--对event事件的封装-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-event-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--基础领域模块-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-domain</artifactId>
+        </dependency>
+
+        <!--元数据管理   工具-->
+        <dependency>
+            <groupId>top.mingempty</groupId>
+            <artifactId>mingempty-meta-data-commons</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <!-- deploy 时忽略此model -->
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    </build>
+
+</project>

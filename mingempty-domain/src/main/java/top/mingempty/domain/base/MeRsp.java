@@ -43,7 +43,7 @@ public class MeRsp<T> extends BaseHeaderModel {
     /**
      * 私有化构造器
      */
-    private MeRsp() {
+    protected MeRsp() {
     }
 
 

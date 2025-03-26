@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.repository.mapper.ExtraFieldMapper">
+    <insert id="transferChange">
+        insert into t_meta_data_extra_field(
+        extra_field_id
+        , entry_code
+        , extra_field_name
+        , extra_field_code
+        , type_is_number
+        , other_dict_flag
+        , other_entry_code
+        , extra_field_sort
+        , create_time
+        , update_time
+        , create_operator
+        , update_operator)
+        SELECT base.extra_field_id
+        , base.entry_code
+        , base.extra_field_name
+        , base.extra_field_code
+        , base.type_is_number
+        , base.other_dict_flag
+        , base.other_entry_code
+        , base.extra_field_sort
+        , base.create_time
+        , base.update_time
+        , base.create_operator
+        , base.update_operator
+        from t_meta_data_change_extra_field base
+        <where>
+            <include refid="top.mingempty.meta.data.repository.mapper.ChangeExtraFieldMapper.base-query-param"/>
+            <include refid="top.mingempty.meta.data.repository.mapper.ChangeExtraFieldMapper.max-query"/>
+        </where>
+        on duplicate key update
+        extra_field_id=values(extra_field_id)
+        , extra_field_name=values(extra_field_name)
+        , type_is_number=values(type_is_number)
+        , other_dict_flag=values(other_dict_flag)
+        , other_entry_code=values(other_entry_code)
+        , extra_field_sort=values(extra_field_sort)
+        , update_time=values(update_time)
+        , update_operator=values(update_operator)
+    </insert>
+    <select id="queryCount" resultType="java.lang.Long">
+        select count(extra_field_id)
+        from t_meta_data_extra_field base
+        <where>
+            <include refid="top.mingempty.meta.data.repository.mapper.ChangeExtraFieldMapper.base-query-param"/>
+        </where>
+    </select>
+
+    <select id="query" resultType="top.mingempty.meta.data.repository.model.po.ExtraFieldPo">
+        select base.*
+        from t_meta_data_extra_field base
+        <where>
+            <include refid="top.mingempty.meta.data.repository.mapper.ChangeExtraFieldMapper.base-query-param"/>
+        </where>
+        order by base.entry_code,base.extra_field_sort
+        <include refid="top.mingempty.BaseMapper.limit"/>
+    </select>
+</mapper>

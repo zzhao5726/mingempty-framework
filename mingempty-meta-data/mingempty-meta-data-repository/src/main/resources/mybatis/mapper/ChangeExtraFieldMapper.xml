@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.repository.mapper.ChangeExtraFieldMapper">
+    <sql id="base-select-column">
+        <choose>
+            <when test="extraFieldQuery.selectColumns != null and !extraFieldQuery.selectColumns.isEmpty() ">
+                <foreach collection="extraFieldQuery.selectColumns" item="selectColumn" separator=",">
+                    base.${selectColumn}
+                </foreach>
+            </when>
+            <otherwise>
+                base.*
+            </otherwise>
+        </choose>
+    </sql>
+    <sql id="base-query-param">
+        <if test="extraFieldQuery.entryCode != null">
+            and base.entry_code = #{extraFieldQuery.entryCode}
+        </if>
+        <if test="extraFieldQuery.entryCodeLike != null">
+            and base.entry_code like concat('%', #{extraFieldQuery.entryCodeLike}, '%')
+        </if>
+        <if test="extraFieldQuery.entryCodes != null  and !extraFieldQuery.entryCodes.isEmpty() ">
+            and base.entry_code IN
+            <foreach collection="extraFieldQuery.entryCodes" item="entryCode" open="(" separator="," close=")">
+                #{entryCode}
+            </foreach>
+        </if>
+        <if test="extraFieldQuery.extraFieldName != null">
+            and base.extra_field_name = #{extraFieldQuery.extraFieldName}
+        </if>
+        <if test="extraFieldQuery.extraFieldNameLike != null">
+            and base.extra_field_name like concat('%', #{extraFieldNameLike}, '%')
+        </if>
+        <if test="extraFieldQuery.extraFieldCode != null">
+            and base.extra_field_code = #{extraFieldQuery.extraFieldCode}
+        </if>
+        <if test="extraFieldQuery.extraFieldCodes != null  and !extraFieldQuery.extraFieldCodes.isEmpty() ">
+            and base.extra_field_code IN
+            <foreach collection="extraFieldQuery.extraFieldCodes" item="extraFieldCode" open="(" separator=","
+                     close=")">
+                #{extraFieldCode}
+            </foreach>
+        </if>
+        <if test="extraFieldQuery.typeIsNumber != null">
+            and base.type_is_number = #{extraFieldQuery.typeIsNumber}
+        </if>
+        <if test="extraFieldQuery.otherDictFlag != null">
+            and base.other_dict_flag = #{extraFieldQuery.otherDictFlag}
+        </if>
+        <if test="extraFieldQuery.otherEntryCode != null">
+            and base.other_entry_code = #{extraFieldQuery.otherEntryCode}
+        </if>
+    </sql>
+
+    <sql id="max-query">
+        and exists(select 1
+        from (SELECT maxbase.entry_code
+        , maxbase.extra_field_code
+        , max(maxbase.entry_version) as entry_version
+        FROM t_meta_data_change_extra_field maxbase
+        <where>
+            <if test="extraFieldQuery.entryCode != null">
+                and maxbase.entry_code = #{extraFieldQuery.entryCode}
+            </if>
+            <if test="extraFieldQuery.entryCodeLike != null">
+                and maxbase.entry_code like concat('%', #{extraFieldQuery.entryCodeLike}, '%')
+            </if>
+            <if test="extraFieldQuery.entryCodes != null  and !extraFieldQuery.entryCodes.isEmpty() ">
+                and maxbase.entry_code IN
+                <foreach collection="extraFieldQuery.entryCodes" item="entryCode" open="(" separator="," close=")">
+                    #{entryCode}
+                </foreach>
+            </if>
+            <if test="extraFieldQuery.entryVersion != null ">
+                and maxbase.entry_version &lt;= #{extraFieldQuery.entryVersion}
+            </if>
+        </where>
+        group by maxbase.entry_code,maxbase.extra_field_code) maxversion
+        where base.entry_code = maxversion.entry_code
+        and base.extra_field_code=maxversion.extra_field_code
+        and base.entry_version = maxversion.entry_version)
+    </sql>
+
+    <select id="queryCount" resultType="java.lang.Long">
+        select count(extra_field_id)
+        from t_meta_data_change_extra_field base
+        <where>
+            <include refid="base-query-param"/>
+            <include refid="max-query"/>
+        </where>
+    </select>
+
+    <select id="query" resultType="top.mingempty.meta.data.repository.model.po.ChangeExtraFieldPo">
+        select base.*
+        from t_meta_data_change_extra_field base
+        <where>
+            <include refid="base-query-param"/>
+            <include refid="max-query"/>
+        </where>
+        order by base.entry_code,base.extra_field_sort
+        <include refid="top.mingempty.BaseMapper.limit"/>
+    </select>
+</mapper>

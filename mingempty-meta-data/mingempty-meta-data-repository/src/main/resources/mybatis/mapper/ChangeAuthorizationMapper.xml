@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.repository.mapper.ChangeAuthorizationMapper">
+    <sql id="base-select-column">
+        <choose>
+            <when test="authorizationQuery.selectColumns != null and !authorizationQuery.selectColumns.isEmpty() ">
+                <foreach collection="authorizationQuery.selectColumns" item="selectColumn" separator=",">
+                    base.${selectColumn}
+                </foreach>
+            </when>
+            <otherwise>
+                base.*
+            </otherwise>
+        </choose>
+    </sql>
+    <sql id="base-query-param">
+        <if test="authorizationQuery.entryCode != null">
+            and base.entry_code = #{authorizationQuery.entryCode}
+        </if>
+        <if test="authorizationQuery.entryCodeLike != null">
+            and base.entry_code like concat('%', #{authorizationQuery.entryCodeLike}, '%')
+        </if>
+        <if test="authorizationQuery.entryCodes != null  and !authorizationQuery.entryCodes.isEmpty() ">
+            and base.entry_code IN
+            <foreach collection="authorizationQuery.entryCodes" item="entryCode" open="(" separator="," close=")">
+                #{entryCode}
+            </foreach>
+        </if>
+        <if test="authorizationQuery.authorizationType != null">
+            and base.authorization_type= #{authorizationQuery.authorizationType}
+        </if>
+        <if test="authorizationQuery.authorizationCode != null">
+            and base.authorization_code = #{authorizationQuery.authorizationCode}
+        </if>
+        <if test="authorizationQuery.authorizationCodes != null  and !authorizationQuery.authorizationCodes.isEmpty() ">
+            and base.authorization_code IN
+            <foreach collection="authorizationQuery.authorizationCodes" item="authorizationCode" open="(" separator=","
+                     close=")">
+                #{authorizationCode}
+            </foreach>
+        </if>
+    </sql>
+    <sql id="base-change-query-param">
+        <include refid="base-query-param"/>
+        <if test="authorizationQuery.deleteStatus != null">
+            and base.delete_status = #{authorizationQuery.deleteStatus}
+        </if>
+        <if test="authorizationQuery.deleteTime != null">
+            and base.delete_time = #{authorizationQuery.deleteTime}
+        </if>
+        <if test="authorizationQuery.deleteOperator != null">
+            and base.delete_operator = #{authorizationQuery.deleteOperator}
+        </if>
+    </sql>
+
+    <sql id="max-query">
+        <if test="authorizationQuery.entryVersion != null">
+            and exists(select 1
+            from (SELECT maxbase.entry_code
+            , maxbase.authorization_type
+            , maxbase.authorization_code
+            , max(maxbase.entry_version) as entry_version
+            FROM t_meta_data_change_authorization maxbase
+            <where>
+                <if test="authorizationQuery.entryCode != null">
+                    and maxbase.entry_code = #{authorizationQuery.entryCode}
+                </if>
+                <if test="authorizationQuery.entryCodeLike != null">
+                    and maxbase.entry_code like concat('%', #{authorizationQuery.entryCodeLike}, '%')
+                </if>
+                <if test="authorizationQuery.entryCodes != null  and !authorizationQuery.entryCodes.isEmpty() ">
+                    and maxbase.entry_code IN
+                    <foreach collection="authorizationQuery.entryCodes" item="entryCode" open="(" separator=","
+                             close=")">
+                        #{entryCode}
+                    </foreach>
+                </if>
+                <if test="authorizationQuery.entryVersion != null ">
+                    and maxbase.entry_version &lt;= #{authorizationQuery.entryVersion}
+                </if>
+            </where>
+            group by maxbase.entry_code,maxbase.authorization_type,maxbase.authorization_code) maxversion
+            where base.entry_code = maxversion.entry_code
+            and base.authorization_type=maxversion.authorization_type
+            and base.authorization_code=maxversion.authorization_code
+            and base.entry_version = maxversion.entry_version)
+        </if>
+    </sql>
+
+    <select id="queryCount" resultType="java.lang.Long">
+        select count(authorization_id)
+        from t_meta_data_change_authorization base
+        <where>
+            <include refid="base-change-query-param"/>
+            <include refid="max-query"/>
+            and base.delete_status = 0
+        </where>
+    </select>
+
+    <select id="query" resultType="top.mingempty.meta.data.repository.model.po.ChangeAuthorizationPo">
+        select base.*
+        from t_meta_data_change_authorization base
+        <where>
+            <include refid="base-change-query-param"/>
+            <include refid="max-query"/>
+            and base.delete_status = 0
+        </where>
+        order by base.entry_code,base.authorization_type,base.authorization_code
+        <include refid="top.mingempty.BaseMapper.limit"/>
+    </select>
+</mapper>

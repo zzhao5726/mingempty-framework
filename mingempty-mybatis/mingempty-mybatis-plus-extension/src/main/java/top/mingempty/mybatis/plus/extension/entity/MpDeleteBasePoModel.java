@@ -37,9 +37,9 @@ public abstract class MpDeleteBasePoModel extends MpBasePoModel implements BaseD
     private LocalDateTime deleteTime;
 
     /**
-     * 删除人
+     * 删除用户
      */
-    @Schema(description = "删除人")
+    @Schema(description = "删除用户")
     @TableField(value = "delete_operator" )
     private String deleteOperator;
 }
