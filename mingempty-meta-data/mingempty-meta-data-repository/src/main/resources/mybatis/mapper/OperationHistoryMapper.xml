@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.mingempty.meta.data.repository.mapper.OperationHistoryMapper">
+
+    <select id="gainMaxVersion" resultType="java.lang.Long">
+        select ifnull(max(entry_version), 0)
+        from t_meta_data_operation_history
+        where entry_code = #{entryCode}
+    </select>
+</mapper>

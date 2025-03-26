@@ -1,0 +1,34 @@
+me:
+  name: meta-data-service
+  group: mingempty
+  version: 1.0.0
+  timestamp: ${current.time}
+  base-path: /meta-data
+  logging:
+    config-name: meta-data.xml
+
+spring:
+  cloud:
+    nacos:
+      server-addr: nacos.mingempty.top:8848
+      username: mingempty
+      password: mingempty
+      config:
+        namespace: 9d0a606f-63ca-4aef-8a97-2832b140f114
+        group: DEFAULT_GROUP
+      discovery:
+        namespace: 9d0a606f-63ca-4aef-8a97-2832b140f114
+        group: DEFAULT_GROUP
+  config:
+    import:
+      - optional:nacos:meta-data.yaml
+
+logging:
+  config: classpath:logback-me.xml
+
+
+mybatis-flex:
+  mapper-locations: classpath*:/mybatis/mapper/**/*.xml
+
+server:
+  port: 8081

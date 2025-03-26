@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 彩色日志 -->
+    <!-- 彩色日志依赖的渲染类 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wex"
+                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx"
+                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+
+    <define name="hostAddress" class="top.mingempty.commons.definer.IPLogDefiner"/>
+    <springProperty scope="context" name="appName" source="me.name"/>
+    <springProperty scope="context" name="port" source="server.port"/>
+
+    <!--彩色日志格式以及包名输出缩进对齐-->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%X{mingempty-trace-id}]){magenta} %clr([%X{mingempty-trace-span-id}]){magenta}  %clr([${LOG_LEVEL_PATTERN:-%5p}]) %clr(${PID:- }){magenta} %clr(-){faint} %clr([%t]){faint} %clr(%logger){cyan} %clr(:){magenta} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+
+    <property name="FILE_LOG_PATTERN"
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] -%X{mingempty-trace-id} -%X{mingempty-trace-span-id} -${hostAddress} -${port} -${appName} -${PID:-} -[%-5level] -[%thread] -%logger -%-3L - %msg%n"/>
+
+
+    <contextName>fanxlxs</contextName>
+
+    <!--文件夹在当前项目磁盘根目录-->
+    <property name="LOG_PATH" value="/apps/logs"/>
+    <!--设置系统日志目录-->
+    <property name="APPDIR" value="/meta-data"/>
+
+    <!--  日志记录器，日期滚动记录
+            ERROR 级别
+     -->
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文件的路径及文件名 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名，日期必须加，如果单天需要生成多个日志，则需要添加%i-->
+            <FileNamePattern>${LOG_PATH}/${APPDIR}/%d{yyyy-MM-dd}/error-%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <!--            &lt;!&ndash;历史日志文件保留天数，不包含当日日志，且需结合cleanHistoryOnStart字段使用&ndash;&gt;
+                        &lt;!&ndash;可以按“文件数量、小时、天、月、年”等策略实现文件保留 &ndash;&gt;
+                        <MaxHistory>3</MaxHistory>
+                        <cleanHistoryOnStart>true</cleanHistoryOnStart>-->
+            <!-- 单天单个日志最大size -->
+            <maxFileSize>10MB</maxFileSize>
+            <!--     &lt;!&ndash;仅针对当天的日志进行总size控制,日志名中的“i”保留最后数值 &ndash;&gt;
+                 <totalSizeCap>10MB</totalSizeCap>-->
+        </rollingPolicy>
+        <!-- 追加方式记录日志 -->
+        <append>true</append>
+        <!-- 日志文件的格式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+        <!-- 此日志文件记录error级别的 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>error</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+
+    <!-- 日志记录器，日期滚动记录
+            WARN  级别
+     -->
+    <appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文件的路径及文件名 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名，日期必须加，如果单天需要生成多个日志，则需要添加%i-->
+            <FileNamePattern>${LOG_PATH}/${APPDIR}/%d{yyyy-MM-dd}/warn-%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <!--            &lt;!&ndash;历史日志文件保留天数，不包含当日日志，且需结合cleanHistoryOnStart字段使用&ndash;&gt;
+                        &lt;!&ndash;可以按“文件数量、小时、天、月、年”等策略实现文件保留 &ndash;&gt;
+                        <MaxHistory>3</MaxHistory>
+                        <cleanHistoryOnStart>true</cleanHistoryOnStart>-->
+            <!-- 单天单个日志最大size -->
+            <maxFileSize>10MB</maxFileSize>
+            <!--     &lt;!&ndash;仅针对当天的日志进行总size控制,日志名中的“i”保留最后数值 &ndash;&gt;
+                 <totalSizeCap>10MB</totalSizeCap>-->
+        </rollingPolicy>
+        <!-- 追加方式记录日志 -->
+        <append>true</append>
+        <!-- 日志文件的格式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+        <!-- 此日志文件只记录warn级别的 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>warn</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+
+    <!-- 日志记录器，日期滚动记录
+            INFO  级别
+    -->
+    <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文件的路径及文件名 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名，日期必须加，如果单天需要生成多个日志，则需要添加%i-->
+            <FileNamePattern>${LOG_PATH}/${APPDIR}/%d{yyyy-MM-dd}/info-%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <!--            &lt;!&ndash;历史日志文件保留天数，不包含当日日志，且需结合cleanHistoryOnStart字段使用&ndash;&gt;
+                        &lt;!&ndash;可以按“文件数量、小时、天、月、年”等策略实现文件保留 &ndash;&gt;
+                        <MaxHistory>3</MaxHistory>
+                        <cleanHistoryOnStart>true</cleanHistoryOnStart>-->
+            <!-- 单天单个日志最大size -->
+            <maxFileSize>10MB</maxFileSize>
+            <!--     &lt;!&ndash;仅针对当天的日志进行总size控制,日志名中的“i”保留最后数值 &ndash;&gt;
+                 <totalSizeCap>10MB</totalSizeCap>-->
+        </rollingPolicy>
+        <!-- 追加方式记录日志 -->
+        <append>true</append>
+        <!-- 日志文件的格式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+        <!-- 此日志文件只记录info级别的 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>info</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+
+    <!-- 日志记录器，日期滚动记录
+            DEBUG  级别
+    -->
+    <appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文件的路径及文件名 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名，日期必须加，如果单天需要生成多个日志，则需要添加%i-->
+            <FileNamePattern>${LOG_PATH}/${APPDIR}/%d{yyyy-MM-dd}/debug-%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <!--            &lt;!&ndash;历史日志文件保留天数，不包含当日日志，且需结合cleanHistoryOnStart字段使用&ndash;&gt;
+                        &lt;!&ndash;可以按“文件数量、小时、天、月、年”等策略实现文件保留 &ndash;&gt;
+                        <MaxHistory>3</MaxHistory>
+                        <cleanHistoryOnStart>true</cleanHistoryOnStart>-->
+            <!-- 单天单个日志最大size -->
+            <maxFileSize>10MB</maxFileSize>
+            <!--     &lt;!&ndash;仅针对当天的日志进行总size控制,日志名中的“i”保留最后数值 &ndash;&gt;
+                 <totalSizeCap>10MB</totalSizeCap>-->
+        </rollingPolicy>
+        <append>true</append>
+        <!-- 日志文件的格式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+        <!-- 此日志文件只记录debug级别的 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>debug</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- ConsoleAppender 控制台输出日志 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!--encoder 默认配置为PatternLayoutEncoder-->
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+        <!--此日志appender是为开发使用，只配置最底级别，控制台输出的日志级别是大于或等于此级别的日志信息-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>debug</level>
+        </filter>
+    </appender>
+
+    <!--    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">-->
+    <!--        <destination>192.168.0.100:21068</destination>-->
+    <!--        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">-->
+    <!--            <timestamp>-->
+    <!--                <timeZone>Asia/Shanghai</timeZone>-->
+    <!--            </timestamp>-->
+    <!--            <providers>-->
+    <!--                <pattern>-->
+    <!--                    <pattern>-->
+    <!--                        {-->
+    <!--                        "index":"mingempty-top-%d{yyyy-MM-dd}",-->
+    <!--                        "appName":"${appName}",-->
+    <!--                        "pid": "${PID:-}",-->
+    <!--                        "port":"${port}",-->
+    <!--                        "host":"${hostAddress}",-->
+    <!--                        "timestamp":"%d{yyyy-MM-dd HH:mm:ss.SSS}",-->
+    <!--                        "parentTraceid":"%X{mingempty-trace-id}",-->
+    <!--                        "traceid":"%X{mingempty-trace-span-id}",-->
+    <!--                        "thread":"%thread",-->
+    <!--                        "level":"%level",-->
+    <!--                        "class": "%logger",-->
+    <!--                        "line": "%L",-->
+    <!--                        "message": "%message",-->
+    <!--                        "stack_trace":"%exception"-->
+    <!--                        }-->
+    <!--                    </pattern>-->
+    <!--                </pattern>-->
+    <!--            </providers>-->
+    <!--        </encoder>-->
+    <!--        <keepAliveDuration>5 minutes</keepAliveDuration>-->
+    <!--    </appender>-->
+
+    将日志文件输出到Logstash
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!-- 获取logstash地址作为输出的目的地 -->
+        <destination>192.168.0.100:21068</destination>
+        <encoder chatset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <!-- FrameworkServlet日志-->
+    <logger name="org.springframework" level="WARN"/>
+
+    <!-- nacos日志-->
+    <logger name="com.alibaba.nacos" level="WARN"/>
+
+    <!-- 链路信息日志-->
+    <logger name="top.mingempty.trace" level="WARN"/>
+
+    <!-- zookeeper日志-->
+    <logger name="org.apache.zookeeper" level="WARN"/>
+
+    <!-- 生产环境下，将此级别配置为适合的级别，以免日志文件太多或影响程序性能 -->
+    <root level="INFO">
+        <!--        <appender-ref ref="ERROR"/>-->
+        <!--        <appender-ref ref="WARN"/>-->
+        <!--        <appender-ref ref="INFO"/>-->
+        <!--        <appender-ref ref="DEBUG"/>-->
+        <!--        <appender-ref ref="LOGSTASH"/>-->
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+
+</configuration>
