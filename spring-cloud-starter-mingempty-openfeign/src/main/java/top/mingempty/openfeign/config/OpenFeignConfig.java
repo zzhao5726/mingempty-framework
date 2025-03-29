@@ -4,8 +4,11 @@ import feign.RequestInterceptor;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import top.mingempty.commons.trace.constants.TraceConstant;
+import top.mingempty.commons.trace.enums.ProtocolEnum;
+import top.mingempty.commons.trace.enums.SpanTypeEnum;
 import top.mingempty.domain.enums.YesOrNoEnum;
 import top.mingempty.domain.other.GlobalConstant;
+import top.mingempty.trace.util.TraceAdapterUtil;
 import top.mingempty.trace.util.TraceIdGenerator;
 
 /**
@@ -30,6 +33,14 @@ public class OpenFeignConfig {
         return requestTemplate -> {
 
             // 设置链路ID
+            if (!TraceAdapterUtil.initialized()) {
+                //进行初始化
+                TraceAdapterUtil.initTraceContext(
+                        "feign#" + requestTemplate.path(),
+                        TraceIdGenerator.generateTraceId(), TraceIdGenerator.generateSpanId(),
+                        ProtocolEnum.RPC, SpanTypeEnum.NORMAL, null);
+            }
+
             requestTemplate.header(TraceConstant.TRACE_ID, TraceIdGenerator.generateTraceId());
             requestTemplate.header(TraceConstant.SPAN_ID, TraceIdGenerator.generateSpanId());
 
